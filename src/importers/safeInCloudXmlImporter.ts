@@ -12,7 +12,7 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 export class SafeInCloudXmlImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const doc = this.parseXml(data)
     if (doc == null) {
@@ -41,10 +41,7 @@ export class SafeInCloudXmlImporter extends BaseImporter implements Importer {
     })
 
     Array.from(doc.querySelectorAll('database > card')).forEach(cardEl => {
-      if (
-        cardEl.getAttribute('template') === 'true' ||
-        cardEl.getAttribute('deleted') === 'true'
-      ) {
+      if (cardEl.getAttribute('template') === 'true' || cardEl.getAttribute('deleted') === 'true') {
         return
       }
 
@@ -52,10 +49,7 @@ export class SafeInCloudXmlImporter extends BaseImporter implements Importer {
       if (labelIdEl != null) {
         const labelId = labelIdEl.textContent
         if (!this.isNullOrWhitespace(labelId) && foldersMap.has(labelId)) {
-          result.folderRelationships.push([
-            result.ciphers.length,
-            foldersMap.get(labelId)
-          ])
+          result.folderRelationships.push([result.ciphers.length, foldersMap.get(labelId)])
         }
       }
 
@@ -72,40 +66,33 @@ export class SafeInCloudXmlImporter extends BaseImporter implements Importer {
         cipher.secureNote = new SecureNoteView()
         cipher.secureNote.type = SecureNoteType.Generic
       } else {
-        Array.from(this.querySelectorAllDirectChild(cardEl, 'field')).forEach(
-          fieldEl => {
-            const text = fieldEl.textContent
-            if (this.isNullOrWhitespace(text)) {
-              return
-            }
-            const name = fieldEl.getAttribute('name')
-            const fieldType = this.getValueOrDefault(
-              fieldEl.getAttribute('type'),
-              ''
-            ).toLowerCase()
-            if (fieldType === 'login') {
-              cipher.login.username = text
-            } else if (fieldType === 'password' || fieldType === 'secret') {
-              // safeInCloud allows for more than one password. we just insert them here and find the one used as password later
-              this.processKvp(cipher, name, text, FieldType.Hidden)
-            } else if (fieldType === 'one_time_password') {
-              cipher.login.totp = text
-            } else if (fieldType === 'notes') {
-              cipher.notes += text + '\n'
-            } else if (fieldType === 'weblogin' || fieldType === 'website') {
-              cipher.login.uris = this.makeUriArray(text)
-            } else {
-              this.processKvp(cipher, name, text)
-            }
+        Array.from(this.querySelectorAllDirectChild(cardEl, 'field')).forEach(fieldEl => {
+          const text = fieldEl.textContent
+          if (this.isNullOrWhitespace(text)) {
+            return
           }
-        )
+          const name = fieldEl.getAttribute('name')
+          const fieldType = this.getValueOrDefault(fieldEl.getAttribute('type'), '').toLowerCase()
+          if (fieldType === 'login') {
+            cipher.login.username = text
+          } else if (fieldType === 'password' || fieldType === 'secret') {
+            // safeInCloud allows for more than one password. we just insert them here and find the one used as password later
+            this.processKvp(cipher, name, text, FieldType.Hidden)
+          } else if (fieldType === 'one_time_password') {
+            cipher.login.totp = text
+          } else if (fieldType === 'notes') {
+            cipher.notes += text + '\n'
+          } else if (fieldType === 'weblogin' || fieldType === 'website') {
+            cipher.login.uris = this.makeUriArray(text)
+          } else {
+            this.processKvp(cipher, name, text)
+          }
+        })
       }
 
-      Array.from(this.querySelectorAllDirectChild(cardEl, 'notes')).forEach(
-        notesEl => {
-          cipher.notes += notesEl.textContent + '\n'
-        }
-      )
+      Array.from(this.querySelectorAllDirectChild(cardEl, 'notes')).forEach(notesEl => {
+        cipher.notes += notesEl.textContent + '\n'
+      })
 
       this.setPassword(cipher)
       this.cleanupCipher(cipher)
@@ -122,10 +109,8 @@ export class SafeInCloudXmlImporter extends BaseImporter implements Importer {
 
   // Choose a password from all passwords. Take one that has password in its name, or the first one if there is no such entry
   // if its name is password, we can safely remove it form the fields. otherwise, it would maybe be best to keep it as a hidden field
-  setPassword (cipher: CipherView) {
-    const candidates = cipher.fields.filter(
-      field => field.type === FieldType.Hidden
-    )
+  setPassword(cipher: CipherView) {
+    const candidates = cipher.fields.filter(field => field.type === FieldType.Hidden)
     if (!candidates.length) {
       return
     }

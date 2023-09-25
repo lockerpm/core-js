@@ -16,7 +16,7 @@ export class Attachment extends Domain {
   key: EncString
   fileName: EncString
 
-  constructor (obj?: AttachmentData, alreadyEncrypted: boolean = false) {
+  constructor(obj?: AttachmentData, alreadyEncrypted: boolean = false) {
     super()
     if (obj == null) {
       return
@@ -31,21 +31,18 @@ export class Attachment extends Domain {
         url: null,
         sizeName: null,
         fileName: null,
-        key: null
+        key: null,
       },
       alreadyEncrypted,
       ['id', 'url', 'sizeName']
     )
   }
 
-  async decrypt (
-    orgId: string,
-    encKey?: SymmetricCryptoKey
-  ): Promise<AttachmentView> {
+  async decrypt(orgId: string, encKey?: SymmetricCryptoKey): Promise<AttachmentView> {
     const view = await this.decryptObj(
       new AttachmentView(this),
       {
-        fileName: null
+        fileName: null,
       },
       orgId,
       encKey
@@ -62,10 +59,7 @@ export class Attachment extends Domain {
 
       try {
         const orgKey = await cryptoService.getOrgKey(orgId)
-        const decValue = await cryptoService.decryptToBytes(
-          this.key,
-          orgKey ?? encKey
-        )
+        const decValue = await cryptoService.decryptToBytes(this.key, orgKey ?? encKey)
         view.key = new SymmetricCryptoKey(decValue)
       } catch (e) {
         // TODO: error?
@@ -75,7 +69,7 @@ export class Attachment extends Domain {
     return view
   }
 
-  toAttachmentData (): AttachmentData {
+  toAttachmentData(): AttachmentData {
     const a = new AttachmentData()
     a.size = this.size
     this.buildDataModel(
@@ -86,7 +80,7 @@ export class Attachment extends Domain {
         url: null,
         sizeName: null,
         fileName: null,
-        key: null
+        key: null,
       },
       ['id', 'url', 'sizeName']
     )

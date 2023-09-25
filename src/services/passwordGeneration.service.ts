@@ -29,28 +29,27 @@ const DefaultOptions = {
   numWords: 3,
   wordSeparator: '-',
   capitalize: false,
-  includeNumber: false
+  includeNumber: false,
 }
 
 const Keys = {
   options: 'passwordGenerationOptions',
-  history: 'generatedPasswordHistory'
+  history: 'generatedPasswordHistory',
 }
 
 const MaxPasswordsInHistory = 100
 
-export class PasswordGenerationService
-implements PasswordGenerationServiceAbstraction {
+export class PasswordGenerationService implements PasswordGenerationServiceAbstraction {
   private optionsCache: any
   private history: GeneratedPasswordHistory[]
 
-  constructor (
+  constructor(
     private cryptoService: CryptoService,
     private storageService: StorageService,
     private policyService: PolicyService
   ) {}
 
-  async generatePassword (options: any): Promise<string> {
+  async generatePassword(options: any): Promise<string> {
     // overload defaults with given options
     const o = Object.assign({}, DefaultOptions, options)
 
@@ -61,8 +60,7 @@ implements PasswordGenerationServiceAbstraction {
     // sanitize
     this.sanitizePasswordLength(o, true)
 
-    const minLength: number =
-      o.minUppercase + o.minLowercase + o.minNumber + o.minSpecial
+    const minLength: number = o.minUppercase + o.minLowercase + o.minNumber + o.minSpecial
     if (o.length < minLength) {
       o.length = minLength
     }
@@ -150,27 +148,20 @@ implements PasswordGenerationServiceAbstraction {
         break
       }
 
-      const randomCharIndex = await this.cryptoService.randomNumber(
-        0,
-        positionChars.length - 1
-      )
+      const randomCharIndex = await this.cryptoService.randomNumber(0, positionChars.length - 1)
       password += positionChars.charAt(randomCharIndex)
     }
 
     return password
   }
 
-  async generatePassphrase (options: any): Promise<string> {
+  async generatePassphrase(options: any): Promise<string> {
     const o = Object.assign({}, DefaultOptions, options)
 
     if (o.numWords == null || o.numWords <= 2) {
       o.numWords = DefaultOptions.numWords
     }
-    if (
-      o.wordSeparator == null ||
-      o.wordSeparator.length === 0 ||
-      o.wordSeparator.length > 1
-    ) {
+    if (o.wordSeparator == null || o.wordSeparator.length === 0 || o.wordSeparator.length > 1) {
       o.wordSeparator = ' '
     }
     if (o.capitalize == null) {
@@ -197,7 +188,7 @@ implements PasswordGenerationServiceAbstraction {
     return wordList.join(o.wordSeparator)
   }
 
-  async getOptions (): Promise<[any, PasswordGeneratorPolicyOptions]> {
+  async getOptions(): Promise<[any, PasswordGeneratorPolicyOptions]> {
     if (this.optionsCache == null) {
       const options = await this.storageService.get(Keys.options)
       if (options == null) {
@@ -206,13 +197,12 @@ implements PasswordGenerationServiceAbstraction {
         this.optionsCache = Object.assign({}, DefaultOptions, options)
       }
     }
-    const enforcedOptions =
-      await this.enforcePasswordGeneratorPoliciesOnOptions(this.optionsCache)
+    const enforcedOptions = await this.enforcePasswordGeneratorPoliciesOnOptions(this.optionsCache)
     this.optionsCache = enforcedOptions[0]
     return [this.optionsCache, enforcedOptions[1]]
   }
 
-  async enforcePasswordGeneratorPoliciesOnOptions (
+  async enforcePasswordGeneratorPoliciesOnOptions(
     options: any
   ): Promise<[any, PasswordGeneratorPolicyOptions]> {
     let enforcedPolicyOptions = await this.getPasswordGeneratorPolicyOptions()
@@ -276,7 +266,7 @@ implements PasswordGenerationServiceAbstraction {
     return [options, enforcedPolicyOptions]
   }
 
-  async getPasswordGeneratorPolicyOptions (): Promise<PasswordGeneratorPolicyOptions> {
+  async getPasswordGeneratorPolicyOptions(): Promise<PasswordGeneratorPolicyOptions> {
     const policies: Policy[] =
       this.policyService == null
         ? null
@@ -297,10 +287,7 @@ implements PasswordGenerationServiceAbstraction {
       }
 
       // Password wins in multi-org collisions
-      if (
-        currentPolicy.data.defaultType != null &&
-        enforcedOptions.defaultType !== 'password'
-      ) {
+      if (currentPolicy.data.defaultType != null && enforcedOptions.defaultType !== 'password') {
         enforcedOptions.defaultType = currentPolicy.data.defaultType
       }
 
@@ -360,28 +347,26 @@ implements PasswordGenerationServiceAbstraction {
     return enforcedOptions
   }
 
-  async saveOptions (options: any) {
+  async saveOptions(options: any) {
     await this.storageService.save(Keys.options, options)
     this.optionsCache = options
   }
 
-  async getHistory (): Promise<GeneratedPasswordHistory[]> {
+  async getHistory(): Promise<GeneratedPasswordHistory[]> {
     const hasKey = await this.cryptoService.hasKey()
     if (!hasKey) {
       return new Array<GeneratedPasswordHistory>()
     }
 
     if (!this.history) {
-      const encrypted = await this.storageService.get<
-        GeneratedPasswordHistory[]
-      >(Keys.history)
+      const encrypted = await this.storageService.get<GeneratedPasswordHistory[]>(Keys.history)
       this.history = await this.decryptHistory(encrypted)
     }
 
     return this.history || new Array<GeneratedPasswordHistory>()
   }
 
-  async addHistory (password: string): Promise<any> {
+  async addHistory(password: string): Promise<any> {
     // Cannot add new history if no key is available
     const hasKey = await this.cryptoService.hasKey()
     if (!hasKey) {
@@ -406,15 +391,12 @@ implements PasswordGenerationServiceAbstraction {
     return await this.storageService.save(Keys.history, newHistory)
   }
 
-  async clear (): Promise<any> {
+  async clear(): Promise<any> {
     this.history = []
     return await this.storageService.remove(Keys.history)
   }
 
-  passwordStrength (
-    password: string,
-    userInputs: string[] = null
-  ): zxcvbn.ZXCVBNResult {
+  passwordStrength(password: string, userInputs: string[] = null): zxcvbn.ZXCVBNResult {
     if (password == null || password.length === 0) {
       return null
     }
@@ -428,10 +410,7 @@ implements PasswordGenerationServiceAbstraction {
     return result
   }
 
-  normalizeOptions (
-    options: any,
-    enforcedPolicyOptions: PasswordGeneratorPolicyOptions
-  ) {
+  normalizeOptions(options: any, enforcedPolicyOptions: PasswordGeneratorPolicyOptions) {
     options.minLowercase = 0
     options.minUppercase = 0
 
@@ -490,11 +469,11 @@ implements PasswordGenerationServiceAbstraction {
     this.sanitizePasswordLength(options, false)
   }
 
-  private capitalize (str: string) {
+  private capitalize(str: string) {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
 
-  private async appendRandomNumberToRandomWord (wordList: string[]) {
+  private async appendRandomNumberToRandomWord(wordList: string[]) {
     if (wordList == null || wordList.length <= 0) {
       return
     }
@@ -503,7 +482,7 @@ implements PasswordGenerationServiceAbstraction {
     wordList[index] = wordList[index] + num
   }
 
-  private async encryptHistory (
+  private async encryptHistory(
     history: GeneratedPasswordHistory[]
   ): Promise<GeneratedPasswordHistory[]> {
     if (history == null || history.length === 0) {
@@ -518,7 +497,7 @@ implements PasswordGenerationServiceAbstraction {
     return await Promise.all(promises)
   }
 
-  private async decryptHistory (
+  private async decryptHistory(
     history: GeneratedPasswordHistory[]
   ): Promise<GeneratedPasswordHistory[]> {
     if (history == null || history.length === 0) {
@@ -526,19 +505,14 @@ implements PasswordGenerationServiceAbstraction {
     }
 
     const promises = history.map(async item => {
-      const decrypted = await this.cryptoService.decryptToUtf8(
-        new EncString(item.password)
-      )
+      const decrypted = await this.cryptoService.decryptToUtf8(new EncString(item.password))
       return new GeneratedPasswordHistory(decrypted, item.date)
     })
 
     return await Promise.all(promises)
   }
 
-  private matchesPrevious (
-    password: string,
-    history: GeneratedPasswordHistory[]
-  ): boolean {
+  private matchesPrevious(password: string, history: GeneratedPasswordHistory[]): boolean {
     if (history == null || history.length === 0) {
       return false
     }
@@ -547,14 +521,14 @@ implements PasswordGenerationServiceAbstraction {
   }
 
   // ref: https://stackoverflow.com/a/12646864/1090359
-  private async shuffleArray (array: string[]) {
+  private async shuffleArray(array: string[]) {
     for (let i = array.length - 1; i > 0; i--) {
-      const j = await this.cryptoService.randomNumber(0, i)
-      ;[array[i], array[j]] = [array[j], array[i]]
+      const j = await this.cryptoService.randomNumber(0, i);
+      [array[i], array[j]] = [array[j], array[i]]
     }
   }
 
-  private sanitizePasswordLength (options: any, forGeneration: boolean) {
+  private sanitizePasswordLength(options: any, forGeneration: boolean) {
     let minUppercaseCalc = 0
     let minLowercaseCalc = 0
     let minNumberCalc: number = options.minNumber
@@ -589,8 +563,7 @@ implements PasswordGenerationServiceAbstraction {
       options.length = 10
     }
 
-    const minLength: number =
-      minUppercaseCalc + minLowercaseCalc + minNumberCalc + minSpecialCalc
+    const minLength: number = minUppercaseCalc + minLowercaseCalc + minNumberCalc + minSpecialCalc
     // Normalize and Generation both require this modification
     if (options.length < minLength) {
       options.length = minLength

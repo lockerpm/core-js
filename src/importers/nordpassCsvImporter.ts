@@ -9,29 +9,29 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 type nodePassCsvParsed = {
-  name: string
-  url: string
-  username: string
-  password: string
-  note: string
-  cardholdername: string
-  cardnumber: string
-  cvc: string
-  expirydate: string
-  zipcode: string
-  folder: string
-  full_name: string
-  phone_number: string
-  email: string
-  address1: string
-  address2: string
-  city: string
-  country: string
-  state: string
-}
+  name: string;
+  url: string;
+  username: string;
+  password: string;
+  note: string;
+  cardholdername: string;
+  cardnumber: string;
+  cvc: string;
+  expirydate: string;
+  zipcode: string;
+  folder: string;
+  full_name: string;
+  phone_number: string;
+  email: string;
+  address1: string;
+  address2: string;
+  city: string;
+  country: string;
+  state: string;
+};
 
 export class NordPassCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results: nodePassCsvParsed[] = this.parseCsv(data, true)
     if (results == null) {
@@ -67,9 +67,7 @@ export class NordPassCsvImporter extends BaseImporter implements Importer {
         break
       case CipherType.Card:
         cipher.type = CipherType.Card
-        cipher.card.cardholderName = this.getValueOrDefault(
-          record.cardholdername
-        )
+        cipher.card.cardholderName = this.getValueOrDefault(record.cardholdername)
         cipher.card.number = this.getValueOrDefault(record.cardnumber)
         cipher.card.code = this.getValueOrDefault(record.cvc)
         cipher.card.brand = this.getCardBrand(cipher.card.number)
@@ -130,7 +128,7 @@ export class NordPassCsvImporter extends BaseImporter implements Importer {
     return Promise.resolve(result)
   }
 
-  private evaluateType (record: nodePassCsvParsed): CipherType {
+  private evaluateType(record: nodePassCsvParsed): CipherType {
     if (!this.isNullOrWhitespace(record.username)) {
       return CipherType.Login
     }
@@ -150,7 +148,7 @@ export class NordPassCsvImporter extends BaseImporter implements Importer {
     return undefined
   }
 
-  private processName (cipher: CipherView, fullName: string) {
+  private processName(cipher: CipherView, fullName: string) {
     if (this.isNullOrWhitespace(fullName)) {
       return
     }

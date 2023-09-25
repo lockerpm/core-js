@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class AscendoCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, false)
     if (results == null) {
@@ -29,10 +29,7 @@ export class AscendoCsvImporter extends BaseImporter implements Importer {
           }
 
           const fieldLower = field.toLowerCase()
-          if (
-            cipher.login.password == null &&
-            this.passwordFieldNames.includes(fieldLower)
-          ) {
+          if (cipher.login.password == null && this.passwordFieldNames.includes(fieldLower)) {
             cipher.login.password = this.getValueOrDefault(val)
           } else if (
             cipher.login.username == null &&

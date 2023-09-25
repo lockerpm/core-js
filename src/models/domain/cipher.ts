@@ -7,7 +7,7 @@ import {
   Identity,
   Login,
   SecureNote,
-  SymmetricCryptoKey
+  SymmetricCryptoKey,
 } from '../../../src/models/domain'
 // import { CipherType } from '../../enums/cipherType'
 import { CipherRepromptType } from '../../../src/enums/cipherRepromptType'
@@ -41,11 +41,7 @@ export class Cipher extends Domain {
   deletedDate: Date
   reprompt: CipherRepromptType
 
-  constructor (
-    obj?: CipherData,
-    alreadyEncrypted: boolean = false,
-    localData: any = null
-  ) {
+  constructor(obj?: CipherData, alreadyEncrypted: boolean = false, localData: any = null) {
     super()
     if (obj == null) {
       return
@@ -60,7 +56,7 @@ export class Cipher extends Domain {
         organizationId: null,
         folderId: null,
         name: null,
-        notes: null
+        notes: null,
       },
       alreadyEncrypted,
       ['id', 'userId', 'organizationId', 'folderId']
@@ -75,14 +71,11 @@ export class Cipher extends Domain {
     } else {
       this.viewPassword = true // Default for already synced Ciphers without viewPassword
     }
-    this.creationDate =
-      obj.creationDate != null ? new Date(obj.creationDate) : null
-    this.revisionDate =
-      obj.revisionDate != null ? new Date(obj.revisionDate) : null
+    this.creationDate = obj.creationDate != null ? new Date(obj.creationDate) : null
+    this.revisionDate = obj.revisionDate != null ? new Date(obj.revisionDate) : null
     this.collectionIds = obj.collectionIds
     this.localData = localData
-    this.deletedDate =
-      obj.deletedDate != null ? new Date(obj.deletedDate) : null
+    this.deletedDate = obj.deletedDate != null ? new Date(obj.deletedDate) : null
     this.reprompt = obj.reprompt
 
     switch (this.type) {
@@ -107,9 +100,7 @@ export class Cipher extends Domain {
     }
 
     if (obj.attachments != null) {
-      this.attachments = obj.attachments.map(
-        a => new Attachment(a, alreadyEncrypted)
-      )
+      this.attachments = obj.attachments.map(a => new Attachment(a, alreadyEncrypted))
     } else {
       this.attachments = null
     }
@@ -121,15 +112,13 @@ export class Cipher extends Domain {
     }
 
     if (obj.passwordHistory != null) {
-      this.passwordHistory = obj.passwordHistory.map(
-        ph => new Password(ph, alreadyEncrypted)
-      )
+      this.passwordHistory = obj.passwordHistory.map(ph => new Password(ph, alreadyEncrypted))
     } else {
       this.passwordHistory = null
     }
   }
 
-  async decrypt (encKey?: SymmetricCryptoKey): Promise<CipherView> {
+  async decrypt(encKey?: SymmetricCryptoKey): Promise<CipherView> {
     // @ts-ignore
     const model = new CipherView(this)
 
@@ -137,7 +126,7 @@ export class Cipher extends Domain {
       model,
       {
         name: null,
-        notes: null
+        notes: null,
       },
       this.organizationId,
       encKey
@@ -149,19 +138,13 @@ export class Cipher extends Domain {
       model.login = await this.login.decrypt(this.organizationId, encKey)
       break
     case CipherType.SecureNote:
-      model.secureNote = await this.secureNote.decrypt(
-        this.organizationId,
-        encKey
-      )
+      model.secureNote = await this.secureNote.decrypt(this.organizationId, encKey)
       break
     case CipherType.Card:
       model.card = await this.card.decrypt(this.organizationId, encKey)
       break
     case CipherType.Identity:
-      model.identity = await this.identity.decrypt(
-        this.organizationId,
-        encKey
-      )
+      model.identity = await this.identity.decrypt(this.organizationId, encKey)
       break
     default:
       break
@@ -214,7 +197,7 @@ export class Cipher extends Domain {
     return model
   }
 
-  toCipherData (userId: string): CipherData {
+  toCipherData(userId: string): CipherData {
     const c = new CipherData()
     c.id = this.id
     c.organizationId = this.organizationId
@@ -224,17 +207,15 @@ export class Cipher extends Domain {
     c.viewPassword = this.viewPassword
     c.organizationUseTotp = this.organizationUseTotp
     c.favorite = this.favorite
-    c.revisionDate =
-      this.revisionDate != null ? this.revisionDate.toISOString() : null
+    c.revisionDate = this.revisionDate != null ? this.revisionDate.toISOString() : null
     c.type = this.type
     c.collectionIds = this.collectionIds
-    c.deletedDate =
-      this.deletedDate != null ? this.deletedDate.toISOString() : null
+    c.deletedDate = this.deletedDate != null ? this.deletedDate.toISOString() : null
     c.reprompt = this.reprompt
 
     this.buildDataModel(this, c, {
       name: null,
-      notes: null
+      notes: null,
     })
 
     switch (c.type) {
@@ -264,9 +245,7 @@ export class Cipher extends Domain {
       c.attachments = this.attachments.map(a => a.toAttachmentData())
     }
     if (this.passwordHistory != null) {
-      c.passwordHistory = this.passwordHistory.map(ph =>
-        ph.toPasswordHistoryData()
-      )
+      c.passwordHistory = this.passwordHistory.map(ph => ph.toPasswordHistoryData())
     }
     return c
   }

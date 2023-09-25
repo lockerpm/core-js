@@ -11,12 +11,10 @@ export abstract class CollectionService {
   clearCache: () => void
   encrypt: (model: CollectionView) => Promise<Collection>
   decryptMany: (collections: Collection[]) => Promise<CollectionView[]>
-  get: (id: string) => Promise<Collection>
+  get: (id: string) => Promise<Collection>;
   getAll: () => Promise<Collection[]>
   getAllDecrypted: () => Promise<CollectionView[]>
-  getAllNested: (
-    collections?: CollectionView[]
-  ) => Promise<TreeNode<CollectionView>[]>
+  getAllNested: (collections?: CollectionView[]) => Promise<TreeNode<CollectionView>[]>
 
   getNested: (id: string) => Promise<TreeNode<CollectionView>>
   upsert: (collection: CollectionData | CollectionData[]) => Promise<any>

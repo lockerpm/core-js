@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class PassmanJsonImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = JSON.parse(data)
     if (results == null || results.length === 0) {

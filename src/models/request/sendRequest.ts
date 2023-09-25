@@ -13,14 +13,12 @@ export class SendRequest {
   cipher: CipherRequest
   emails: string[]
 
-  constructor (send: Send) {
+  constructor(send: Send) {
     this.key = send?.key?.encryptedString || null
     this.password = send.password
     this.max_access_count = send.maxAccessCount || null
     this.each_email_access_count = send.eachEmailAccessCount || null
-    this.expiration_date = send.expirationDate
-      ? send.expirationDate.getTime() / 1000
-      : null
+    this.expiration_date = send.expirationDate ? send.expirationDate.getTime() / 1000 : null
     this.require_otp = send.requireOtp
     this.cipher_id = send.cipherId
     this.cipher = new CipherRequest(send.cipher)

@@ -7,7 +7,7 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 export class EncryptrCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -26,7 +26,7 @@ export class EncryptrCsvImporter extends BaseImporter implements Importer {
       'Card Number',
       'CVV',
       'Expiry',
-      'Entry Type'
+      'Entry Type',
     ]
 
     results.forEach(value => {
@@ -50,9 +50,7 @@ export class EncryptrCsvImporter extends BaseImporter implements Importer {
       } else if (type === 'Credit Card') {
         cipher.type = CipherType.Card
         cipher.card = new CardView()
-        cipher.card.cardholderName = this.getValueOrDefault(
-          value['Name on card']
-        )
+        cipher.card.cardholderName = this.getValueOrDefault(value['Name on card'])
         cipher.card.number = this.getValueOrDefault(value['Card Number'])
         cipher.card.brand = this.getCardBrand(cipher.card.number)
         cipher.card.code = this.getValueOrDefault(value.CVV)
@@ -61,9 +59,7 @@ export class EncryptrCsvImporter extends BaseImporter implements Importer {
           const expParts = expiry.split('/')
           if (expParts.length > 1) {
             cipher.card.expMonth = parseInt(expParts[0], null).toString()
-            cipher.card.expYear = (
-              2000 + parseInt(expParts[1], null)
-            ).toString()
+            cipher.card.expYear = (2000 + parseInt(expParts[1], null)).toString()
           }
         }
       }

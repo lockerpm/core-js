@@ -5,7 +5,7 @@ import { FolderService } from '../../src/abstractions/folder.service'
 import { I18nService } from '../../src/abstractions/i18n.service'
 import {
   ImportOption,
-  ImportService as ImportServiceAbstraction
+  ImportService as ImportServiceAbstraction,
 } from '../../src/abstractions/import.service'
 import { PlatformUtilsService } from '../../src/abstractions/platformUtils.service'
 
@@ -97,7 +97,7 @@ export class ImportService implements ImportServiceAbstraction {
     { id: 'keepass2xml', name: 'KeePass 2 (xml)' },
     { id: '1password1pif', name: '1Password (1pif)' },
     { id: 'dashlanecsv', name: 'Dashlane (csv)' },
-    { id: 'dashlanejson', name: 'Dashlane (json)' }
+    { id: 'dashlanejson', name: 'Dashlane (json)' },
   ]
 
   regularImportOptions: ImportOption[] = [
@@ -148,11 +148,11 @@ export class ImportService implements ImportServiceAbstraction {
     { id: 'encryptrcsv', name: 'Encryptr (csv)' },
     { id: 'yoticsv', name: 'Yoti (csv)' },
     { id: 'nordpasscsv', name: 'Nordpass (csv)' },
-    { id: 'heylogincsv', name: 'HeyLogin (csv)' }
+    { id: 'heylogincsv', name: 'HeyLogin (csv)' },
   ]
 
   // eslint-disable-next-line no-useless-constructor
-  constructor (
+  constructor(
     private cipherService: CipherService,
     private folderService: FolderService,
     private apiService: ApiService,
@@ -161,21 +161,18 @@ export class ImportService implements ImportServiceAbstraction {
     private platformUtilsService: PlatformUtilsService
   ) {}
 
-  getImportOptions (): ImportOption[] {
+  getImportOptions(): ImportOption[] {
     return this.featuredImportOptions.concat(this.regularImportOptions)
   }
 
-  async import (
+  async import(
     importer: Importer,
     fileContents: string,
     organizationId: string = null
   ): Promise<Error> {
     const importResult = await importer.parse(fileContents)
     if (importResult.success) {
-      if (
-        importResult.folders.length === 0 &&
-        importResult.ciphers.length === 0
-      ) {
+      if (importResult.folders.length === 0 && importResult.ciphers.length === 0) {
         return new Error(this.i18nService.t('importNothingError'))
       } else if (importResult.ciphers.length > 0) {
         const halfway = Math.floor(importResult.ciphers.length / 2)
@@ -201,7 +198,7 @@ export class ImportService implements ImportServiceAbstraction {
     }
   }
 
-  getImporter (format: string, organizationId: string = null): Importer {
+  getImporter(format: string, organizationId: string = null): Importer {
     const importer = this.getImporterInstance(format)
     if (importer == null) {
       return null
@@ -210,7 +207,7 @@ export class ImportService implements ImportServiceAbstraction {
     return importer
   }
 
-  private getImporterInstance (format: string) {
+  private getImporterInstance(format: string) {
     if (format == null || format === '') {
       return null
     }
@@ -338,10 +335,7 @@ export class ImportService implements ImportServiceAbstraction {
     }
   }
 
-  private async postImport (
-    importResult: ImportResult,
-    organizationId: string = null
-  ) {
+  private async postImport(importResult: ImportResult, organizationId: string = null) {
     if (organizationId == null) {
       const request = new ImportCiphersRequest()
       for (let i = 0; i < importResult.ciphers.length; i++) {
@@ -370,9 +364,7 @@ export class ImportService implements ImportServiceAbstraction {
       if (importResult.collections != null) {
         for (let i = 0; i < importResult.collections.length; i++) {
           importResult.collections[i].organizationId = organizationId
-          const c = await this.collectionService.encrypt(
-            importResult.collections[i]
-          )
+          const c = await this.collectionService.encrypt(importResult.collections[i])
           request.collections.push(new CollectionRequest(c))
         }
       }
@@ -381,14 +373,11 @@ export class ImportService implements ImportServiceAbstraction {
           request.collectionRelationships.push(new KvpRequest(r[0], r[1]))
         )
       }
-      return await this.apiService.postImportOrganizationCiphers(
-        organizationId,
-        request
-      )
+      return await this.apiService.postImportOrganizationCiphers(organizationId, request)
     }
   }
 
-  private badData (c: CipherView) {
+  private badData(c: CipherView) {
     return (
       (c.name == null || c.name === '--') &&
       c.type === CipherType.Login &&
@@ -397,50 +386,45 @@ export class ImportService implements ImportServiceAbstraction {
     )
   }
 
-  private handleServerError (
-    errorResponse: ErrorResponse,
-    importResult: ImportResult
-  ): Error {
+  private handleServerError(errorResponse: ErrorResponse, importResult: ImportResult): Error {
     if (errorResponse.validationErrors == null) {
       return new Error(errorResponse.message)
     }
 
     let errorMessage = ''
 
-    Object.entries(errorResponse.validationErrors).forEach(
-      ([key, value], index) => {
-        let item
-        let itemType
-        const i = Number(key.match(/[0-9]+/)[0])
+    Object.entries(errorResponse.validationErrors).forEach(([key, value], index) => {
+      let item
+      let itemType
+      const i = Number(key.match(/[0-9]+/)[0])
 
-        switch (key.match(/^\w+/)[0]) {
-        case 'Ciphers':
-          item = importResult.ciphers[i]
-          itemType = CipherType[item.type]
-          break
-        case 'Folders':
-          item = importResult.folders[i]
-          itemType = 'Folder'
-          break
-        case 'Collections':
-          item = importResult.collections[i]
-          itemType = 'Collection'
-          break
-        default:
-          return
-        }
-
-        if (index > 0) {
-          errorMessage += '\n\n'
-        }
-
-        if (itemType !== 'Folder' && itemType !== 'Collection') {
-          errorMessage += '[' + (i + 1) + '] '
-        }
-
-        errorMessage += '[' + itemType + '] "' + item.name + '": ' + value
+      switch (key.match(/^\w+/)[0]) {
+      case 'Ciphers':
+        item = importResult.ciphers[i]
+        itemType = CipherType[item.type]
+        break
+      case 'Folders':
+        item = importResult.folders[i]
+        itemType = 'Folder'
+        break
+      case 'Collections':
+        item = importResult.collections[i]
+        itemType = 'Collection'
+        break
+      default:
+        return
       }
-    )
+
+      if (index > 0) {
+        errorMessage += '\n\n'
+      }
+
+      if (itemType !== 'Folder' && itemType !== 'Collection') {
+        errorMessage += '[' + (i + 1) + '] '
+      }
+
+      errorMessage += '[' + itemType + '] "' + item.name + '": ' + value
+    })
 
     return new Error(errorMessage)
   }

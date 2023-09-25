@@ -60,7 +60,7 @@ export abstract class BaseImporter {
     'reg #',
 
     // Non-English names
-    'passwort'
+    'passwort',
   ]
 
   protected usernameFieldNames = [
@@ -91,7 +91,7 @@ export abstract class BaseImporter {
 
     // Non-English names
     'nom',
-    'benutzername'
+    'benutzername',
   ]
 
   protected notesFieldNames = [
@@ -108,7 +108,7 @@ export abstract class BaseImporter {
     'free',
 
     // Non-English names
-    'kommentar'
+    'kommentar',
   ]
 
   protected uriFieldNames: string[] = [
@@ -132,46 +132,40 @@ export abstract class BaseImporter {
 
     // Non-English names
     'ort',
-    'adresse'
+    'adresse',
   ]
 
   protected parseCsvOptions = {
     encoding: 'UTF-8',
-    skipEmptyLines: false
+    skipEmptyLines: false,
   }
 
-  protected get organization () {
+  protected get organization() {
     return this.organizationId != null
   }
 
-  protected parseXml (data: string): Document {
+  protected parseXml(data: string): Document {
     const parser = new DOMParser()
     const doc = parser.parseFromString(data, 'application/xml')
     return doc != null && doc.querySelector('parsererror') == null ? doc : null
   }
 
-  protected parseCsv (data: string, header: boolean, options: any = {}): any[] {
-    const parseOptions = Object.assign(
-      { header },
-      this.parseCsvOptions,
-      options
-    )
+  protected parseCsv(data: string, header: boolean, options: any = {}): any[] {
+    const parseOptions = Object.assign({ header }, this.parseCsvOptions, options)
     data = this.splitNewLine(data).join('\n').trim()
     const result = papa.parse(data, parseOptions)
     if (result.errors != null && result.errors.length > 0) {
       result.errors.forEach(e => {
         if (e.row != null) {
           // tslint:disable-next-line
-          this.logService.warning(
-            'Error parsing row ' + e.row + ': ' + e.message
-          )
+          this.logService.warning('Error parsing row ' + e.row + ': ' + e.message)
         }
       })
     }
     return result.data && result.data.length > 0 ? result.data : null
   }
 
-  protected parseSingleRowCsv (rowData: string) {
+  protected parseSingleRowCsv(rowData: string) {
     if (this.isNullOrWhitespace(rowData)) {
       return null
     }
@@ -182,7 +176,7 @@ export abstract class BaseImporter {
     return null
   }
 
-  protected makeUriArray (uri: string | string[]): LoginUriView[] {
+  protected makeUriArray(uri: string | string[]): LoginUriView[] {
     if (uri == null) {
       return null
     }
@@ -214,7 +208,7 @@ export abstract class BaseImporter {
     return null
   }
 
-  protected fixUri (uri: string) {
+  protected fixUri(uri: string) {
     if (uri == null) {
       return null
     }
@@ -228,7 +222,7 @@ export abstract class BaseImporter {
     return uri
   }
 
-  protected nameFromUrl (url: string) {
+  protected nameFromUrl(url: string) {
     const hostname = Utils.getHostname(url)
     if (this.isNullOrWhitespace(hostname)) {
       return null
@@ -236,26 +230,23 @@ export abstract class BaseImporter {
     return hostname.startsWith('www.') ? hostname.replace('www.', '') : hostname
   }
 
-  protected isNullOrWhitespace (str: string): boolean {
+  protected isNullOrWhitespace(str: string): boolean {
     return Utils.isNullOrWhitespace(str)
   }
 
-  protected getValueOrDefault (
-    str: string,
-    defaultValue: string = null
-  ): string {
+  protected getValueOrDefault(str: string, defaultValue: string = null): string {
     if (this.isNullOrWhitespace(str)) {
       return defaultValue
     }
     return str
   }
 
-  protected splitNewLine (str: string): string[] {
+  protected splitNewLine(str: string): string[] {
     return str.split(this.newLineRegex)
   }
 
   // ref https://stackoverflow.com/a/5911300
-  protected getCardBrand (cardNum: string) {
+  protected getCardBrand(cardNum: string) {
     if (this.isNullOrWhitespace(cardNum)) {
       return null
     }
@@ -317,7 +308,7 @@ export abstract class BaseImporter {
     return null
   }
 
-  protected setCardExpiration (cipher: CipherView, expiration: string): boolean {
+  protected setCardExpiration(cipher: CipherView, expiration: string): boolean {
     if (!this.isNullOrWhitespace(expiration)) {
       expiration = expiration.replace(/\s/g, '')
       const parts = expiration.split('/')
@@ -343,10 +334,8 @@ export abstract class BaseImporter {
     return false
   }
 
-  protected moveFoldersToCollections (result: ImportResult) {
-    result.folderRelationships.forEach(r =>
-      result.collectionRelationships.push(r)
-    )
+  protected moveFoldersToCollections(result: ImportResult) {
+    result.folderRelationships.forEach(r => result.collectionRelationships.push(r))
     result.collections = result.folders.map(f => {
       const collection = new CollectionView()
       collection.name = f.name
@@ -356,18 +345,16 @@ export abstract class BaseImporter {
     result.folders = []
   }
 
-  protected querySelectorDirectChild (parentEl: Element, query: string) {
+  protected querySelectorDirectChild(parentEl: Element, query: string) {
     const els = this.querySelectorAllDirectChild(parentEl, query)
     return els.length === 0 ? null : els[0]
   }
 
-  protected querySelectorAllDirectChild (parentEl: Element, query: string) {
-    return Array.from(parentEl.querySelectorAll(query)).filter(
-      el => el.parentNode === parentEl
-    )
+  protected querySelectorAllDirectChild(parentEl: Element, query: string) {
+    return Array.from(parentEl.querySelectorAll(query)).filter(el => el.parentNode === parentEl)
   }
 
-  protected initLoginCipher () {
+  protected initLoginCipher() {
     const cipher = new CipherView()
     cipher.favorite = false
     cipher.notes = ''
@@ -377,7 +364,7 @@ export abstract class BaseImporter {
     return cipher
   }
 
-  protected cleanupCipher (cipher: CipherView) {
+  protected cleanupCipher(cipher: CipherView) {
     if (cipher == null) {
       return
     }
@@ -397,7 +384,7 @@ export abstract class BaseImporter {
     }
   }
 
-  protected processKvp (
+  protected processKvp(
     cipher: CipherView,
     key: string,
     value: string,
@@ -430,9 +417,7 @@ export abstract class BaseImporter {
       if (type === 7 || type === 8) {
         try {
           const val = parseInt(value)
-          field.value = moment(val).format(
-            type === 8 ? 'MM/YYYY' : 'DD/MM/YYYY'
-          )
+          field.value = moment(val).format(type === 8 ? 'MM/YYYY' : 'DD/MM/YYYY')
         } catch (error) {}
       }
 
@@ -440,7 +425,7 @@ export abstract class BaseImporter {
     }
   }
 
-  protected processFolder (result: ImportResult, folderName: string) {
+  protected processFolder(result: ImportResult, folderName: string) {
     let folderIndex = result.folders.length
     const hasFolder = !this.isNullOrWhitespace(folderName)
     let addFolder = hasFolder
@@ -465,7 +450,7 @@ export abstract class BaseImporter {
     }
   }
 
-  protected convertToNoteIfNeeded (cipher: CipherView) {
+  protected convertToNoteIfNeeded(cipher: CipherView) {
     if (
       cipher.type === CipherType.Login &&
       this.isNullOrWhitespace(cipher.login.username) &&

@@ -8,7 +8,7 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 export class PasswordBossJsonImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = JSON.parse(data)
     if (results == null || results.items == null) {
@@ -34,10 +34,7 @@ export class PasswordBossJsonImporter extends BaseImporter implements Importer {
       cipher.login.uris = this.makeUriArray(value.login_url)
 
       if (value.folder != null && foldersIndexMap.has(value.folder)) {
-        result.folderRelationships.push([
-          result.ciphers.length,
-          foldersIndexMap.get(value.folder)
-        ])
+        result.folderRelationships.push([result.ciphers.length, foldersIndexMap.get(value.folder)])
       }
 
       if (value.identifiers == null) {
@@ -45,11 +42,7 @@ export class PasswordBossJsonImporter extends BaseImporter implements Importer {
       }
 
       if (!this.isNullOrWhitespace(value.identifiers.notes)) {
-        cipher.notes = value.identifiers.notes
-          .split('\\r\\n')
-          .join('\n')
-          .split('\\n')
-          .join('\n')
+        cipher.notes = value.identifiers.notes.split('\\r\\n').join('\n').split('\\n').join('\n')
       }
 
       if (value.type === 'CreditCard') {

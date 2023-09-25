@@ -2,19 +2,11 @@ import { Importer } from '../importer'
 
 import { CipherType } from '../../../src/enums/cipherType'
 import { CardView, CipherView, IdentityView } from '../../../src/models/view'
-import {
-  IgnoredProperties,
-  OnePasswordCsvImporter
-} from './onepasswordCsvImporter'
+import { IgnoredProperties, OnePasswordCsvImporter } from './onepasswordCsvImporter'
 
-export class OnePasswordMacCsvImporter
-  extends OnePasswordCsvImporter
-  implements Importer {
-  setCipherType (value: any, cipher: CipherView) {
-    const onePassType = this.getValueOrDefault(
-      this.getProp(value, 'type'),
-      'Login'
-    )
+export class OnePasswordMacCsvImporter extends OnePasswordCsvImporter implements Importer {
+  setCipherType(value: any, cipher: CipherView) {
+    const onePassType = this.getValueOrDefault(this.getProp(value, 'type'), 'Login')
     switch (onePassType) {
     case 'Credit Card':
       cipher.type = CipherType.Card

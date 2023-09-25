@@ -6,7 +6,7 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 export class AvastJsonImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = JSON.parse(data)
     if (results == null) {
@@ -69,7 +69,7 @@ export class AvastJsonImporter extends BaseImporter implements Importer {
         'holderName',
         'cardNumber',
         'cvv',
-        'expirationDate'
+        'expirationDate',
       ]
 
       results.cards.forEach((value: any) => {

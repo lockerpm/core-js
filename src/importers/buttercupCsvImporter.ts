@@ -2,18 +2,10 @@ import { ImportResult } from '../../src/models/domain/importResult'
 import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
-const OfficialProps = [
-  '!group_id',
-  '!group_name',
-  'title',
-  'username',
-  'password',
-  'URL',
-  'id'
-]
+const OfficialProps = ['!group_id', '!group_name', 'title', 'username', 'password', 'URL', 'id']
 
 export class ButtercupCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {

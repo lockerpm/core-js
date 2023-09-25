@@ -8,18 +8,14 @@ export class AttachmentUploadDataResponse extends BaseResponse {
   cipherResponse: CipherResponse | null
   cipherMiniResponse: CipherResponse | null
   url: string
-  constructor (response: any) {
+  constructor(response: any) {
     super(response)
     this.attachmentId = this.getResponseProperty('AttachmentId')
     this.fileUploadType = this.getResponseProperty('FileUploadType')
     const cipherResponse = this.getResponseProperty('CipherResponse')
     const cipherMiniResponse = this.getResponseProperty('CipherMiniResponse')
-    this.cipherResponse = cipherResponse
-      ? new CipherResponse(cipherResponse)
-      : null
-    this.cipherMiniResponse = cipherMiniResponse
-      ? new CipherResponse(cipherMiniResponse)
-      : null
+    this.cipherResponse = cipherResponse ? new CipherResponse(cipherResponse) : null
+    this.cipherMiniResponse = cipherMiniResponse ? new CipherResponse(cipherMiniResponse) : null
     this.url = this.getResponseProperty('Url')
   }
 }

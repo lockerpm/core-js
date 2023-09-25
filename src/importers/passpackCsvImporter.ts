@@ -4,7 +4,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class PasspackCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -13,9 +13,7 @@ export class PasspackCsvImporter extends BaseImporter implements Importer {
     }
 
     results.forEach(value => {
-      const tagsJson = !this.isNullOrWhitespace(value.Tags)
-        ? JSON.parse(value.Tags)
-        : null
+      const tagsJson = !this.isNullOrWhitespace(value.Tags) ? JSON.parse(value.Tags) : null
       const tags: string[] =
         tagsJson != null && tagsJson.tags != null && tagsJson.tags.length > 0
           ? tagsJson.tags
@@ -48,10 +46,7 @@ export class PasspackCsvImporter extends BaseImporter implements Importer {
             result.collections.push(collection)
           }
 
-          result.collectionRelationships.push([
-            result.ciphers.length,
-            collectionIndex
-          ])
+          result.collectionRelationships.push([result.ciphers.length, collectionIndex])
         })
       } else if (!this.organization && tags != null && tags.length > 0) {
         this.processFolder(result, tags[0])
@@ -59,8 +54,7 @@ export class PasspackCsvImporter extends BaseImporter implements Importer {
 
       const cipher = this.initLoginCipher()
       cipher.notes = this.getValueOrDefault(value.Notes, '')
-      cipher.notes +=
-        '\n\n' + this.getValueOrDefault(value['Shared Notes'], '') + '\n'
+      cipher.notes += '\n\n' + this.getValueOrDefault(value['Shared Notes'], '') + '\n'
       cipher.name = this.getValueOrDefault(value['Entry Name'], '--')
       cipher.login.username = this.getValueOrDefault(value['User ID'])
       cipher.login.password = this.getValueOrDefault(value.Password)
@@ -78,9 +72,7 @@ export class PasspackCsvImporter extends BaseImporter implements Importer {
         ? JSON.parse(value['Extra Fields'])
         : null
       const fields =
-        fieldsJson != null &&
-        fieldsJson.extraFields != null &&
-        fieldsJson.extraFields.length > 0
+        fieldsJson != null && fieldsJson.extraFields != null && fieldsJson.extraFields.length > 0
           ? fieldsJson.extraFields.map((fieldJson: string) => {
             try {
               return JSON.parse(fieldJson)

@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class ClipperzHtmlImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const doc = this.parseXml(data)
     if (doc == null) {
@@ -36,8 +36,7 @@ export class ClipperzHtmlImporter extends BaseImporter implements Importer {
           }
 
           const field = entry.currentVersion.fields[property]
-          const actionType =
-            field.actionType != null ? field.actionType.toLowerCase() : null
+          const actionType = field.actionType != null ? field.actionType.toLowerCase() : null
           switch (actionType) {
           case 'password':
             cipher.login.password = this.getValueOrDefault(field.value)
@@ -52,12 +51,8 @@ export class ClipperzHtmlImporter extends BaseImporter implements Importer {
             cipher.login.uris = this.makeUriArray(field.value)
             break
           default:
-            const labelLower =
-                field.label != null ? field.label.toLowerCase() : null
-            if (
-              cipher.login.password == null &&
-                this.passwordFieldNames.includes(labelLower)
-            ) {
+            const labelLower = field.label != null ? field.label.toLowerCase() : null
+            if (cipher.login.password == null && this.passwordFieldNames.includes(labelLower)) {
               cipher.login.password = this.getValueOrDefault(field.value)
             } else if (
               cipher.login.username == null &&

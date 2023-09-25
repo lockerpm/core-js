@@ -18,7 +18,7 @@ export class SendResponse extends BaseResponse {
   cipher: CipherResponse
   emails: string[]
 
-  constructor (response: any) {
+  constructor(response: any) {
     super(response)
     this.id = this.getResponseProperty('Id')
     this.accessId = this.getResponseProperty('AccessId')

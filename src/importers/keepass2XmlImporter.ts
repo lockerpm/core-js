@@ -9,7 +9,7 @@ import { BaseImporter } from './baseImporter'
 export class KeePass2XmlImporter extends BaseImporter implements Importer {
   result = new ImportResult()
 
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const doc = this.parseXml(data)
     if (doc == null) {
       this.result.success = false
@@ -33,7 +33,7 @@ export class KeePass2XmlImporter extends BaseImporter implements Importer {
     return Promise.resolve(this.result)
   }
 
-  traverse (node: Element, isRootNode: boolean, groupPrefixName: string) {
+  traverse(node: Element, isRootNode: boolean, groupPrefixName: string) {
     const folderIndex = this.result.folders.length
     let groupName = groupPrefixName
 

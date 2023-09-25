@@ -8,7 +8,7 @@ export class CollectionData {
   readOnly: boolean
   revisionDate: string
 
-  constructor (response: CollectionDetailsResponse) {
+  constructor(response: CollectionDetailsResponse) {
     this.id = response.id
     this.organizationId = response.organizationId
     this.name = response.name

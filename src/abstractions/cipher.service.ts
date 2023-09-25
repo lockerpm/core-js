@@ -19,23 +19,14 @@ export abstract class CipherService {
     originalCipher?: Cipher
   ) => Promise<Cipher>
 
-  encryptFields: (
-    fieldsModel: FieldView[],
-    key: SymmetricCryptoKey
-  ) => Promise<Field[]>
+  encryptFields: (fieldsModel: FieldView[], key: SymmetricCryptoKey) => Promise<Field[]>
 
-  encryptField: (
-    fieldModel: FieldView,
-    key: SymmetricCryptoKey
-  ) => Promise<Field>
+  encryptField: (fieldModel: FieldView, key: SymmetricCryptoKey) => Promise<Field>
 
-  get: (id: string) => Promise<Cipher>
+  get: (id: string) => Promise<Cipher>;
   getAll: () => Promise<Cipher[]>
   getAllDecrypted: () => Promise<CipherView[]>
-  getAllDecryptedForGrouping: (
-    groupingId: string,
-    folder?: boolean
-  ) => Promise<CipherView[]>
+  getAllDecryptedForGrouping: (groupingId: string, folder?: boolean) => Promise<CipherView[]>
 
   getAllDecryptedForUrl: (
     url: string,
@@ -59,10 +50,7 @@ export abstract class CipherService {
   deleteWithServer: (id: string) => Promise<any>
   deleteManyWithServer: (ids: string[]) => Promise<any>
   deleteAttachment: (id: string, attachmentId: string) => Promise<void>
-  deleteAttachmentWithServer: (
-    id: string,
-    attachmentId: string
-  ) => Promise<void>
+  deleteAttachmentWithServer: (id: string, attachmentId: string) => Promise<void>
 
   sortCiphersByLastUsed: (a: any, b: any) => number
   sortCiphersByLastUsedThenName: (a: any, b: any) => number
@@ -71,9 +59,7 @@ export abstract class CipherService {
   softDeleteWithServer: (id: string) => Promise<any>
   softDeleteManyWithServer: (ids: string[]) => Promise<any>
   restore: (
-    cipher:
-      | { id: string; revisionDate: string }
-      | { id: string; revisionDate: string }[]
+    cipher: { id: string; revisionDate: string } | { id: string; revisionDate: string }[]
   ) => Promise<any>
 
   restoreWithServer: (id: string) => Promise<any>

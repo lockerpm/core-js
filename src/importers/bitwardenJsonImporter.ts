@@ -10,14 +10,10 @@ export class BitwardenJsonImporter extends BaseImporter implements Importer {
   private results: any
   private result: ImportResult
 
-  async parse (data: string): Promise<ImportResult> {
+  async parse(data: string): Promise<ImportResult> {
     this.result = new ImportResult()
     this.results = JSON.parse(data)
-    if (
-      this.results == null ||
-      this.results.items == null ||
-      this.results.items.length === 0
-    ) {
+    if (this.results == null || this.results.items == null || this.results.items.length === 0) {
       this.result.success = false
       return this.result
     }
@@ -32,7 +28,7 @@ export class BitwardenJsonImporter extends BaseImporter implements Importer {
     return this.result
   }
 
-  private async parseEncrypted () {
+  private async parseEncrypted() {
     const groupingsMap = new Map<string, number>()
 
     if (this.organization && this.results.collections != null) {
@@ -71,21 +67,17 @@ export class BitwardenJsonImporter extends BaseImporter implements Importer {
         cipher.passwordHistory = cipher.passwordHistory.slice(0, 5)
       }
 
-      if (
-        !this.organization &&
-        c.folderId != null &&
-        groupingsMap.has(c.folderId)
-      ) {
+      if (!this.organization && c.folderId != null && groupingsMap.has(c.folderId)) {
         this.result.folderRelationships.push([
           this.result.ciphers.length,
-          groupingsMap.get(c.folderId)
+          groupingsMap.get(c.folderId),
         ])
       } else if (this.organization && c.collectionIds != null) {
         c.collectionIds.forEach(cId => {
           if (groupingsMap.has(cId)) {
             this.result.collectionRelationships.push([
               this.result.ciphers.length,
-              groupingsMap.get(cId)
+              groupingsMap.get(cId),
             ])
           }
         })
@@ -97,7 +89,7 @@ export class BitwardenJsonImporter extends BaseImporter implements Importer {
     }
   }
 
-  private parseDecrypted () {
+  private parseDecrypted() {
     const groupingsMap = new Map<string, number>()
     if (this.organization && this.results.collections != null) {
       this.results.collections.forEach((c: CollectionWithId) => {
@@ -133,21 +125,17 @@ export class BitwardenJsonImporter extends BaseImporter implements Importer {
         cipher.passwordHistory = cipher.passwordHistory.slice(0, 5)
       }
 
-      if (
-        !this.organization &&
-        c.folderId != null &&
-        groupingsMap.has(c.folderId)
-      ) {
+      if (!this.organization && c.folderId != null && groupingsMap.has(c.folderId)) {
         this.result.folderRelationships.push([
           this.result.ciphers.length,
-          groupingsMap.get(c.folderId)
+          groupingsMap.get(c.folderId),
         ])
       } else if (this.organization && c.collectionIds != null) {
         c.collectionIds.forEach(cId => {
           if (groupingsMap.has(cId)) {
             this.result.collectionRelationships.push([
               this.result.ciphers.length,
-              groupingsMap.get(cId)
+              groupingsMap.get(cId),
             ])
           }
         })

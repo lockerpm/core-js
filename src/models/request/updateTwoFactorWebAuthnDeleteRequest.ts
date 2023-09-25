@@ -1,5 +1,5 @@
-import { PasswordVerificationRequest } from './passwordVerificationRequest';
+import { PasswordVerificationRequest } from './passwordVerificationRequest'
 
 export class UpdateTwoFactorWebAuthnDeleteRequest extends PasswordVerificationRequest {
-    id: number;
+  id: number
 }

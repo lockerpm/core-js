@@ -1,7 +1,7 @@
-import { PasswordVerificationRequest } from './passwordVerificationRequest';
+import { PasswordVerificationRequest } from './passwordVerificationRequest'
 
-import { TwoFactorProviderType } from '../../enums/twoFactorProviderType';
+import { TwoFactorProviderType } from '../../enums/twoFactorProviderType'
 
 export class TwoFactorProviderRequest extends PasswordVerificationRequest {
-    type: TwoFactorProviderType;
+  type: TwoFactorProviderType
 }

@@ -33,7 +33,7 @@ export class CipherResponse extends BaseResponse {
   deletedDate: string
   reprompt: CipherRepromptType
 
-  constructor (response: any) {
+  constructor(response: any) {
     super(response)
     this.id = this.getResponseProperty('Id')
     this.organizationId = this.getResponseProperty('OrganizationId')
@@ -86,12 +86,9 @@ export class CipherResponse extends BaseResponse {
 
     const passwordHistory = this.getResponseProperty('PasswordHistory')
     if (passwordHistory != null) {
-      this.passwordHistory = passwordHistory.map(
-        (h: any) => new PasswordHistoryResponse(h)
-      )
+      this.passwordHistory = passwordHistory.map((h: any) => new PasswordHistoryResponse(h))
     }
 
-    this.reprompt =
-      this.getResponseProperty('Reprompt') || CipherRepromptType.None
+    this.reprompt = this.getResponseProperty('Reprompt') || CipherRepromptType.None
   }
 }

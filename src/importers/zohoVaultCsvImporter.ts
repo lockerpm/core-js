@@ -4,7 +4,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class ZohoVaultCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -22,7 +22,7 @@ export class ZohoVaultCsvImporter extends BaseImporter implements Importer {
       'Password URL',
       'Secret URL',
       'SecretData',
-      'CustomData'
+      'CustomData',
     ]
 
     results.forEach(value => {
@@ -41,10 +41,7 @@ export class ZohoVaultCsvImporter extends BaseImporter implements Importer {
         this.getValueOrDefault(value['Secret Name'], '--')
       )
       cipher.login.uris = this.makeUriArray(
-        this.getValueOrDefault(
-          value['Password URL'],
-          this.getValueOrDefault(value['Secret URL'])
-        )
+        this.getValueOrDefault(value['Password URL'], this.getValueOrDefault(value['Secret URL']))
       )
       this.parseData(cipher, value.SecretData)
       this.parseData(cipher, value.CustomData)
@@ -69,7 +66,7 @@ export class ZohoVaultCsvImporter extends BaseImporter implements Importer {
     return Promise.resolve(result)
   }
 
-  private parseData (cipher: CipherView, data: string) {
+  private parseData(cipher: CipherView, data: string) {
     if (this.isNullOrWhitespace(data)) {
       return
     }
@@ -80,8 +77,7 @@ export class ZohoVaultCsvImporter extends BaseImporter implements Importer {
         return
       }
       const field = line.substring(0, delimPosition)
-      const value =
-        line.length > delimPosition ? line.substring(delimPosition + 1) : null
+      const value = line.length > delimPosition ? line.substring(delimPosition + 1) : null
       if (
         this.isNullOrWhitespace(field) ||
         this.isNullOrWhitespace(value) ||
@@ -90,15 +86,9 @@ export class ZohoVaultCsvImporter extends BaseImporter implements Importer {
         return
       }
       const fieldLower = field.toLowerCase()
-      if (
-        cipher.login.username == null &&
-        this.usernameFieldNames.includes(fieldLower)
-      ) {
+      if (cipher.login.username == null && this.usernameFieldNames.includes(fieldLower)) {
         cipher.login.username = value
-      } else if (
-        cipher.login.password == null &&
-        this.passwordFieldNames.includes(fieldLower)
-      ) {
+      } else if (cipher.login.password == null && this.passwordFieldNames.includes(fieldLower)) {
         cipher.login.password = value
       } else {
         this.processKvp(cipher, field, value)

@@ -8,13 +8,9 @@ export abstract class SendService {
   decryptedSendCache: SendView[]
 
   clearCache: () => void
-  encrypt: (
-    model: SendView,
-    password: string,
-    key?: SymmetricCryptoKey
-  ) => Promise<Send>
+  encrypt: (model: SendView, password: string, key?: SymmetricCryptoKey) => Promise<Send>
 
-  get: (id: string) => Promise<Send>
+  get: (id: string) => Promise<Send>;
   getAll: () => Promise<Send[]>
   getAllDecrypted: () => Promise<SendView[]>
   upsert: (send: SendData | SendData[]) => Promise<any>

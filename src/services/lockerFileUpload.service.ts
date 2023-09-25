@@ -5,9 +5,9 @@ import { EncArrayBuffer } from '../models/domain/encArrayBuffer'
 import { Utils } from '../misc/utils'
 
 export class LockerFileUploadService {
-  constructor (private apiService: ApiService) {}
+  constructor(private apiService: ApiService) {}
 
-  async upload (
+  async upload(
     encryptedFileName: string,
     encryptedFileData: EncArrayBuffer,
     apiCall: (fd: FormData) => Promise<any>
@@ -15,7 +15,7 @@ export class LockerFileUploadService {
     const fd = new FormData()
     try {
       const blob = new Blob([encryptedFileData.buffer], {
-        type: 'application/octet-stream'
+        type: 'application/octet-stream',
       })
       fd.append('data', blob, encryptedFileName)
     } catch (e) {
@@ -25,7 +25,7 @@ export class LockerFileUploadService {
           Buffer.from(encryptedFileData.buffer) as any,
           {
             filepath: encryptedFileName,
-            contentType: 'application/octet-stream'
+            contentType: 'application/octet-stream',
           } as any
         )
       } else {

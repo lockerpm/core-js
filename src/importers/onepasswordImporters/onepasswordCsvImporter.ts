@@ -16,23 +16,21 @@ export const IgnoredProperties = [
   'tags',
   'title',
   'uuid',
-  'notes'
+  'notes',
 ]
 
-export abstract class OnePasswordCsvImporter
-  extends BaseImporter
-  implements Importer {
+export abstract class OnePasswordCsvImporter extends BaseImporter implements Importer {
   protected loginPropertyParsers = [
     this.setLoginUsername,
     this.setLoginPassword,
-    this.setLoginUris
+    this.setLoginUris,
   ]
 
   protected creditCardPropertyParsers = [
     this.setCreditCardNumber,
     this.setCreditCardVerification,
     this.setCreditCardCardholderName,
-    this.setCreditCardExpiry
+    this.setCreditCardExpiry,
   ]
 
   protected identityPropertyParsers = [
@@ -42,16 +40,16 @@ export abstract class OnePasswordCsvImporter
     this.setIdentityUserName,
     this.setIdentityEmail,
     this.setIdentityPhone,
-    this.setIdentityCompany
+    this.setIdentityCompany,
   ]
 
-  abstract setCipherType(value: any, cipher: CipherView): void
+  abstract setCipherType(value: any, cipher: CipherView): void;
 
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true, {
       quoteChar: '"',
-      escapeChar: '\\'
+      escapeChar: '\\',
     })
     if (results == null) {
       result.success = false
@@ -72,28 +70,16 @@ export abstract class OnePasswordCsvImporter
 
       let altUsername: string = null
       for (const property in value) {
-        if (
-          !value.hasOwnProperty(property) ||
-          this.isNullOrWhitespace(value[property])
-        ) {
+        if (!value.hasOwnProperty(property) || this.isNullOrWhitespace(value[property])) {
           continue
         }
 
         const context = new CipherImportContext(value, property, cipher)
-        if (
-          cipher.type === CipherType.Login &&
-          this.setKnownLoginValue(context)
-        ) {
+        if (cipher.type === CipherType.Login && this.setKnownLoginValue(context)) {
           continue
-        } else if (
-          cipher.type === CipherType.Card &&
-          this.setKnownCreditCardValue(context)
-        ) {
+        } else if (cipher.type === CipherType.Card && this.setKnownCreditCardValue(context)) {
           continue
-        } else if (
-          cipher.type === CipherType.Identity &&
-          this.setKnownIdentityValue(context)
-        ) {
+        } else if (cipher.type === CipherType.Identity && this.setKnownIdentityValue(context)) {
           continue
         }
 
@@ -118,27 +104,21 @@ export abstract class OnePasswordCsvImporter
     return Promise.resolve(result)
   }
 
-  protected getProp (obj: any, name: string): any {
-    const lowerObj = Object.entries(obj).reduce(
-      (agg: any, entry: [string, any]) => {
-        agg[entry[0].toLowerCase()] = entry[1]
-        return agg
-      },
-      {}
-    )
+  protected getProp(obj: any, name: string): any {
+    const lowerObj = Object.entries(obj).reduce((agg: any, entry: [string, any]) => {
+      agg[entry[0].toLowerCase()] = entry[1]
+      return agg
+    }, {})
     return lowerObj[name.toLowerCase()]
   }
 
-  protected getPropByRegexp (obj: any, regexp: RegExp): any {
-    const matchingKeys = Object.keys(obj).reduce(
-      (agg: string[], key: string) => {
-        if (key.match(regexp)) {
-          agg.push(key)
-        }
-        return agg
-      },
-      []
-    )
+  protected getPropByRegexp(obj: any, regexp: RegExp): any {
+    const matchingKeys = Object.keys(obj).reduce((agg: string[], key: string) => {
+      if (key.match(regexp)) {
+        agg.push(key)
+      }
+      return agg
+    }, [])
     if (matchingKeys.length === 0) {
       return null
     } else {
@@ -146,16 +126,13 @@ export abstract class OnePasswordCsvImporter
     }
   }
 
-  protected getPropIncluding (obj: any, name: string): any {
-    const includesMap = Object.keys(obj).reduce(
-      (agg: string[], entry: string) => {
-        if (entry.toLowerCase().includes(name.toLowerCase())) {
-          agg.push(entry)
-        }
-        return agg
-      },
-      []
-    )
+  protected getPropIncluding(obj: any, name: string): any {
+    const includesMap = Object.keys(obj).reduce((agg: string[], entry: string) => {
+      if (entry.toLowerCase().includes(name.toLowerCase())) {
+        agg.push(entry)
+      }
+      return agg
+    }, [])
     if (includesMap.length === 0) {
       return null
     } else {
@@ -163,7 +140,7 @@ export abstract class OnePasswordCsvImporter
     }
   }
 
-  protected setNotes (importRecord: any, cipher: CipherView) {
+  protected setNotes(importRecord: any, cipher: CipherView) {
     cipher.notes =
       this.getValueOrDefault(this.getProp(importRecord, 'notesPlain'), '') +
       '\n' +
@@ -172,7 +149,7 @@ export abstract class OnePasswordCsvImporter
     cipher.notes.trim()
   }
 
-  protected setKnownLoginValue (context: CipherImportContext): boolean {
+  protected setKnownLoginValue(context: CipherImportContext): boolean {
     return this.loginPropertyParsers.reduce((agg: boolean, func) => {
       if (!agg) {
         agg = func.bind(this)(context)
@@ -181,7 +158,7 @@ export abstract class OnePasswordCsvImporter
     }, false)
   }
 
-  protected setKnownCreditCardValue (context: CipherImportContext): boolean {
+  protected setKnownCreditCardValue(context: CipherImportContext): boolean {
     return this.creditCardPropertyParsers.reduce((agg: boolean, func) => {
       if (!agg) {
         agg = func.bind(this)(context)
@@ -190,7 +167,7 @@ export abstract class OnePasswordCsvImporter
     }, false)
   }
 
-  protected setKnownIdentityValue (context: CipherImportContext): boolean {
+  protected setKnownIdentityValue(context: CipherImportContext): boolean {
     return this.identityPropertyParsers.reduce((agg: boolean, func) => {
       if (!agg) {
         agg = func.bind(this)(context)
@@ -199,10 +176,7 @@ export abstract class OnePasswordCsvImporter
     }, false)
   }
 
-  protected setUnknownValue (
-    context: CipherImportContext,
-    altUsername: string
-  ): string {
+  protected setUnknownValue(context: CipherImportContext, altUsername: string): string {
     if (
       !IgnoredProperties.includes(context.lowerProperty) &&
       !context.lowerProperty.startsWith('section:') &&
@@ -217,11 +191,7 @@ export abstract class OnePasswordCsvImporter
         const readableDate = new Date(
           parseInt(context.importRecord[context.property], 10) * 1000
         ).toUTCString()
-        this.processKvp(
-          context.cipher,
-          '1Password ' + context.property,
-          readableDate
-        )
+        this.processKvp(context.cipher, '1Password ' + context.property, readableDate)
         return null
       }
       if (
@@ -236,17 +206,13 @@ export abstract class OnePasswordCsvImporter
           FieldType.Hidden
         )
       } else {
-        this.processKvp(
-          context.cipher,
-          context.property,
-          context.importRecord[context.property]
-        )
+        this.processKvp(context.cipher, context.property, context.importRecord[context.property])
       }
     }
     return null
   }
 
-  protected setIdentityFirstName (context: CipherImportContext) {
+  protected setIdentityFirstName(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.identity.firstName) &&
       context.lowerProperty.includes('first name')
@@ -257,19 +223,18 @@ export abstract class OnePasswordCsvImporter
     return false
   }
 
-  protected setIdentityInitial (context: CipherImportContext) {
+  protected setIdentityInitial(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.identity.middleName) &&
       context.lowerProperty.includes('initial')
     ) {
-      context.cipher.identity.middleName =
-        context.importRecord[context.property]
+      context.cipher.identity.middleName = context.importRecord[context.property]
       return true
     }
     return false
   }
 
-  protected setIdentityLastName (context: CipherImportContext) {
+  protected setIdentityLastName(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.identity.lastName) &&
       context.lowerProperty.includes('last name')
@@ -280,7 +245,7 @@ export abstract class OnePasswordCsvImporter
     return false
   }
 
-  protected setIdentityUserName (context: CipherImportContext) {
+  protected setIdentityUserName(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.identity.username) &&
       context.lowerProperty.includes('username')
@@ -291,7 +256,7 @@ export abstract class OnePasswordCsvImporter
     return false
   }
 
-  protected setIdentityCompany (context: CipherImportContext) {
+  protected setIdentityCompany(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.identity.company) &&
       context.lowerProperty.includes('company')
@@ -302,7 +267,7 @@ export abstract class OnePasswordCsvImporter
     return false
   }
 
-  protected setIdentityPhone (context: CipherImportContext) {
+  protected setIdentityPhone(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.identity.phone) &&
       context.lowerProperty.includes('default phone')
@@ -313,7 +278,7 @@ export abstract class OnePasswordCsvImporter
     return false
   }
 
-  protected setIdentityEmail (context: CipherImportContext) {
+  protected setIdentityEmail(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.identity.email) &&
       context.lowerProperty.includes('email')
@@ -324,7 +289,7 @@ export abstract class OnePasswordCsvImporter
     return false
   }
 
-  protected setCreditCardNumber (context: CipherImportContext): boolean {
+  protected setCreditCardNumber(context: CipherImportContext): boolean {
     if (
       this.isNullOrWhitespace(context.cipher.card.number) &&
       context.lowerProperty.includes('number')
@@ -336,7 +301,7 @@ export abstract class OnePasswordCsvImporter
     return false
   }
 
-  protected setCreditCardVerification (context: CipherImportContext) {
+  protected setCreditCardVerification(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.card.code) &&
       context.lowerProperty.includes('verification number')
@@ -347,39 +312,37 @@ export abstract class OnePasswordCsvImporter
     return false
   }
 
-  protected setCreditCardCardholderName (context: CipherImportContext) {
+  protected setCreditCardCardholderName(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.card.cardholderName) &&
       context.lowerProperty.includes('cardholder name')
     ) {
-      context.cipher.card.cardholderName =
-        context.importRecord[context.property]
+      context.cipher.card.cardholderName = context.importRecord[context.property]
       return true
     }
     return false
   }
 
-  protected setCreditCardExpiry (context: CipherImportContext) {
+  protected setCreditCardExpiry(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.card.expiration) &&
       context.lowerProperty.includes('expiry date') &&
       context.importRecord[context.property].length === 7
     ) {
-      context.cipher.card.expMonth = (
-        context.importRecord[context.property] as string
-      ).substr(0, 2)
+      context.cipher.card.expMonth = (context.importRecord[context.property] as string).substr(
+        0,
+        2
+      )
       if (context.cipher.card.expMonth[0] === '0') {
         context.cipher.card.expMonth = context.cipher.card.expMonth.substr(1, 1)
       }
-      context.cipher.card.expYear = (
-        context.importRecord[context.property] as string
-      ).substr(3, 4)
+      context.cipher.card.expYear = (context.importRecord[context.property] as string).substr(3, 4)
       return true
     }
     return false
   }
 
-  protected setLoginPassword (context: CipherImportContext) {
+  protected setLoginPassword(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.login.password) &&
       context.lowerProperty === 'password'
@@ -390,7 +353,7 @@ export abstract class OnePasswordCsvImporter
     return false
   }
 
-  protected setLoginUsername (context: CipherImportContext) {
+  protected setLoginUsername(context: CipherImportContext) {
     if (
       this.isNullOrWhitespace(context.cipher.login.username) &&
       context.lowerProperty === 'username'
@@ -401,24 +364,19 @@ export abstract class OnePasswordCsvImporter
     return false
   }
 
-  protected setLoginUris (context: CipherImportContext) {
+  protected setLoginUris(context: CipherImportContext) {
     if (
-      (context.cipher.login.uris == null ||
-        context.cipher.login.uris.length === 0) &&
+      (context.cipher.login.uris == null || context.cipher.login.uris.length === 0) &&
       context.lowerProperty === 'urls'
     ) {
-      const urls = context.importRecord[context.property].split(
-        this.newLineRegex
-      )
+      const urls = context.importRecord[context.property].split(this.newLineRegex)
       context.cipher.login.uris = this.makeUriArray(urls)
       return true
     } else if (context.lowerProperty === 'url') {
       if (context.cipher.login.uris == null) {
         context.cipher.login.uris = []
       }
-      context.cipher.login.uris.concat(
-        this.makeUriArray(context.importRecord[context.property])
-      )
+      context.cipher.login.uris.concat(this.makeUriArray(context.importRecord[context.property]))
       return true
     }
     return false

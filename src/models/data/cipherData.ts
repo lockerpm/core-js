@@ -4,7 +4,7 @@ import {
   FieldData,
   IdentityData,
   LoginData,
-  SecureNoteData
+  SecureNoteData,
 } from '../../../src/models/data'
 import { CipherRepromptType } from '../../../src/enums/cipherRepromptType'
 import { PasswordHistoryData } from '../../../src/models/data/passwordHistoryData'
@@ -37,11 +37,7 @@ export class CipherData {
   deletedDate: string
   reprompt: CipherRepromptType
 
-  constructor (
-    response?: CipherResponse,
-    userId?: string,
-    collectionIds?: string[]
-  ) {
+  constructor(response?: CipherResponse, userId?: string, collectionIds?: string[]) {
     if (response == null) {
       return
     }
@@ -59,8 +55,7 @@ export class CipherData {
     this.type = response.type
     this.name = response.name
     this.notes = response.notes
-    this.collectionIds =
-      collectionIds != null ? collectionIds : response.collectionIds
+    this.collectionIds = collectionIds != null ? collectionIds : response.collectionIds
     this.deletedDate = response.deletedDate
     this.reprompt = response.reprompt
 
@@ -92,9 +87,7 @@ export class CipherData {
       this.attachments = response.attachments.map(a => new AttachmentData(a))
     }
     if (response.passwordHistory != null) {
-      this.passwordHistory = response.passwordHistory.map(
-        ph => new PasswordHistoryData(ph)
-      )
+      this.passwordHistory = response.passwordHistory.map(ph => new PasswordHistoryData(ph))
     }
   }
 }

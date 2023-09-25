@@ -1,4 +1,3 @@
-
 import { ApiService } from '../abstractions/api.service'
 import { AppIdService } from '../abstractions/appId.service'
 import { EnvironmentService } from '../abstractions/environment.service'
@@ -15,7 +14,7 @@ export class NotificationsService implements NotificationsServiceAbstraction {
   private inactive = false
   private reconnectTimer: any = null
 
-  constructor (
+  constructor(
     private userService: UserService,
     private syncService: SyncService,
     private appIdService: AppIdService,
@@ -25,19 +24,11 @@ export class NotificationsService implements NotificationsServiceAbstraction {
     private logService: LogService
   ) {}
 
-  async init (environmentService: EnvironmentService): Promise<void> {
+  async init(environmentService: EnvironmentService): Promise<void> {}
 
-  }
+  async updateConnection(sync = false): Promise<void> {}
 
-  async updateConnection (sync = false): Promise<void> {
+  async reconnectFromActivity(): Promise<void> {}
 
-  }
-
-  async reconnectFromActivity (): Promise<void> {
-
-  }
-
-  async disconnectFromInactivity (): Promise<void> {
-
-  }
+  async disconnectFromInactivity(): Promise<void> {}
 }

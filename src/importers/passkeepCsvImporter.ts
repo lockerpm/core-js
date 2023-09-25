@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class PassKeepCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -32,10 +32,7 @@ export class PassKeepCsvImporter extends BaseImporter implements Importer {
     return Promise.resolve(result)
   }
 
-  private getValue (key: string, value: any) {
-    return this.getValueOrDefault(
-      value[key],
-      this.getValueOrDefault(value[' ' + key])
-    )
+  private getValue(key: string, value: any) {
+    return this.getValueOrDefault(value[key], this.getValueOrDefault(value[' ' + key]))
   }
 }

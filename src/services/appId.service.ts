@@ -4,17 +4,17 @@ import { AppIdService as AppIdServiceAbstraction } from '../abstractions/appId.s
 import { StorageService } from '../abstractions/storage.service'
 
 export class AppIdService implements AppIdServiceAbstraction {
-  constructor (private storageService: StorageService) {}
+  constructor(private storageService: StorageService) {}
 
-  getAppId (): Promise<string> {
+  getAppId(): Promise<string> {
     return this.makeAndGetAppId('appId')
   }
 
-  getAnonymousAppId (): Promise<string> {
+  getAnonymousAppId(): Promise<string> {
     return this.makeAndGetAppId('anonymousAppId')
   }
 
-  private async makeAndGetAppId (key: string) {
+  private async makeAndGetAppId(key: string) {
     const existingId = await this.storageService.get<string>(key)
     if (existingId != null) {
       return existingId

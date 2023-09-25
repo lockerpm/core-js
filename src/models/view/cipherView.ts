@@ -5,7 +5,7 @@ import {
   IdentityView,
   LoginView,
   SecureNoteView,
-  View
+  View,
 } from '../../../src/models/view'
 import { CipherRepromptType } from '../../../src/enums/cipherRepromptType'
 import { PasswordHistoryView } from '../../../src/models/view/passwordHistoryView'
@@ -37,7 +37,7 @@ export class CipherView implements View {
   deletedDate: Date = null
   reprompt: CipherRepromptType = null
 
-  constructor (c?: Cipher) {
+  constructor(c?: Cipher) {
     if (!c) {
       return
     }
@@ -58,7 +58,7 @@ export class CipherView implements View {
     this.reprompt = c.reprompt
   }
 
-  get subTitle (): string {
+  get subTitle(): string {
     switch (this.type) {
     case CipherType.Login:
     case 8:
@@ -76,15 +76,15 @@ export class CipherView implements View {
     return null
   }
 
-  get hasPasswordHistory (): boolean {
+  get hasPasswordHistory(): boolean {
     return this.passwordHistory && this.passwordHistory.length > 0
   }
 
-  get hasAttachments (): boolean {
+  get hasAttachments(): boolean {
     return this.attachments && this.attachments.length > 0
   }
 
-  get hasOldAttachments (): boolean {
+  get hasOldAttachments(): boolean {
     if (this.hasAttachments) {
       for (let i = 0; i < this.attachments.length; i++) {
         if (this.attachments[i].key == null) {
@@ -95,11 +95,11 @@ export class CipherView implements View {
     return false
   }
 
-  get hasFields (): boolean {
+  get hasFields(): boolean {
     return this.fields && this.fields.length > 0
   }
 
-  get passwordRevisionDisplayDate (): Date {
+  get passwordRevisionDisplayDate(): Date {
     if (this.type !== CipherType.Login || this.login == null) {
       return null
     } else if (this.login.password == null || this.login.password === '') {
@@ -108,7 +108,7 @@ export class CipherView implements View {
     return this.login.passwordRevisionDate
   }
 
-  get isDeleted (): boolean {
+  get isDeleted(): boolean {
     return this.deletedDate != null
   }
 }

@@ -21,7 +21,7 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
     'issue_date',
     'expiration_date',
     'place_of_issue',
-    'state'
+    'state',
   ]
 
   // Convert to card
@@ -32,7 +32,7 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
     'cc_number',
     'code',
     'expiration_month',
-    'expiration_year'
+    'expiration_year',
     // 'routing_number'
     // 'account_number'
     // 'country',
@@ -59,7 +59,7 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
     'country',
     'state',
     'city',
-    'zip'
+    'zip',
     // 'address_recipient',
     // 'address_building',
     // 'address_apartment',
@@ -76,12 +76,12 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
     'title',
     'password',
     // 'note',
-    'url'
+    'url',
     // 'category',
     // 'otpSecret'
   ]
 
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -113,7 +113,7 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
   }
 
   // ID
-  private processId (obj: { [key: string]: string }) {
+  private processId(obj: { [key: string]: string }) {
     let existingKeys = ['name', 'number', 'type']
 
     const cipher = new CipherView()
@@ -157,14 +157,8 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
   }
 
   // Payment
-  private processPayment (obj: { [key: string]: string }) {
-    let existingKeys = [
-      'type',
-      'account_name',
-      'cc_number',
-      'expiration_month',
-      'expiration_year'
-    ]
+  private processPayment(obj: { [key: string]: string }) {
+    let existingKeys = ['type', 'account_name', 'cc_number', 'expiration_month', 'expiration_year']
 
     const cipher = new CipherView()
     cipher.name = this.getValueOrDefault(obj.account_name)
@@ -206,7 +200,7 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
   }
 
   // Personal info
-  private processPersonalInfo (obj: { [key: string]: string }) {
+  private processPersonalInfo(obj: { [key: string]: string }) {
     let existingKeys = [
       'type',
       'item_name',
@@ -220,7 +214,7 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
       'country',
       'state',
       'city',
-      'zip'
+      'zip',
     ]
 
     const cipher = new CipherView()
@@ -236,8 +230,7 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
       cipher.identity = new IdentityView()
       cipher.identity.firstName = this.getValueOrDefault(obj.first_name)
       if (this.getValueOrDefault(obj.middle_name)) {
-        cipher.identity.firstName +=
-            ' ' + this.getValueOrDefault(obj.middle_name)
+        cipher.identity.firstName += ' ' + this.getValueOrDefault(obj.middle_name)
       }
       cipher.identity.lastName = this.getValueOrDefault(obj.last_name)
       cipher.identity.username = this.getValueOrDefault(obj.login)
@@ -273,15 +266,8 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
   }
 
   // Credential
-  private processCredential (obj: { [key: string]: string }) {
-    const existingKeys = [
-      'title',
-      'username',
-      'password',
-      'note',
-      'url',
-      'otpSecret'
-    ]
+  private processCredential(obj: { [key: string]: string }) {
+    const existingKeys = ['title', 'username', 'password', 'note', 'url', 'otpSecret']
     const cipher = new CipherView()
     cipher.type = CipherType.Login
     cipher.name = this.getValueOrDefault(obj.title || obj.username)
@@ -301,7 +287,7 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
   }
 
   // Note
-  private processNote (obj: { [key: string]: string }) {
+  private processNote(obj: { [key: string]: string }) {
     const existingKeys = ['title', 'note', 'name']
     const cipher = new CipherView()
     cipher.type = CipherType.SecureNote
@@ -318,7 +304,7 @@ export class DashlaneCsvImporter extends BaseImporter implements Importer {
   }
 }
 
-function isSubset (a: string[], b: string[]) {
+function isSubset(a: string[], b: string[]) {
   const setB = new Set(b)
   return a.every(item => setB.has(item))
 }

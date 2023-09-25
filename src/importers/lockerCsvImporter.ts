@@ -17,7 +17,7 @@ import { SecureNoteType } from '../../src/enums/secureNoteType'
 import { CipherMapper } from '../../constants'
 
 export class LockerCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -46,10 +46,7 @@ export class LockerCsvImporter extends BaseImporter implements Importer {
             result.collections.push(collection)
           }
 
-          result.collectionRelationships.push([
-            result.ciphers.length,
-            collectionIndex
-          ])
+          result.collectionRelationships.push([result.ciphers.length, collectionIndex])
         })
       } else if (!this.organization) {
         this.processFolder(result, value.folder)
@@ -57,8 +54,7 @@ export class LockerCsvImporter extends BaseImporter implements Importer {
 
       const cipher = new CipherView()
       cipher.favorite = !!(
-        !this.organization &&
-        this.getValueOrDefault(value.favorite, '0') !== '0'
+        !this.organization && this.getValueOrDefault(value.favorite, '0') !== '0'
       )
       cipher.type = CipherType.SecureNote
       cipher.notes = this.getValueOrDefault(value.notes)
@@ -133,15 +129,9 @@ export class LockerCsvImporter extends BaseImporter implements Importer {
       case 'login': {
         cipher.type = CipherType.Login
         cipher.login = new LoginView()
-        cipher.login.totp = this.getValueOrDefault(
-          value.login_totp || value.totp
-        )
-        cipher.login.username = this.getValueOrDefault(
-          value.login_username || value.username
-        )
-        cipher.login.password = this.getValueOrDefault(
-          value.login_password || value.password
-        )
+        cipher.login.totp = this.getValueOrDefault(value.login_totp || value.totp)
+        cipher.login.username = this.getValueOrDefault(value.login_username || value.username)
+        cipher.login.password = this.getValueOrDefault(value.login_password || value.password)
         const uris = this.parseSingleRowCsv(value.login_uri || value.uri)
         cipher.login.uris = this.makeUriArray(uris)
         break
@@ -149,9 +139,7 @@ export class LockerCsvImporter extends BaseImporter implements Importer {
       default: {
         // Check new type
         if (valueType) {
-          const mappedType = Object.values(CipherMapper).find(
-            m => m.csvTypeName === valueType
-          )
+          const mappedType = Object.values(CipherMapper).find(m => m.csvTypeName === valueType)
           if (mappedType) {
             // @ts-ignore
             cipher.type = mappedType.type

@@ -14,7 +14,7 @@ export class EncString {
   iv?: string
   mac?: string
 
-  constructor (
+  constructor(
     encryptedStringOrType: string | EncryptionType,
     data?: string,
     iv?: string,
@@ -97,10 +97,7 @@ export class EncString {
     }
   }
 
-  async decrypt (
-    orgId: string,
-    key: SymmetricCryptoKey = null
-  ): Promise<string> {
+  async decrypt(orgId: string, key: SymmetricCryptoKey = null): Promise<string> {
     if (this.decryptedValue != null) {
       return this.decryptedValue
     }

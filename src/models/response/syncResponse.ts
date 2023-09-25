@@ -16,7 +16,7 @@ export class SyncResponse extends BaseResponse {
   policies?: PolicyResponse[] = []
   sends: SendResponse[] = []
 
-  constructor (response: any) {
+  constructor(response: any) {
     super(response)
 
     const profile = this.getResponseProperty('Profile')
@@ -31,9 +31,7 @@ export class SyncResponse extends BaseResponse {
 
     const collections = this.getResponseProperty('Collections')
     if (collections != null) {
-      this.collections = collections.map(
-        (c: any) => new CollectionDetailsResponse(c)
-      )
+      this.collections = collections.map((c: any) => new CollectionDetailsResponse(c))
     }
 
     const ciphers = this.getResponseProperty('Ciphers')

@@ -24,15 +24,13 @@ import { CollectionWithId as CollectionExport } from '../models/export/collectio
 import { FolderWithId as FolderExport } from '../models/export/folderWithId'
 
 export class ExportService implements ExportServiceAbstraction {
-  constructor (
+  constructor(
     private folderService: FolderService,
     private cipherService: CipherService,
     private apiService: ApiService
   ) {}
 
-  async getExport (
-    format: 'csv' | 'json' | 'encrypted_json' = 'csv'
-  ): Promise<string> {
+  async getExport(format: 'csv' | 'json' | 'encrypted_json' = 'csv'): Promise<string> {
     if (format === 'encrypted_json') {
       return this.getEncryptedExport()
     } else {
@@ -40,7 +38,7 @@ export class ExportService implements ExportServiceAbstraction {
     }
   }
 
-  async getOrganizationExport (
+  async getOrganizationExport(
     organizationId: string,
     format: 'csv' | 'json' | 'encrypted_json' = 'csv'
   ): Promise<string> {
@@ -51,7 +49,7 @@ export class ExportService implements ExportServiceAbstraction {
     }
   }
 
-  getFileName (prefix: string = null, extension: string = 'csv'): string {
+  getFileName(prefix: string = null, extension: string = 'csv'): string {
     const now = new Date()
     const dateString =
       now.getFullYear() +
@@ -64,17 +62,10 @@ export class ExportService implements ExportServiceAbstraction {
       this.padNumber(now.getMinutes(), 2) +
       this.padNumber(now.getSeconds(), 2)
 
-    return (
-      'locker' +
-      (prefix ? '_' + prefix : '') +
-      '_export_' +
-      dateString +
-      '.' +
-      extension
-    )
+    return 'locker' + (prefix ? '_' + prefix : '') + '_export_' + dateString + '.' + extension
   }
 
-  private async getDecryptedExport (format: 'json' | 'csv'): Promise<string> {
+  private async getDecryptedExport(format: 'json' | 'csv'): Promise<string> {
     let decFolders: FolderView[] = []
     let decCiphers: CipherView[] = []
     const promises = []
@@ -113,9 +104,7 @@ export class ExportService implements ExportServiceAbstraction {
 
         const cipher: any = {}
         cipher.folder =
-          c.folderId != null && foldersMap.has(c.folderId)
-            ? foldersMap.get(c.folderId).name
-            : null
+          c.folderId != null && foldersMap.has(c.folderId) ? foldersMap.get(c.folderId).name : null
         cipher.favorite = c.favorite ? 1 : null
         this.buildCommonCipher(cipher, c)
         exportCiphers.push(cipher)
@@ -126,7 +115,7 @@ export class ExportService implements ExportServiceAbstraction {
       const jsonDoc: any = {
         encrypted: false,
         folders: [],
-        items: []
+        items: [],
       }
 
       decFolders.forEach(f => {
@@ -152,7 +141,7 @@ export class ExportService implements ExportServiceAbstraction {
     }
   }
 
-  private async getEncryptedExport (): Promise<string> {
+  private async getEncryptedExport(): Promise<string> {
     let folders: Folder[] = []
     let ciphers: Cipher[] = []
     const promises = []
@@ -174,7 +163,7 @@ export class ExportService implements ExportServiceAbstraction {
     const jsonDoc: any = {
       encrypted: true,
       folders: [],
-      items: []
+      items: [],
     }
 
     folders.forEach(f => {
@@ -199,7 +188,7 @@ export class ExportService implements ExportServiceAbstraction {
     return JSON.stringify(jsonDoc, null, '  ')
   }
 
-  private async getOrganizationDecryptedExport (
+  private async getOrganizationDecryptedExport(
     organizationId: string,
     format: 'json' | 'csv'
   ): Promise<string> {
@@ -210,15 +199,9 @@ export class ExportService implements ExportServiceAbstraction {
     promises.push(
       this.apiService.getCollections(organizationId).then(collections => {
         const collectionPromises: any = []
-        if (
-          collections != null &&
-          collections.data != null &&
-          collections.data.length > 0
-        ) {
+        if (collections != null && collections.data != null && collections.data.length > 0) {
           collections.data.forEach(c => {
-            const collection = new Collection(
-              new CollectionData(c as CollectionDetailsResponse)
-            )
+            const collection = new Collection(new CollectionData(c as CollectionDetailsResponse))
             collectionPromises.push(
               collection.decrypt().then(decCol => {
                 decCollections.push(decCol)
@@ -233,11 +216,7 @@ export class ExportService implements ExportServiceAbstraction {
     promises.push(
       this.apiService.getCiphersOrganization(organizationId).then(ciphers => {
         const cipherPromises: any = []
-        if (
-          ciphers != null &&
-          ciphers.data != null &&
-          ciphers.data.length > 0
-        ) {
+        if (ciphers != null && ciphers.data != null && ciphers.data.length > 0) {
           ciphers.data
             .filter(c => c.deletedDate === null)
             .forEach(c => {
@@ -284,7 +263,7 @@ export class ExportService implements ExportServiceAbstraction {
       const jsonDoc: any = {
         encrypted: false,
         collections: [],
-        items: []
+        items: [],
       }
 
       decCollections.forEach(c => {
@@ -302,9 +281,7 @@ export class ExportService implements ExportServiceAbstraction {
     }
   }
 
-  private async getOrganizationEncryptedExport (
-    organizationId: string
-  ): Promise<string> {
+  private async getOrganizationEncryptedExport(organizationId: string): Promise<string> {
     const collections: Collection[] = []
     const ciphers: Cipher[] = []
     const promises = []
@@ -314,9 +291,7 @@ export class ExportService implements ExportServiceAbstraction {
         const collectionPromises: any = []
         if (c != null && c.data != null && c.data.length > 0) {
           c.data.forEach(r => {
-            const collection = new Collection(
-              new CollectionData(r as CollectionDetailsResponse)
-            )
+            const collection = new Collection(new CollectionData(r as CollectionDetailsResponse))
             collections.push(collection)
           })
         }
@@ -344,7 +319,7 @@ export class ExportService implements ExportServiceAbstraction {
     const jsonDoc: any = {
       encrypted: true,
       collections: [],
-      items: []
+      items: [],
     }
 
     collections.forEach(c => {
@@ -361,18 +336,14 @@ export class ExportService implements ExportServiceAbstraction {
     return JSON.stringify(jsonDoc, null, '  ')
   }
 
-  private padNumber (
-    num: number,
-    width: number,
-    padCharacter: string = '0'
-  ): string {
+  private padNumber(num: number, width: number, padCharacter: string = '0'): string {
     const numString = num.toString()
     return numString.length >= width
       ? numString
       : new Array(width - numString.length + 1).join(padCharacter) + numString
   }
 
-  private buildCommonCipher (cipher: any, c: CipherView) {
+  private buildCommonCipher(cipher: any, c: CipherView) {
     cipher.type = null
     cipher.name = c.name
     cipher.notes = c.notes

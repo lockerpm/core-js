@@ -10,7 +10,7 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 export class MykiCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -42,13 +42,7 @@ export class MykiCsvImporter extends BaseImporter implements Importer {
         cipher.card.expMonth = this.getValueOrDefault(value.exp_month)
         cipher.card.expYear = this.getValueOrDefault(value.exp_year)
         cipher.card.code = this.getValueOrDefault(value.cvv)
-        existingKeys.push(
-          'cardName',
-          'cardNumber',
-          'exp_month',
-          'exp_year',
-          'cvv'
-        )
+        existingKeys.push('cardName', 'cardNumber', 'exp_month', 'exp_year', 'cvv')
       } else if (value.firstName !== undefined) {
         // Identities
         cipher.identity = new IdentityView()
@@ -59,12 +53,8 @@ export class MykiCsvImporter extends BaseImporter implements Importer {
         cipher.identity.lastName = this.getValueOrDefault(value.lastName)
         cipher.identity.phone = this.getValueOrDefault(value.number)
         cipher.identity.email = this.getValueOrDefault(value.email)
-        cipher.identity.address1 = this.getValueOrDefault(
-          value.firstAddressLine
-        )
-        cipher.identity.address2 = this.getValueOrDefault(
-          value.secondAddressLine
-        )
+        cipher.identity.address1 = this.getValueOrDefault(value.firstAddressLine)
+        cipher.identity.address2 = this.getValueOrDefault(value.secondAddressLine)
         cipher.identity.city = this.getValueOrDefault(value.city)
         cipher.identity.country = this.getValueOrDefault(value.country)
         cipher.identity.postalCode = this.getValueOrDefault(value.zipCode)

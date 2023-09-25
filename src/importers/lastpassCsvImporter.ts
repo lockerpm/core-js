@@ -13,7 +13,7 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 export class LastPassCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -26,9 +26,7 @@ export class LastPassCsvImporter extends BaseImporter implements Importer {
       let folderIndex = result.folders.length
       let grouping = value.grouping
       if (grouping != null) {
-        grouping = grouping
-          .replace(/\\/g, '/')
-          .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+        grouping = grouping.replace(/\\/g, '/').replace(/[\x00-\x1F\x7F-\x9F]/g, '')
       }
       const hasFolder = this.getValueOrDefault(grouping, '(none)') !== '(none)'
       let addFolder = hasFolder
@@ -89,12 +87,9 @@ export class LastPassCsvImporter extends BaseImporter implements Importer {
     return Promise.resolve(result)
   }
 
-  private buildBaseCipher (value: any) {
+  private buildBaseCipher(value: any) {
     const cipher = new CipherView()
-    if (
-      value.hasOwnProperty('profilename') &&
-      value.hasOwnProperty('profilelanguage')
-    ) {
+    if (value.hasOwnProperty('profilename') && value.hasOwnProperty('profilelanguage')) {
       // form fill
       cipher.favorite = false
       cipher.name = this.getValueOrDefault(value.profilename, '--')
@@ -113,16 +108,14 @@ export class LastPassCsvImporter extends BaseImporter implements Importer {
       }
     } else {
       // site or secure note
-      cipher.favorite =
-        !this.organization && this.getValueOrDefault(value.fav, '0') === '1'
+      cipher.favorite = !this.organization && this.getValueOrDefault(value.fav, '0') === '1'
       cipher.name = this.getValueOrDefault(value.name, '--')
-      cipher.type =
-        value.url === 'http://sn' ? CipherType.SecureNote : CipherType.Login
+      cipher.type = value.url === 'http://sn' ? CipherType.SecureNote : CipherType.Login
     }
     return cipher
   }
 
-  private parseCard (value: any): CardView {
+  private parseCard(value: any): CardView {
     const card = new CardView()
     card.cardholderName = this.getValueOrDefault(value.ccname)
     card.number = this.getValueOrDefault(value.ccnum)
@@ -143,7 +136,7 @@ export class LastPassCsvImporter extends BaseImporter implements Importer {
     return card
   }
 
-  private parseIdentity (value: any): IdentityView {
+  private parseIdentity(value: any): IdentityView {
     const identity = new IdentityView()
     identity.title = this.getValueOrDefault(value.title)
     identity.firstName = this.getValueOrDefault(value.firstname)
@@ -163,14 +156,13 @@ export class LastPassCsvImporter extends BaseImporter implements Importer {
     identity.phone = this.getValueOrDefault(value.phone)
 
     if (!this.isNullOrWhitespace(identity.title)) {
-      identity.title =
-        identity.title.charAt(0).toUpperCase() + identity.title.slice(1)
+      identity.title = identity.title.charAt(0).toUpperCase() + identity.title.slice(1)
     }
 
     return identity
   }
 
-  private parseSecureNote (value: any, cipher: CipherView) {
+  private parseSecureNote(value: any, cipher: CipherView) {
     const extraParts = this.splitNewLine(value.extra)
     let processedNote = false
 
@@ -182,33 +174,23 @@ export class LastPassCsvImporter extends BaseImporter implements Importer {
         (typeParts[1] === 'Credit Card' || typeParts[1] === 'Address')
       ) {
         if (typeParts[1] === 'Credit Card') {
-          const mappedData = this.parseSecureNoteMapping<CardView>(
-            cipher,
-            extraParts,
-            {
-              Number: 'number',
-              'Name on Card': 'cardholderName',
-              'Security Code': 'code',
-              // LP provides date in a format like 'June,2020'
-              // Store in expMonth, then parse and modify
-              'Expiration Date': 'expMonth'
-            }
-          )
+          const mappedData = this.parseSecureNoteMapping<CardView>(cipher, extraParts, {
+            Number: 'number',
+            'Name on Card': 'cardholderName',
+            'Security Code': 'code',
+            // LP provides date in a format like 'June,2020'
+            // Store in expMonth, then parse and modify
+            'Expiration Date': 'expMonth',
+          })
 
-          if (
-            this.isNullOrWhitespace(mappedData.expMonth) ||
-            mappedData.expMonth === ','
-          ) {
+          if (this.isNullOrWhitespace(mappedData.expMonth) || mappedData.expMonth === ',') {
             // No expiration data
             mappedData.expMonth = undefined
           } else {
             const [monthString, year] = mappedData.expMonth.split(',')
             // Parse month name into number
             if (!this.isNullOrWhitespace(monthString)) {
-              const month =
-                new Date(
-                  Date.parse(monthString.trim() + ' 1, 2012')
-                ).getMonth() + 1
+              const month = new Date(Date.parse(monthString.trim() + ' 1, 2012')).getMonth() + 1
               if (isNaN(month)) {
                 mappedData.expMonth = undefined
               } else {
@@ -225,26 +207,22 @@ export class LastPassCsvImporter extends BaseImporter implements Importer {
           cipher.type = CipherType.Card
           cipher.card = mappedData
         } else if (typeParts[1] === 'Address') {
-          const mappedData = this.parseSecureNoteMapping<IdentityView>(
-            cipher,
-            extraParts,
-            {
-              Title: 'title',
-              'First Name': 'firstName',
-              'Last Name': 'lastName',
-              'Middle Name': 'middleName',
-              Company: 'company',
-              'Address 1': 'address1',
-              'Address 2': 'address2',
-              'Address 3': 'address3',
-              'City / Town': 'city',
-              State: 'state',
-              'Zip / Postal Code': 'postalCode',
-              Country: 'country',
-              'Email Address': 'email',
-              Username: 'username'
-            }
-          )
+          const mappedData = this.parseSecureNoteMapping<IdentityView>(cipher, extraParts, {
+            Title: 'title',
+            'First Name': 'firstName',
+            'Last Name': 'lastName',
+            'Middle Name': 'middleName',
+            Company: 'company',
+            'Address 1': 'address1',
+            'Address 2': 'address2',
+            'Address 3': 'address3',
+            'City / Town': 'city',
+            State: 'state',
+            'Zip / Postal Code': 'postalCode',
+            Country: 'country',
+            'Email Address': 'email',
+            Username: 'username',
+          })
           cipher.type = CipherType.Identity
           cipher.identity = mappedData
         }
@@ -259,11 +237,7 @@ export class LastPassCsvImporter extends BaseImporter implements Importer {
     }
   }
 
-  private parseSecureNoteMapping<T> (
-    cipher: CipherView,
-    extraParts: string[],
-    map: any
-  ): T {
+  private parseSecureNoteMapping<T>(cipher: CipherView, extraParts: string[], map: any): T {
     const dataObj: any = {}
 
     let processingNotes = false
@@ -283,11 +257,7 @@ export class LastPassCsvImporter extends BaseImporter implements Importer {
             val = extraPart.substring(colonIndex + 1)
           }
         }
-        if (
-          this.isNullOrWhitespace(key) ||
-          this.isNullOrWhitespace(val) ||
-          key === 'NoteType'
-        ) {
+        if (this.isNullOrWhitespace(key) || this.isNullOrWhitespace(val) || key === 'NoteType') {
           return
         }
       }

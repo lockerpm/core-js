@@ -2,10 +2,8 @@ import { ImportResult } from '../../src/models/domain/importResult'
 import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
-export class StickyPasswordXmlImporter
-  extends BaseImporter
-  implements Importer {
-  parse (data: string): Promise<ImportResult> {
+export class StickyPasswordXmlImporter extends BaseImporter implements Importer {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const doc = this.parseXml(data)
     if (doc == null) {
@@ -70,10 +68,8 @@ export class StickyPasswordXmlImporter
     return Promise.resolve(result)
   }
 
-  buildGroupText (doc: Document, groupId: string, groupText: string): string {
-    const group = doc.querySelector(
-      'root > Database > Groups > Group[ID="' + groupId + '"]'
-    )
+  buildGroupText(doc: Document, groupId: string, groupText: string): string {
+    const group = doc.querySelector('root > Database > Groups > Group[ID="' + groupId + '"]')
     if (group == null) {
       return groupText
     }

@@ -1,128 +1,130 @@
-import { OrganizationData } from '../data/organizationData';
+import { OrganizationData } from '../data/organizationData'
 
-import { OrganizationUserStatusType } from '../../enums/organizationUserStatusType';
-import { OrganizationUserType } from '../../enums/organizationUserType';
-import { PermissionsApi } from '../api/permissionsApi';
-
+import { OrganizationUserStatusType } from '../../enums/organizationUserStatusType'
+import { OrganizationUserType } from '../../enums/organizationUserType'
+import { PermissionsApi } from '../api/permissionsApi'
 
 export class Organization {
-    id: string;
-    name: string;
-    status: OrganizationUserStatusType;
-    type: OrganizationUserType;
-    enabled: boolean;
-    usePolicies: boolean;
-    useGroups: boolean;
-    useDirectory: boolean;
-    useEvents: boolean;
-    useTotp: boolean;
-    use2fa: boolean;
-    useApi: boolean;
-    useBusinessPortal: boolean;
-    useSso: boolean;
-    selfHost: boolean;
-    usersGetPremium: boolean;
-    seats: number;
-    maxCollections: number;
-    maxStorageGb?: number;
-    ssoBound: boolean;
-    identifier: string;
-    permissions: PermissionsApi;
-    resetPasswordKey: string;
-    userId: string;
+  id: string
+  name: string
+  status: OrganizationUserStatusType
+  type: OrganizationUserType
+  enabled: boolean
+  usePolicies: boolean
+  useGroups: boolean
+  useDirectory: boolean
+  useEvents: boolean
+  useTotp: boolean
+  use2fa: boolean
+  useApi: boolean
+  useBusinessPortal: boolean
+  useSso: boolean
+  selfHost: boolean
+  usersGetPremium: boolean
+  seats: number
+  maxCollections: number
+  maxStorageGb?: number
+  ssoBound: boolean
+  identifier: string
+  permissions: PermissionsApi
+  resetPasswordKey: string
+  userId: string
 
-    constructor(obj?: OrganizationData) {
-        if (obj == null) {
-            return;
-        }
-
-        this.id = obj.id;
-        this.name = obj.name;
-        this.status = obj.status;
-        this.type = obj.type;
-        this.enabled = obj.enabled;
-        this.usePolicies = obj.usePolicies;
-        this.useGroups = obj.useGroups;
-        this.useDirectory = obj.useDirectory;
-        this.useEvents = obj.useEvents;
-        this.useTotp = obj.useTotp;
-        this.use2fa = obj.use2fa;
-        this.useApi = obj.useApi;
-        this.useBusinessPortal = obj.useBusinessPortal;
-        this.useSso = obj.useSso;
-        this.selfHost = obj.selfHost;
-        this.usersGetPremium = obj.usersGetPremium;
-        this.seats = obj.seats;
-        this.maxCollections = obj.maxCollections;
-        this.maxStorageGb = obj.maxStorageGb;
-        this.ssoBound = obj.ssoBound;
-        this.identifier = obj.identifier;
-        this.permissions = obj.permissions;
-        this.resetPasswordKey = obj.resetPasswordKey;
-        this.userId = obj.userId;
+  constructor(obj?: OrganizationData) {
+    if (obj == null) {
+      return
     }
 
-    get canAccess() {
-        if (this.type === OrganizationUserType.Owner) {
-            return true;
-        }
-        return this.enabled && this.status === OrganizationUserStatusType.Confirmed;
-    }
+    this.id = obj.id
+    this.name = obj.name
+    this.status = obj.status
+    this.type = obj.type
+    this.enabled = obj.enabled
+    this.usePolicies = obj.usePolicies
+    this.useGroups = obj.useGroups
+    this.useDirectory = obj.useDirectory
+    this.useEvents = obj.useEvents
+    this.useTotp = obj.useTotp
+    this.use2fa = obj.use2fa
+    this.useApi = obj.useApi
+    this.useBusinessPortal = obj.useBusinessPortal
+    this.useSso = obj.useSso
+    this.selfHost = obj.selfHost
+    this.usersGetPremium = obj.usersGetPremium
+    this.seats = obj.seats
+    this.maxCollections = obj.maxCollections
+    this.maxStorageGb = obj.maxStorageGb
+    this.ssoBound = obj.ssoBound
+    this.identifier = obj.identifier
+    this.permissions = obj.permissions
+    this.resetPasswordKey = obj.resetPasswordKey
+    this.userId = obj.userId
+  }
 
-    get isManager() {
-        return this.type === OrganizationUserType.Manager || this.type === OrganizationUserType.Owner ||
-            this.type === OrganizationUserType.Admin;
+  get canAccess() {
+    if (this.type === OrganizationUserType.Owner) {
+      return true
     }
+    return this.enabled && this.status === OrganizationUserStatusType.Confirmed
+  }
 
-    get isAdmin() {
-        return this.type === OrganizationUserType.Owner || this.type === OrganizationUserType.Admin;
-    }
+  get isManager() {
+    return (
+      this.type === OrganizationUserType.Manager ||
+      this.type === OrganizationUserType.Owner ||
+      this.type === OrganizationUserType.Admin
+    )
+  }
 
-    get isOwner() {
-        return this.type === OrganizationUserType.Owner;
-    }
+  get isAdmin() {
+    return this.type === OrganizationUserType.Owner || this.type === OrganizationUserType.Admin
+  }
 
-    get canAccessBusinessPortal() {
-        return this.isAdmin || this.permissions.accessBusinessPortal;
-    }
+  get isOwner() {
+    return this.type === OrganizationUserType.Owner
+  }
 
-    get canAccessEventLogs() {
-        return this.isAdmin || this.permissions.accessEventLogs;
-    }
+  get canAccessBusinessPortal() {
+    return this.isAdmin || this.permissions.accessBusinessPortal
+  }
 
-    get canAccessImportExport() {
-        return this.isAdmin || this.permissions.accessImportExport;
-    }
+  get canAccessEventLogs() {
+    return this.isAdmin || this.permissions.accessEventLogs
+  }
 
-    get canAccessReports() {
-        return this.isAdmin || this.permissions.accessReports;
-    }
+  get canAccessImportExport() {
+    return this.isAdmin || this.permissions.accessImportExport
+  }
 
-    get canManageAllCollections() {
-        return this.isAdmin || this.permissions.manageAllCollections;
-    }
+  get canAccessReports() {
+    return this.isAdmin || this.permissions.accessReports
+  }
 
-    get canManageAssignedCollections() {
-        return this.isManager || this.permissions.manageAssignedCollections;
-    }
+  get canManageAllCollections() {
+    return this.isAdmin || this.permissions.manageAllCollections
+  }
 
-    get canManageGroups() {
-        return this.isAdmin || this.permissions.manageGroups;
-    }
+  get canManageAssignedCollections() {
+    return this.isManager || this.permissions.manageAssignedCollections
+  }
 
-    get canManageSso() {
-        return this.isAdmin || this.permissions.manageSso;
-    }
+  get canManageGroups() {
+    return this.isAdmin || this.permissions.manageGroups
+  }
 
-    get canManagePolicies() {
-        return this.isAdmin || this.permissions.managePolicies;
-    }
+  get canManageSso() {
+    return this.isAdmin || this.permissions.manageSso
+  }
 
-    get canManageUsers() {
-        return this.isAdmin || this.permissions.manageUsers;
-    }
+  get canManagePolicies() {
+    return this.isAdmin || this.permissions.managePolicies
+  }
 
-    get isResetPasswordEnrolled() {
-        return this.resetPasswordKey != null;
-    }
+  get canManageUsers() {
+    return this.isAdmin || this.permissions.manageUsers
+  }
+
+  get isResetPasswordEnrolled() {
+    return this.resetPasswordKey != null
+  }
 }

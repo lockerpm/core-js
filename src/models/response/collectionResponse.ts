@@ -8,7 +8,7 @@ export class CollectionResponse extends BaseResponse {
   externalId: string
   revisionDate: string
 
-  constructor (response: any) {
+  constructor(response: any) {
     super(response)
     this.id = this.getResponseProperty('Id')
     this.organizationId = this.getResponseProperty('OrganizationId')
@@ -21,7 +21,7 @@ export class CollectionResponse extends BaseResponse {
 export class CollectionDetailsResponse extends CollectionResponse {
   readOnly: boolean
 
-  constructor (response: any) {
+  constructor(response: any) {
     super(response)
     this.readOnly = this.getResponseProperty('ReadOnly') || false
   }
@@ -30,7 +30,7 @@ export class CollectionDetailsResponse extends CollectionResponse {
 export class CollectionGroupDetailsResponse extends CollectionResponse {
   groups: SelectionReadOnlyResponse[] = []
 
-  constructor (response: any) {
+  constructor(response: any) {
     super(response)
     const groups = this.getResponseProperty('Groups')
     if (groups != null) {

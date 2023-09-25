@@ -1,6 +1,6 @@
-import { PasswordVerificationRequest } from './passwordVerificationRequest';
+import { PasswordVerificationRequest } from './passwordVerificationRequest'
 
 export class PasswordRequest extends PasswordVerificationRequest {
-    newMasterPasswordHash: string;
-    key: string;
+  newMasterPasswordHash: string
+  key: string
 }

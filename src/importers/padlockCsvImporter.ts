@@ -6,7 +6,7 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 export class PadlockCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, false)
     if (results == null) {
@@ -47,10 +47,7 @@ export class PadlockCsvImporter extends BaseImporter implements Importer {
               result.collections.push(collection)
             }
 
-            result.collectionRelationships.push([
-              result.ciphers.length,
-              collectionIndex
-            ])
+            result.collectionRelationships.push([result.ciphers.length, collectionIndex])
           })
         } else {
           const tags = (value[1] as string).split(',')
@@ -64,10 +61,7 @@ export class PadlockCsvImporter extends BaseImporter implements Importer {
 
       for (let i = 2; i < value.length; i++) {
         const header = headers[i].trim().toLowerCase()
-        if (
-          this.isNullOrWhitespace(value[i]) ||
-          this.isNullOrWhitespace(header)
-        ) {
+        if (this.isNullOrWhitespace(value[i]) || this.isNullOrWhitespace(header)) {
           continue
         }
 

@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class GnomeJsonImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = JSON.parse(data)
     if (results == null || Object.keys(results).length === 0) {
@@ -30,9 +30,7 @@ export class GnomeJsonImporter extends BaseImporter implements Importer {
 
         this.processFolder(result, keyRing)
         const cipher = this.initLoginCipher()
-        cipher.name = value.display_name
-          .replace('http://', '')
-          .replace('https://', '')
+        cipher.name = value.display_name.replace('http://', '').replace('https://', '')
         if (cipher.name.length > 30) {
           cipher.name = cipher.name.substring(0, 30)
         }

@@ -8,7 +8,7 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 export class MSecureCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, false)
     if (results == null) {
@@ -22,9 +22,7 @@ export class MSecureCsvImporter extends BaseImporter implements Importer {
       }
 
       const folderName =
-        this.getValueOrDefault(value[0], 'Unassigned') !== 'Unassigned'
-          ? value[0]
-          : null
+        this.getValueOrDefault(value[0], 'Unassigned') !== 'Unassigned' ? value[0] : null
       this.processFolder(result, folderName)
 
       const cipher = this.initLoginCipher()
@@ -34,9 +32,7 @@ export class MSecureCsvImporter extends BaseImporter implements Importer {
         cipher.login.uris = this.makeUriArray(value[4])
         cipher.login.username = this.getValueOrDefault(value[5])
         cipher.login.password = this.getValueOrDefault(value[6])
-        cipher.notes = !this.isNullOrWhitespace(value[3])
-          ? value[3].split('\\n').join('\n')
-          : null
+        cipher.notes = !this.isNullOrWhitespace(value[3]) ? value[3].split('\\n').join('\n') : null
       } else if (value.length > 3) {
         cipher.type = CipherType.SecureNote
         cipher.secureNote = new SecureNoteView()
@@ -48,10 +44,7 @@ export class MSecureCsvImporter extends BaseImporter implements Importer {
         }
       }
 
-      if (
-        !this.isNullOrWhitespace(value[1]) &&
-        cipher.type !== CipherType.Login
-      ) {
+      if (!this.isNullOrWhitespace(value[1]) && cipher.type !== CipherType.Login) {
         cipher.name = value[1] + ': ' + cipher.name
       }
 

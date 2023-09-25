@@ -12,7 +12,7 @@ export class CollectionView implements View, ITreeNodeObject {
   readOnly: boolean = null
   hidePasswords: boolean = null
   revisionDate: Date = null
-  constructor (c?: Collection | CollectionGroupDetailsResponse) {
+  constructor(c?: Collection | CollectionGroupDetailsResponse) {
     if (!c) {
       return
     }
@@ -25,8 +25,6 @@ export class CollectionView implements View, ITreeNodeObject {
       this.hidePasswords = c.hidePasswords
     }
     this.revisionDate =
-      typeof c.revisionDate === 'string'
-        ? new Date(c.revisionDate)
-        : c.revisionDate
+      typeof c.revisionDate === 'string' ? new Date(c.revisionDate) : c.revisionDate
   }
 }

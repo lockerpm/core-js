@@ -79,14 +79,14 @@ import { BreachAccountResponse } from '../../src/models/response/breachAccountRe
 import { CipherResponse } from '../../src/models/response/cipherResponse'
 import {
   CollectionGroupDetailsResponse,
-  CollectionResponse
+  CollectionResponse,
 } from '../../src/models/response/collectionResponse'
 import { DomainsResponse } from '../../src/models/response/domainsResponse'
 import {
   EmergencyAccessGranteeDetailsResponse,
   EmergencyAccessGrantorDetailsResponse,
   EmergencyAccessTakeoverResponse,
-  EmergencyAccessViewResponse
+  EmergencyAccessViewResponse,
 } from '../../src/models/response/emergencyAccessResponse'
 import { EventResponse } from '../../src/models/response/eventResponse'
 import { FolderResponse } from '../../src/models/response/folderResponse'
@@ -98,7 +98,7 @@ import { OrganizationResponse } from '../../src/models/response/organizationResp
 import { OrganizationSubscriptionResponse } from '../../src/models/response/organizationSubscriptionResponse'
 import {
   OrganizationUserDetailsResponse,
-  OrganizationUserUserDetailsResponse
+  OrganizationUserUserDetailsResponse,
 } from '../../src/models/response/organizationUserResponse'
 import { PaymentResponse } from '../../src/models/response/paymentResponse'
 import { PlanResponse } from '../../src/models/response/planResponse'
@@ -121,7 +121,7 @@ import { TwoFactorProviderResponse } from '../../src/models/response/twoFactorPr
 import { TwoFactorRecoverResponse } from '../../src/models/response/twoFactorRescoverResponse'
 import {
   ChallengeResponse,
-  TwoFactorWebAuthnResponse
+  TwoFactorWebAuthnResponse,
 } from '../../src/models/response/twoFactorWebAuthnResponse'
 import { TwoFactorYubiKeyResponse } from '../../src/models/response/twoFactorYubiKeyResponse'
 import { UserKeyResponse } from '../../src/models/response/userKeyResponse'
@@ -434,7 +434,9 @@ export abstract class ApiService {
 
   getTwoFactorYubiKey: (request: PasswordVerificationRequest) => Promise<TwoFactorYubiKeyResponse>
 
-  getTwoFactorWebAuthn: (request: PasswordVerificationRequest) => Promise<TwoFactorWebAuthnResponse>
+  getTwoFactorWebAuthn: (
+    request: PasswordVerificationRequest
+  ) => Promise<TwoFactorWebAuthnResponse>
 
   getTwoFactorWebAuthnChallenge: (
     request: PasswordVerificationRequest
@@ -501,7 +503,10 @@ export abstract class ApiService {
   postEmergencyAccessReject: (id: string) => Promise<any>
   postEmergencyAccessTakeover: (id: string) => Promise<EmergencyAccessTakeoverResponse>
 
-  postEmergencyAccessPassword: (id: string, request: EmergencyAccessPasswordRequest) => Promise<any>
+  postEmergencyAccessPassword: (
+    id: string,
+    request: EmergencyAccessPasswordRequest
+  ) => Promise<any>
 
   postEmergencyAccessView: (id: string) => Promise<EmergencyAccessViewResponse>
 
@@ -513,7 +518,10 @@ export abstract class ApiService {
   getOrganizationTaxInfo: (id: string) => Promise<TaxInfoResponse>
   postOrganization: (request: OrganizationCreateRequest) => Promise<OrganizationResponse>
 
-  putOrganization: (id: string, request: OrganizationUpdateRequest) => Promise<OrganizationResponse>
+  putOrganization: (
+    id: string,
+    request: OrganizationUpdateRequest
+  ) => Promise<OrganizationResponse>
 
   putOrganizationTaxInfo: (id: string, request: OrganizationTaxInfoUpdateRequest) => Promise<any>
 

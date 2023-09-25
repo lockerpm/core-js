@@ -17,12 +17,12 @@ export class FileUploadService implements FileUploadServiceAbstraction {
   private azureFileUploadService: AzureFileUploadService
   private lockerFileUploadService: LockerFileUploadService
 
-  constructor (private logService: LogService, private apiService: ApiService) {
+  constructor(private logService: LogService, private apiService: ApiService) {
     this.azureFileUploadService = new AzureFileUploadService(logService)
     this.lockerFileUploadService = new LockerFileUploadService(apiService)
   }
 
-  async uploadSendFile (
+  async uploadSendFile(
     uploadData: SendFileUploadDataResponse,
     fileName: EncString,
     encryptedFileData: EncArrayBuffer
@@ -44,12 +44,11 @@ export class FileUploadService implements FileUploadServiceAbstraction {
         break
       case FileUploadType.Azure:
         const renewalCallback = async () => {
-          const renewalResponse =
-              await this.apiService.renewSendFileUploadUrl(
-                uploadData.sendResponse.id,
-                // @ts-ignore
-                uploadData.sendResponse.file.id
-              )
+          const renewalResponse = await this.apiService.renewSendFileUploadUrl(
+            uploadData.sendResponse.id,
+            // @ts-ignore
+            uploadData.sendResponse.file.id
+          )
           return renewalResponse.url
         }
         await this.azureFileUploadService.upload(
@@ -67,36 +66,26 @@ export class FileUploadService implements FileUploadServiceAbstraction {
     }
   }
 
-  async uploadCipherAttachment (
+  async uploadCipherAttachment(
     admin: boolean,
     uploadData: AttachmentUploadDataResponse,
     encryptedFileName: string,
     encryptedFileData: EncArrayBuffer
   ) {
-    const response = admin
-      ? uploadData.cipherMiniResponse
-      : uploadData.cipherResponse
+    const response = admin ? uploadData.cipherMiniResponse : uploadData.cipherResponse
     try {
       switch (uploadData.fileUploadType) {
       case FileUploadType.Direct:
-        await this.lockerFileUploadService.upload(
-          encryptedFileName,
-          encryptedFileData,
-          fd =>
-            this.apiService.postAttachmentFile(
-              response.id,
-              uploadData.attachmentId,
-              fd
-            )
+        await this.lockerFileUploadService.upload(encryptedFileName, encryptedFileData, fd =>
+          this.apiService.postAttachmentFile(response.id, uploadData.attachmentId, fd)
         )
         break
       case FileUploadType.Azure:
         const renewalCallback = async () => {
-          const renewalResponse =
-              await this.apiService.renewAttachmentUploadUrl(
-                response.id,
-                uploadData.attachmentId
-              )
+          const renewalResponse = await this.apiService.renewAttachmentUploadUrl(
+            response.id,
+            uploadData.attachmentId
+          )
           return renewalResponse.url
         }
         await this.azureFileUploadService.upload(
@@ -110,15 +99,9 @@ export class FileUploadService implements FileUploadServiceAbstraction {
       }
     } catch (e) {
       if (admin) {
-        await this.apiService.deleteCipherAttachmentAdmin(
-          response.id,
-          uploadData.attachmentId
-        )
+        await this.apiService.deleteCipherAttachmentAdmin(response.id, uploadData.attachmentId)
       } else {
-        await this.apiService.deleteCipherAttachment(
-          response.id,
-          uploadData.attachmentId
-        )
+        await this.apiService.deleteCipherAttachment(response.id, uploadData.attachmentId)
       }
       throw e
     }

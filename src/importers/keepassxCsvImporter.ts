@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class KeePassXCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -12,14 +12,7 @@ export class KeePassXCsvImporter extends BaseImporter implements Importer {
     }
 
     // CS
-    const existingKeys = [
-      'Group',
-      'Notes',
-      'Title',
-      'Username',
-      'Password',
-      'URL'
-    ]
+    const existingKeys = ['Group', 'Notes', 'Title', 'Username', 'Password', 'URL']
 
     results.forEach(value => {
       if (this.isNullOrWhitespace(value.Title)) {
@@ -30,9 +23,7 @@ export class KeePassXCsvImporter extends BaseImporter implements Importer {
         !this.isNullOrWhitespace(value.Group) && value.Group.startsWith('Root/')
           ? value.Group.replace('Root/', '')
           : value.Group
-      const groupName = !this.isNullOrWhitespace(value.Group)
-        ? value.Group
-        : null
+      const groupName = !this.isNullOrWhitespace(value.Group) ? value.Group : null
       this.processFolder(result, groupName)
 
       const cipher = this.initLoginCipher()

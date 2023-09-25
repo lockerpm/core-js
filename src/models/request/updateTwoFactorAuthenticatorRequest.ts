@@ -1,6 +1,6 @@
-import { PasswordVerificationRequest } from './passwordVerificationRequest';
+import { PasswordVerificationRequest } from './passwordVerificationRequest'
 
 export class UpdateTwoFactorAuthenticatorRequest extends PasswordVerificationRequest {
-    token: string;
-    key: string;
+  token: string
+  key: string
 }

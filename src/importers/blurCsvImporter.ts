@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class BlurCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -33,10 +33,7 @@ export class BlurCsvImporter extends BaseImporter implements Importer {
       //     cipher.login.username = this.getValueOrDefault(value.email);
       //     cipher.notes = this.getValueOrDefault(value.username);
       // }
-      if (
-        this.isNullOrWhitespace(value.username) &&
-        !this.isNullOrWhitespace(value.email)
-      ) {
+      if (this.isNullOrWhitespace(value.username) && !this.isNullOrWhitespace(value.email)) {
         cipher.login.username = value.email
       } else {
         cipher.login.username = this.getValueOrDefault(value.username)

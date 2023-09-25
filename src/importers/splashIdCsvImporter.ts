@@ -1,12 +1,7 @@
 import { ImportResult } from '../../src/models/domain/importResult'
 import { CipherView } from '../../src/models/view/cipherView'
 import { CipherType, SecureNoteType } from '../enums'
-import {
-  CardView,
-  IdentityView,
-  LoginView,
-  SecureNoteView
-} from '../models/view'
+import { CardView, IdentityView, LoginView, SecureNoteView } from '../models/view'
 import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
@@ -14,7 +9,7 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
   // Static fields = category __ item_type __ name __ favourite __ sync
   // Format = STATIC_FIELDS __ VALUES | FIELDS_NAME | TYPE/true/false:MASKED | NOTES | TAGS | CREATED_TIME __ LAST_UPDATE
 
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, false)
     if (results == null) {
@@ -29,8 +24,8 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
 
       this.processFolder(result, this.getValueOrDefault(value[0]))
       let parseResult: {
-        cipher: CipherView
-        existingKeys: string[]
+        cipher: CipherView;
+        existingKeys: string[];
       }
       const type = this.getValueOrDefault(value[1])
       const obj = this.parseValue(value)
@@ -70,7 +65,7 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
       default:
         parseResult = {
           cipher: new CipherView(),
-          existingKeys: []
+          existingKeys: [],
         }
         parseResult.cipher.type = CipherType.SecureNote
         parseResult.cipher.secureNote = new SecureNoteView()
@@ -101,7 +96,7 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
   }
 
   // Address
-  private processAddress (obj: { [key: string]: string }) {
+  private processAddress(obj: { [key: string]: string }) {
     const existingKeys = [
       'Address',
       'Address 2',
@@ -110,7 +105,7 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
       'Zip Code',
       'Country',
       'Email',
-      'Phone'
+      'Phone',
     ]
     const cipher = new CipherView()
     cipher.type = CipherType.Identity
@@ -127,12 +122,12 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
   }
 
   // Bank account
-  private processBankAccount (obj: { [key: string]: string }) {
+  private processBankAccount(obj: { [key: string]: string }) {
     const existingKeys = [
       // 'Description',
       'Account #',
       // 'PIN',
-      'Name'
+      'Name',
       // 'Branch',
       // 'Phone #'
     ]
@@ -145,13 +140,13 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
   }
 
   // Credit card
-  private processCreditCard (obj: { [key: string]: string }) {
+  private processCreditCard(obj: { [key: string]: string }) {
     const existingKeys = [
       // 'Description',
       'Card #',
       'Expir Date',
       'Name',
-      'PIN'
+      'PIN',
       // 'Bank'
     ]
     const cipher = new CipherView()
@@ -161,20 +156,18 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
     cipher.card.brand = this.getCardBrand(cipher.card.number)
     cipher.card.cardholderName = obj.Name
     cipher.card.code = obj.PIN
-    const [month, year] = this.getValueOrDefault(obj['Expir Date'], '/').split(
-      '/'
-    )
+    const [month, year] = this.getValueOrDefault(obj['Expir Date'], '/').split('/')
     cipher.card.expMonth = month
     cipher.card.expYear = year
     return { cipher, existingKeys }
   }
 
   // Email account
-  private processEmailAccount (obj: { [key: string]: string }) {
+  private processEmailAccount(obj: { [key: string]: string }) {
     const existingKeys = [
       // 'Description',
       'Username',
-      'Password'
+      'Password',
       // 'POP3 Host',
       // 'SMTP Host'
     ]
@@ -187,11 +180,11 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
   }
 
   // Identification
-  private processIdentification (obj: { [key: string]: string }) {
+  private processIdentification(obj: { [key: string]: string }) {
     const existingKeys = [
       // 'Description',
       'Number',
-      'Name'
+      'Name',
       // 'Date'
     ]
     const cipher = new CipherView()
@@ -203,11 +196,11 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
   }
 
   // Phone number
-  private processPhoneNumber (obj: { [key: string]: string }) {
+  private processPhoneNumber(obj: { [key: string]: string }) {
     const existingKeys = [
       // 'Description',
       'Phone #',
-      'Name'
+      'Name',
       // 'Date'
     ]
     const cipher = new CipherView()
@@ -219,12 +212,12 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
   }
 
   // Server
-  private processServer (obj: { [key: string]: string }) {
+  private processServer(obj: { [key: string]: string }) {
     const existingKeys = [
       // 'Description',
       'Username',
       'Password',
-      'Address'
+      'Address',
     ]
     const cipher = new CipherView()
     cipher.type = CipherType.Login
@@ -236,12 +229,12 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
   }
 
   // Web logins
-  private processWebLogin (obj: { [key: string]: string }) {
+  private processWebLogin(obj: { [key: string]: string }) {
     const existingKeys = [
       // 'Description',
       'User ID',
       'Password',
-      'URL'
+      'URL',
     ]
     const cipher = new CipherView()
     cipher.type = CipherType.Login
@@ -254,12 +247,14 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
 
   // ------- Supporting functions -------
 
-  private parseValue (value: string[]) {
-    const [values, fields, fieldTypes, notes, tags] =
-      this.splitArrayBySeparator(value.slice(5), '|')
+  private parseValue(value: string[]) {
+    const [values, fields, fieldTypes, notes, tags] = this.splitArrayBySeparator(
+      value.slice(5),
+      '|'
+    )
     const res = {
       notes: (notes || []).join('\n'),
-      tags: (tags || []).join(', ')
+      tags: (tags || []).join(', '),
     }
     try {
       fields.forEach((f: string, index: number) => {
@@ -275,7 +270,7 @@ export class SplashIdCsvImporter extends BaseImporter implements Importer {
     return res
   }
 
-  private splitArrayBySeparator (arr: string[], separator: string) {
+  private splitArrayBySeparator(arr: string[], separator: string) {
     const result = []
     let currentArray = []
     for (const item of arr) {

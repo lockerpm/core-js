@@ -13,5 +13,5 @@ export enum CipherType {
   WirelessRouter = 13,
   Server = 14,
   APICipher = 15,
-  Database = 16
+  Database = 16,
 }

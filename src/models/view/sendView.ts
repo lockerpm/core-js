@@ -24,7 +24,7 @@ export class SendView implements View {
   cipher: CipherView
   emails: string[]
 
-  constructor (s?: Send) {
+  constructor(s?: Send) {
     if (!s) {
       return
     }
@@ -45,18 +45,18 @@ export class SendView implements View {
     this.emails = s.emails
   }
 
-  get urlB64Key (): string {
+  get urlB64Key(): string {
     return Utils.fromBufferToUrlB64(this.key)
   }
 
-  get maxAccessCountReached (): boolean {
+  get maxAccessCountReached(): boolean {
     if (this.maxAccessCount == null) {
       return false
     }
     return this.accessCount >= this.maxAccessCount
   }
 
-  get expired (): boolean {
+  get expired(): boolean {
     if (this.expirationDate == null) {
       return false
     }

@@ -15,7 +15,7 @@ import { ServiceUtils } from '../../src/misc/serviceUtils'
 import { Utils } from '../../src/misc/utils'
 
 const Keys = {
-  collectionsPrefix: 'collections_'
+  collectionsPrefix: 'collections_',
 }
 const NestingDelimiter = '/'
 
@@ -23,24 +23,24 @@ export class CollectionService implements CollectionServiceAbstraction {
   decryptedCollectionCache: CollectionView[]
 
   // eslint-disable-next-line no-useless-constructor
-  constructor (
+  constructor(
     private cryptoService: CryptoService,
     private userService: UserService,
     private storageService: StorageService,
     private i18nService: I18nService
   ) {}
 
-  clearCache (): void {
+  clearCache(): void {
     this.decryptedCollectionCache = null
   }
 
-  async encrypt (model: CollectionView): Promise<Collection> {
+  async encrypt(model: CollectionView): Promise<Collection> {
     if (model.organizationId == null) {
       throw new Error('Collection has no organization id.')
     }
     const key = await this.cryptoService.getOrgKey(model.organizationId)
     if (key == null) {
-      throw new Error("No key for this collection's organization.")
+      throw new Error('No key for this collection\'s organization.')
     }
     const collection = new Collection()
     collection.id = model.id
@@ -50,7 +50,7 @@ export class CollectionService implements CollectionServiceAbstraction {
     return collection
   }
 
-  async decryptMany (collections: Collection[]): Promise<CollectionView[]> {
+  async decryptMany(collections: Collection[]): Promise<CollectionView[]> {
     if (collections == null) {
       return []
     }
@@ -63,10 +63,10 @@ export class CollectionService implements CollectionServiceAbstraction {
     return decCollections.sort(Utils.getSortFunction(this.i18nService, 'name'))
   }
 
-  async get (id: string): Promise<Collection> {
+  async get(id: string): Promise<Collection> {
     const userId = await this.userService.getUserId()
     const collections = await this.storageService.get<{
-      [id: string]: CollectionData
+      [id: string]: CollectionData;
     }>(Keys.collectionsPrefix + userId)
     if (collections == null || !collections.hasOwnProperty(id)) {
       return null
@@ -75,10 +75,10 @@ export class CollectionService implements CollectionServiceAbstraction {
     return new Collection(collections[id])
   }
 
-  async getAll (): Promise<Collection[]> {
+  async getAll(): Promise<Collection[]> {
     const userId = await this.userService.getUserId()
     const collections = await this.storageService.get<{
-      [id: string]: CollectionData
+      [id: string]: CollectionData;
     }>(Keys.collectionsPrefix + userId)
     const response: Collection[] = []
     for (const id in collections) {
@@ -89,7 +89,7 @@ export class CollectionService implements CollectionServiceAbstraction {
     return response
   }
 
-  async getAllDecrypted (): Promise<CollectionView[]> {
+  async getAllDecrypted(): Promise<CollectionView[]> {
     if (this.decryptedCollectionCache != null) {
       return this.decryptedCollectionCache
     }
@@ -104,9 +104,7 @@ export class CollectionService implements CollectionServiceAbstraction {
     return this.decryptedCollectionCache
   }
 
-  async getAllNested (
-    collections: CollectionView[] = null
-  ): Promise<TreeNode<CollectionView>[]> {
+  async getAllNested(collections: CollectionView[] = null): Promise<TreeNode<CollectionView>[]> {
     if (collections == null) {
       collections = await this.getAllDecrypted()
     }
@@ -115,34 +113,21 @@ export class CollectionService implements CollectionServiceAbstraction {
       const collectionCopy = new CollectionView()
       collectionCopy.id = c.id
       collectionCopy.organizationId = c.organizationId
-      const parts =
-        c.name != null
-          ? c.name.replace(/^\/+|\/+$/g, '').split(NestingDelimiter)
-          : []
-      ServiceUtils.nestedTraverse(
-        nodes,
-        0,
-        parts,
-        collectionCopy,
-        null,
-        NestingDelimiter
-      )
+      const parts = c.name != null ? c.name.replace(/^\/+|\/+$/g, '').split(NestingDelimiter) : []
+      ServiceUtils.nestedTraverse(nodes, 0, parts, collectionCopy, null, NestingDelimiter)
     })
     return nodes
   }
 
-  async getNested (id: string): Promise<TreeNode<CollectionView>> {
+  async getNested(id: string): Promise<TreeNode<CollectionView>> {
     const collections = await this.getAllNested()
-    return ServiceUtils.getTreeNodeObject(
-      collections,
-      id
-    ) as TreeNode<CollectionView>
+    return ServiceUtils.getTreeNodeObject(collections, id) as TreeNode<CollectionView>
   }
 
-  async upsert (collection: CollectionData | CollectionData[]): Promise<any> {
+  async upsert(collection: CollectionData | CollectionData[]): Promise<any> {
     const userId = await this.userService.getUserId()
     let collections = await this.storageService.get<{
-      [id: string]: CollectionData
+      [id: string]: CollectionData;
     }>(Keys.collectionsPrefix + userId)
     if (collections == null) {
       collections = {}
@@ -152,7 +137,7 @@ export class CollectionService implements CollectionServiceAbstraction {
       const c = collection as CollectionData
       collections[c.id] = c
     } else {
-      ;(collection as CollectionData[]).forEach(c => {
+      (collection as CollectionData[]).forEach(c => {
         collections[c.id] = c
       })
     }
@@ -161,21 +146,21 @@ export class CollectionService implements CollectionServiceAbstraction {
     this.decryptedCollectionCache = null
   }
 
-  async replace (collections: { [id: string]: CollectionData }): Promise<any> {
+  async replace(collections: { [id: string]: CollectionData }): Promise<any> {
     const userId = await this.userService.getUserId()
     await this.storageService.save(Keys.collectionsPrefix + userId, collections)
     this.decryptedCollectionCache = null
   }
 
-  async clear (userId: string): Promise<any> {
+  async clear(userId: string): Promise<any> {
     await this.storageService.remove(Keys.collectionsPrefix + userId)
     this.decryptedCollectionCache = null
   }
 
-  async delete (id: string | string[]): Promise<any> {
+  async delete(id: string | string[]): Promise<any> {
     const userId = await this.userService.getUserId()
     const collections = await this.storageService.get<{
-      [id: string]: CollectionData
+      [id: string]: CollectionData;
     }>(Keys.collectionsPrefix + userId)
     if (collections == null) {
       return
@@ -185,7 +170,7 @@ export class CollectionService implements CollectionServiceAbstraction {
       const i = id as string
       delete collections[id]
     } else {
-      ;(id as string[]).forEach(i => {
+      (id as string[]).forEach(i => {
         delete collections[i]
       })
     }

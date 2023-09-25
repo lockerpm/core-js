@@ -31,7 +31,7 @@ export const TwoFactorProviders = {
     description: null as string,
     priority: 1,
     sort: 1,
-    premium: false
+    premium: false,
   },
   [TwoFactorProviderType.Yubikey]: {
     type: TwoFactorProviderType.Yubikey,
@@ -39,7 +39,7 @@ export const TwoFactorProviders = {
     description: null as string,
     priority: 3,
     sort: 2,
-    premium: true
+    premium: true,
   },
   [TwoFactorProviderType.Duo]: {
     type: TwoFactorProviderType.Duo,
@@ -47,7 +47,7 @@ export const TwoFactorProviders = {
     description: null as string,
     priority: 2,
     sort: 3,
-    premium: true
+    premium: true,
   },
   [TwoFactorProviderType.OrganizationDuo]: {
     type: TwoFactorProviderType.OrganizationDuo,
@@ -55,7 +55,7 @@ export const TwoFactorProviders = {
     description: null as string,
     priority: 10,
     sort: 4,
-    premium: false
+    premium: false,
   },
   [TwoFactorProviderType.Email]: {
     type: TwoFactorProviderType.Email,
@@ -63,7 +63,7 @@ export const TwoFactorProviders = {
     description: null as string,
     priority: 0,
     sort: 6,
-    premium: false
+    premium: false,
   },
   [TwoFactorProviderType.WebAuthn]: {
     type: TwoFactorProviderType.WebAuthn,
@@ -71,8 +71,8 @@ export const TwoFactorProviders = {
     description: null as string,
     priority: 4,
     sort: 5,
-    premium: true
-  }
+    premium: true,
+  },
 }
 
 export class AuthService implements AuthServiceAbstraction {
@@ -88,7 +88,7 @@ export class AuthService implements AuthServiceAbstraction {
 
   private key: SymmetricCryptoKey
 
-  constructor (
+  constructor(
     private cryptoService: CryptoService,
     private apiService: ApiService,
     private userService: UserService,
@@ -102,43 +102,35 @@ export class AuthService implements AuthServiceAbstraction {
     private setCryptoKeys = true
   ) {}
 
-  init () {
-    TwoFactorProviders[TwoFactorProviderType.Email].name =
-      this.i18nService.t('emailTitle')
-    TwoFactorProviders[TwoFactorProviderType.Email].description =
-      this.i18nService.t('emailDesc')
+  init() {
+    TwoFactorProviders[TwoFactorProviderType.Email].name = this.i18nService.t('emailTitle')
+    TwoFactorProviders[TwoFactorProviderType.Email].description = this.i18nService.t('emailDesc')
 
     TwoFactorProviders[TwoFactorProviderType.Authenticator].name =
       this.i18nService.t('authenticatorAppTitle')
     TwoFactorProviders[TwoFactorProviderType.Authenticator].description =
       this.i18nService.t('authenticatorAppDesc')
 
-    TwoFactorProviders[TwoFactorProviderType.Duo].description =
-      this.i18nService.t('duoDesc')
+    TwoFactorProviders[TwoFactorProviderType.Duo].description = this.i18nService.t('duoDesc')
 
     TwoFactorProviders[TwoFactorProviderType.OrganizationDuo].name =
       'Duo (' + this.i18nService.t('organization') + ')'
     TwoFactorProviders[TwoFactorProviderType.OrganizationDuo].description =
       this.i18nService.t('duoOrganizationDesc')
 
-    TwoFactorProviders[TwoFactorProviderType.WebAuthn].name =
-      this.i18nService.t('webAuthnTitle')
+    TwoFactorProviders[TwoFactorProviderType.WebAuthn].name = this.i18nService.t('webAuthnTitle')
     TwoFactorProviders[TwoFactorProviderType.WebAuthn].description =
       this.i18nService.t('webAuthnDesc')
 
-    TwoFactorProviders[TwoFactorProviderType.Yubikey].name =
-      this.i18nService.t('yubiKeyTitle')
+    TwoFactorProviders[TwoFactorProviderType.Yubikey].name = this.i18nService.t('yubiKeyTitle')
     TwoFactorProviders[TwoFactorProviderType.Yubikey].description =
       this.i18nService.t('yubiKeyDesc')
   }
 
-  async logIn (email: string, masterPassword: string): Promise<AuthResult> {
+  async logIn(email: string, masterPassword: string): Promise<AuthResult> {
     this.selectedTwoFactorProviderType = null
     const key = await this.makePreloginKey(masterPassword, email)
-    const hashedPassword = await this.cryptoService.hashPassword(
-      masterPassword,
-      key
-    )
+    const hashedPassword = await this.cryptoService.hashPassword(masterPassword, key)
     return await this.logInHelper(
       email,
       hashedPassword,
@@ -154,11 +146,7 @@ export class AuthService implements AuthServiceAbstraction {
     )
   }
 
-  async logInSso (
-    code: string,
-    codeVerifier: string,
-    redirectUrl: string
-  ): Promise<AuthResult> {
+  async logInSso(code: string, codeVerifier: string, redirectUrl: string): Promise<AuthResult> {
     this.selectedTwoFactorProviderType = null
     return await this.logInHelper(
       null,
@@ -175,10 +163,7 @@ export class AuthService implements AuthServiceAbstraction {
     )
   }
 
-  async logInApiKey (
-    clientId: string,
-    clientSecret: string
-  ): Promise<AuthResult> {
+  async logInApiKey(clientId: string, clientSecret: string): Promise<AuthResult> {
     this.selectedTwoFactorProviderType = null
     return await this.logInHelper(
       null,
@@ -195,7 +180,7 @@ export class AuthService implements AuthServiceAbstraction {
     )
   }
 
-  async logInTwoFactor (
+  async logInTwoFactor(
     twoFactorProvider: TwoFactorProviderType,
     twoFactorToken: string,
     remember?: boolean
@@ -215,7 +200,7 @@ export class AuthService implements AuthServiceAbstraction {
     )
   }
 
-  async logInComplete (
+  async logInComplete(
     email: string,
     masterPassword: string,
     twoFactorProvider: TwoFactorProviderType,
@@ -224,10 +209,7 @@ export class AuthService implements AuthServiceAbstraction {
   ): Promise<AuthResult> {
     this.selectedTwoFactorProviderType = null
     const key = await this.makePreloginKey(masterPassword, email)
-    const hashedPassword = await this.cryptoService.hashPassword(
-      masterPassword,
-      key
-    )
+    const hashedPassword = await this.cryptoService.hashPassword(masterPassword, key)
     return await this.logInHelper(
       email,
       hashedPassword,
@@ -243,7 +225,7 @@ export class AuthService implements AuthServiceAbstraction {
     )
   }
 
-  async logInSsoComplete (
+  async logInSsoComplete(
     code: string,
     codeVerifier: string,
     redirectUrl: string,
@@ -267,7 +249,7 @@ export class AuthService implements AuthServiceAbstraction {
     )
   }
 
-  async logInApiKeyComplete (
+  async logInApiKeyComplete(
     clientId: string,
     clientSecret: string,
     twoFactorProvider: TwoFactorProviderType,
@@ -290,12 +272,12 @@ export class AuthService implements AuthServiceAbstraction {
     )
   }
 
-  logOut (callback: Function) {
+  logOut(callback: Function) {
     callback()
     this.messagingService.send('loggedOut')
   }
 
-  getSupportedTwoFactorProviders (win: Window): any[] {
+  getSupportedTwoFactorProviders(win: Window): any[] {
     const providers: any[] = []
     if (this.twoFactorProvidersData == null) {
       return providers
@@ -337,9 +319,7 @@ export class AuthService implements AuthServiceAbstraction {
     return providers
   }
 
-  getDefaultTwoFactorProvider (
-    webAuthnSupported: boolean
-  ): TwoFactorProviderType {
+  getDefaultTwoFactorProvider(webAuthnSupported: boolean): TwoFactorProviderType {
     if (this.twoFactorProvidersData == null) {
       return null
     }
@@ -368,17 +348,12 @@ export class AuthService implements AuthServiceAbstraction {
     return providerType
   }
 
-  async makePreloginKey (
-    masterPassword: string,
-    email: string
-  ): Promise<SymmetricCryptoKey> {
+  async makePreloginKey(masterPassword: string, email: string): Promise<SymmetricCryptoKey> {
     email = email.trim().toLowerCase()
     let kdf: KdfType = null
     let kdfIterations: number = null
     try {
-      const preloginResponse = await this.apiService.postPrelogin(
-        new PreloginRequest(email)
-      )
+      const preloginResponse = await this.apiService.postPrelogin(new PreloginRequest(email))
       if (preloginResponse != null) {
         kdf = preloginResponse.kdf
         kdfIterations = preloginResponse.kdfIterations
@@ -391,23 +366,19 @@ export class AuthService implements AuthServiceAbstraction {
     return this.cryptoService.makeKey(masterPassword, email, kdf, kdfIterations)
   }
 
-  authingWithApiKey (): boolean {
+  authingWithApiKey(): boolean {
     return this.clientId != null && this.clientSecret != null
   }
 
-  authingWithSso (): boolean {
-    return (
-      this.code != null &&
-      this.codeVerifier != null &&
-      this.ssoRedirectUrl != null
-    )
+  authingWithSso(): boolean {
+    return this.code != null && this.codeVerifier != null && this.ssoRedirectUrl != null
   }
 
-  authingWithPassword (): boolean {
+  authingWithPassword(): boolean {
     return this.email != null && this.masterPasswordHash != null
   }
 
-  private async logInHelper (
+  private async logInHelper(
     email: string,
     hashedPassword: string,
     code: string,
@@ -420,9 +391,7 @@ export class AuthService implements AuthServiceAbstraction {
     twoFactorToken?: string,
     remember?: boolean
   ): Promise<AuthResult> {
-    const storedTwoFactorToken = await this.tokenService.getTwoFactorToken(
-      email
-    )
+    const storedTwoFactorToken = await this.tokenService.getTwoFactorToken(email)
     const appId = await this.appIdService.getAppId()
     const deviceRequest = new DeviceRequest(appId, this.platformUtilsService)
 
@@ -504,16 +473,10 @@ export class AuthService implements AuthServiceAbstraction {
     const tokenResponse = response as IdentityTokenResponse
     result.resetMasterPassword = tokenResponse.resetMasterPassword
     if (tokenResponse.twoFactorToken != null) {
-      await this.tokenService.setTwoFactorToken(
-        tokenResponse.twoFactorToken,
-        email
-      )
+      await this.tokenService.setTwoFactorToken(tokenResponse.twoFactorToken, email)
     }
 
-    await this.tokenService.setTokens(
-      tokenResponse.accessToken,
-      tokenResponse.refreshToken
-    )
+    await this.tokenService.setTokens(tokenResponse.accessToken, tokenResponse.refreshToken)
     await this.userService.setInformation(
       this.tokenService.getUserId(),
       this.tokenService.getEmail(),
@@ -557,7 +520,7 @@ export class AuthService implements AuthServiceAbstraction {
     return result
   }
 
-  private clearState (): void {
+  private clearState(): void {
     this.key = null
     this.email = null
     this.masterPasswordHash = null

@@ -8,13 +8,9 @@ const MAX_SINGLE_BLOB_UPLOAD_SIZE = 256 * 1024 * 1024 // 256 MiB
 const MAX_BLOCKS_PER_BLOB = 50000
 
 export class AzureFileUploadService {
-  constructor (private logService: LogService) {}
+  constructor(private logService: LogService) {}
 
-  async upload (
-    url: string,
-    data: EncArrayBuffer,
-    renewalCallback: () => Promise<string>
-  ) {
+  async upload(url: string, data: EncArrayBuffer, renewalCallback: () => Promise<string>) {
     if (data.buffer.byteLength <= MAX_SINGLE_BLOB_UPLOAD_SIZE) {
       return await this.azureUploadBlob(url, data)
     } else {
@@ -22,20 +18,20 @@ export class AzureFileUploadService {
     }
   }
 
-  private async azureUploadBlob (url: string, data: EncArrayBuffer) {
+  private async azureUploadBlob(url: string, data: EncArrayBuffer) {
     const urlObject = Utils.getUrl(url)
     const headers = new Headers({
       'x-ms-date': new Date().toUTCString(),
       'x-ms-version': urlObject.searchParams.get('sv'),
       'Content-Length': data.buffer.byteLength.toString(),
-      'x-ms-blob-type': 'BlockBlob'
+      'x-ms-blob-type': 'BlockBlob',
     })
 
     const request = new Request(url, {
       body: data.buffer,
       cache: 'no-store',
       method: 'PUT',
-      headers
+      headers,
     })
 
     const blobResponse = await fetch(request)
@@ -45,7 +41,7 @@ export class AzureFileUploadService {
     }
   }
 
-  private async azureUploadBlocks (
+  private async azureUploadBlocks(
     url: string,
     data: EncArrayBuffer,
     renewalCallback: () => Promise<string>
@@ -58,9 +54,7 @@ export class AzureFileUploadService {
 
     if (numBlocks > MAX_BLOCKS_PER_BLOB) {
       throw new Error(
-        `Cannot upload file, exceeds maximum size of ${
-          blockSize * MAX_BLOCKS_PER_BLOB
-        }`
+        `Cannot upload file, exceeds maximum size of ${blockSize * MAX_BLOCKS_PER_BLOB}`
       )
     }
 
@@ -76,14 +70,14 @@ export class AzureFileUploadService {
         const blockHeaders = new Headers({
           'x-ms-date': new Date().toUTCString(),
           'x-ms-version': blockUrl.searchParams.get('sv'),
-          'Content-Length': blockData.byteLength.toString()
+          'Content-Length': blockData.byteLength.toString(),
         })
 
         const blockRequest = new Request(blockUrl.toString(), {
           body: blockData,
           cache: 'no-store',
           method: 'PUT',
-          headers: blockHeaders
+          headers: blockHeaders,
         })
 
         const blockResponse = await fetch(blockRequest)
@@ -105,14 +99,14 @@ export class AzureFileUploadService {
       const headers = new Headers({
         'x-ms-date': new Date().toUTCString(),
         'x-ms-version': blockListUrl.searchParams.get('sv'),
-        'Content-Length': blockListXml.length.toString()
+        'Content-Length': blockListXml.length.toString(),
       })
 
       const request = new Request(blockListUrl.toString(), {
         body: blockListXml,
         cache: 'no-store',
         method: 'PUT',
-        headers
+        headers,
       })
 
       const response = await fetch(request)
@@ -127,7 +121,7 @@ export class AzureFileUploadService {
     }
   }
 
-  private async renewUrlIfNecessary (
+  private async renewUrlIfNecessary(
     url: string,
     renewalCallback: () => Promise<string>
   ): Promise<string> {
@@ -144,7 +138,7 @@ export class AzureFileUploadService {
     return url
   }
 
-  private encodedBlockId (blockIndex: number) {
+  private encodedBlockId(blockIndex: number) {
     // Encoded blockId max size is 64, so pre-encoding max size is 48
     const utfBlockId = (
       '000000000000000000000000000000000000000000000000' + blockIndex.toString()
@@ -152,7 +146,7 @@ export class AzureFileUploadService {
     return Utils.fromUtf8ToB64(utfBlockId)
   }
 
-  private blockListXml (blockIdList: string[]) {
+  private blockListXml(blockIdList: string[]) {
     let xml = '<?xml version="1.0" encoding="utf-8"?><BlockList>'
     blockIdList.forEach(blockId => {
       xml += `<Latest>${blockId}</Latest>`
@@ -161,7 +155,7 @@ export class AzureFileUploadService {
     return xml
   }
 
-  private getMaxBlockSize (version: string) {
+  private getMaxBlockSize(version: string) {
     if (Version.compare(version, '2019-12-12') >= 0) {
       return 4000 * 1024 * 1024 // 4000 MiB
     } else if (Version.compare(version, '2016-05-31') >= 0) {
@@ -180,7 +174,7 @@ class Version {
    * @returns a number less than zero if b is newer than a, 0 if equal,
    * and greater than zero if a is newer than b
    */
-  static compare (a: Required<Version> | string, b: Required<Version> | string) {
+  static compare(a: Required<Version> | string, b: Required<Version> | string) {
     if (typeof a === 'string') {
       a = new Version(a)
     }
@@ -202,7 +196,7 @@ class Version {
   month = 0
   day = 0
 
-  constructor (version: string) {
+  constructor(version: string) {
     try {
       const parts = version.split('-').map(v => Number.parseInt(v, 10))
       this.year = parts[0]
@@ -217,7 +211,7 @@ class Version {
    * @returns a number less than zero if compareTo is newer, 0 if equal,
    * and greater than zero if this is greater than compareTo
    */
-  compare (compareTo: Required<Version> | string) {
+  compare(compareTo: Required<Version> | string) {
     return Version.compare(this, compareTo)
   }
 }

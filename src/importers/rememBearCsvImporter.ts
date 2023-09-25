@@ -7,7 +7,7 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 export class RememBearCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -38,11 +38,7 @@ export class RememBearCsvImporter extends BaseImporter implements Importer {
           const expMonth = this.getValueOrDefault(value.expiryMonth)
           if (expMonth != null) {
             const expMonthNumber = parseInt(expMonth, null)
-            if (
-              expMonthNumber != null &&
-              expMonthNumber >= 1 &&
-              expMonthNumber <= 12
-            ) {
+            if (expMonthNumber != null && expMonthNumber >= 1 && expMonthNumber <= 12) {
               cipher.card.expMonth = expMonthNumber.toString()
             }
           }

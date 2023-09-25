@@ -29,7 +29,7 @@ export class Send extends Domain {
 
   obj: SendData
 
-  constructor (obj?: SendData, alreadyEncrypted: boolean = false) {
+  constructor(obj?: SendData, alreadyEncrypted: boolean = false) {
     super()
     if (obj == null) {
       return
@@ -45,31 +45,28 @@ export class Send extends Domain {
         userId: null,
         accessId: null,
         key: null,
-        cipherId: null
+        cipherId: null,
       },
       alreadyEncrypted,
       ['id', 'userId', 'accessId', 'cipherId']
     )
 
     // @ts-ignore
-    this.creationDate =
-      obj.creationDate != null ? new Date(obj.creationDate) : null
+    this.creationDate = obj.creationDate != null ? new Date(obj.creationDate) : null
     // @ts-ignore
-    this.revisionDate =
-      obj.revisionDate != null ? new Date(obj.revisionDate) : null
+    this.revisionDate = obj.revisionDate != null ? new Date(obj.revisionDate) : null
     this.password = obj.password
     this.maxAccessCount = obj.maxAccessCount
     this.accessCount = obj.accessCount
     this.eachEmailAccessCount = obj.eachEmailAccessCount
     // @ts-ignore
-    this.expirationDate =
-      obj.expirationDate != null ? new Date(obj.expirationDate) : null
+    this.expirationDate = obj.expirationDate != null ? new Date(obj.expirationDate) : null
     this.disabled = obj.disabled
     this.requireOtp = obj.requireOtp
     this.emails = obj.emails
   }
 
-  async decrypt (): Promise<SendView> {
+  async decrypt(): Promise<SendView> {
     const model = new SendView(this)
 
     let cryptoService: CryptoService

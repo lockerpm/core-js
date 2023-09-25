@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class RoboFormCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -38,8 +38,7 @@ export class RoboFormCsvImporter extends BaseImporter implements Importer {
             return
           }
           const key = parts[0] === '-no-name-' ? null : parts[0]
-          const val =
-            parts.length === 4 && parts[2] === 'rck' ? parts[1] : parts[2]
+          const val = parts.length === 4 && parts[2] === 'rck' ? parts[1] : parts[2]
           this.processKvp(cipher, key, val)
         })
       }

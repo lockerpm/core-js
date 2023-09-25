@@ -19,7 +19,7 @@ export class SendData {
   userId: string
   emails: string[]
 
-  constructor (response?: SendResponse, userId?: string) {
+  constructor(response?: SendResponse, userId?: string) {
     if (response == null) {
       return
     }

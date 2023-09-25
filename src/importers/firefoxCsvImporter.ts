@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class FirefoxCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -20,10 +20,7 @@ export class FirefoxCsvImporter extends BaseImporter implements Importer {
       })
       .forEach(value => {
         const cipher = this.initLoginCipher()
-        const url = this.getValueOrDefault(
-          value.url,
-          this.getValueOrDefault(value.hostname)
-        )
+        const url = this.getValueOrDefault(value.url, this.getValueOrDefault(value.hostname))
         cipher.name = this.getValueOrDefault(this.nameFromUrl(url), '--')
         cipher.login.username = this.getValueOrDefault(value.username)
         cipher.login.password = this.getValueOrDefault(value.password)

@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class PasswordAgentCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, false)
     if (results == null) {
@@ -26,12 +26,8 @@ export class PasswordAgentCsvImporter extends BaseImporter implements Importer {
         cipher.notes = this.getValueOrDefault(value[4])
         cipher.login.uris = this.makeUriArray(value[3])
       } else {
-        const folder = this.getValueOrDefault(
-          value[altFormat ? 9 : 8],
-          '(None)'
-        )
-        let folderName =
-          folder !== '(None)' ? folder.split('\\').join('/') : null
+        const folder = this.getValueOrDefault(value[altFormat ? 9 : 8], '(None)')
+        let folderName = folder !== '(None)' ? folder.split('\\').join('/') : null
         if (folderName != null) {
           folderName = folder.split(' > ').join('/')
           folderName = folder.split('>').join('/')

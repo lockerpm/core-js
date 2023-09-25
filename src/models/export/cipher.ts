@@ -12,7 +12,7 @@ import { Login } from '../../../src/models/export/login'
 import { SecureNote } from '../../../src/models/export/secureNote'
 
 export class Cipher {
-  static template (): Cipher {
+  static template(): Cipher {
     const req = new Cipher()
     req.organizationId = null
     req.collectionIds = null
@@ -29,7 +29,7 @@ export class Cipher {
     return req
   }
 
-  static toView (req: Cipher, view = new CipherView()) {
+  static toView(req: Cipher, view = new CipherView()) {
     // @ts-ignore
     view.type = req.type
     view.folderId = req.folderId
@@ -37,9 +37,7 @@ export class Cipher {
       view.organizationId = req.organizationId
     }
     if (view.collectionIds || req.collectionIds) {
-      const set = new Set(
-        (view.collectionIds ?? []).concat(req.collectionIds ?? [])
-      )
+      const set = new Set((view.collectionIds ?? []).concat(req.collectionIds ?? []))
       view.collectionIds = Array.from(set.values())
     }
     view.name = req.name
@@ -68,7 +66,7 @@ export class Cipher {
     return view
   }
 
-  static toDomain (req: Cipher, domain = new CipherDomain()) {
+  static toDomain(req: Cipher, domain = new CipherDomain()) {
     // @ts-ignore
     domain.type = req.type
     domain.folderId = req.folderId
@@ -115,7 +113,7 @@ export class Cipher {
   identity: Identity
 
   // Use build method instead of ctor so that we can control order of JSON stringify for pretty print
-  build (o: CipherView | CipherDomain) {
+  build(o: CipherView | CipherDomain) {
     this.organizationId = o.organizationId
     this.folderId = o.folderId
     this.type = o.type

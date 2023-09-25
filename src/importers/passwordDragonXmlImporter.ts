@@ -2,10 +2,8 @@ import { ImportResult } from '../../src/models/domain/importResult'
 import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
-export class PasswordDragonXmlImporter
-  extends BaseImporter
-  implements Importer {
-  parse (data: string): Promise<ImportResult> {
+export class PasswordDragonXmlImporter extends BaseImporter implements Importer {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const doc = this.parseXml(data)
     if (doc == null) {
@@ -31,34 +29,24 @@ export class PasswordDragonXmlImporter
       const notes = this.querySelectorDirectChild(record, 'Notes')
       const cipher = this.initLoginCipher()
       cipher.name =
-        accountName != null
-          ? this.getValueOrDefault(accountName.textContent, '--')
-          : '--'
-      cipher.notes =
-        notes != null ? this.getValueOrDefault(notes.textContent) : ''
-      cipher.login.username =
-        userId != null ? this.getValueOrDefault(userId.textContent) : null
+        accountName != null ? this.getValueOrDefault(accountName.textContent, '--') : '--'
+      cipher.notes = notes != null ? this.getValueOrDefault(notes.textContent) : ''
+      cipher.login.username = userId != null ? this.getValueOrDefault(userId.textContent) : null
       cipher.login.password =
         password != null ? this.getValueOrDefault(password.textContent) : null
-      cipher.login.uris =
-        url != null ? this.makeUriArray(url.textContent) : null
+      cipher.login.uris = url != null ? this.makeUriArray(url.textContent) : null
 
       const attributes: string[] = []
       for (let i = 1; i <= 10; i++) {
         attributes.push('Attribute-' + i)
       }
 
-      this.querySelectorAllDirectChild(record, attributes.join(',')).forEach(
-        attr => {
-          if (
-            this.isNullOrWhitespace(attr.textContent) ||
-            attr.textContent === 'null'
-          ) {
-            return
-          }
-          this.processKvp(cipher, attr.tagName, attr.textContent)
+      this.querySelectorAllDirectChild(record, attributes.join(',')).forEach(attr => {
+        if (this.isNullOrWhitespace(attr.textContent) || attr.textContent === 'null') {
+          return
         }
-      )
+        this.processKvp(cipher, attr.tagName, attr.textContent)
+      })
 
       this.cleanupCipher(cipher)
       result.ciphers.push(cipher)

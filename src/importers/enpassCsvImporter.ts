@@ -9,7 +9,7 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 export class EnpassCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, false)
     if (results == null) {
@@ -19,10 +19,7 @@ export class EnpassCsvImporter extends BaseImporter implements Importer {
 
     let firstRow = true
     results.forEach(value => {
-      if (
-        value.length < 2 ||
-        (firstRow && (value[0] === 'Title' || value[0] === 'title'))
-      ) {
+      if (value.length < 2 || (firstRow && (value[0] === 'Title' || value[0] === 'title'))) {
         firstRow = false
         return
       }
@@ -81,10 +78,7 @@ export class EnpassCsvImporter extends BaseImporter implements Importer {
             ) {
               cipher.login.password = fieldValue
               continue
-            } else if (
-              fieldNameLower === 'totp' &&
-              this.isNullOrWhitespace(cipher.login.totp)
-            ) {
+            } else if (fieldNameLower === 'totp' && this.isNullOrWhitespace(cipher.login.totp)) {
               cipher.login.totp = fieldValue
               continue
             }
@@ -95,17 +89,11 @@ export class EnpassCsvImporter extends BaseImporter implements Importer {
             ) {
               cipher.card.cardholderName = fieldValue
               continue
-            } else if (
-              fieldNameLower === 'number' &&
-              this.isNullOrWhitespace(cipher.card.number)
-            ) {
+            } else if (fieldNameLower === 'number' && this.isNullOrWhitespace(cipher.card.number)) {
               cipher.card.number = fieldValue
               cipher.card.brand = this.getCardBrand(fieldValue)
               continue
-            } else if (
-              fieldNameLower === 'cvc' &&
-              this.isNullOrWhitespace(cipher.card.code)
-            ) {
+            } else if (fieldNameLower === 'cvc' && this.isNullOrWhitespace(cipher.card.code)) {
               cipher.card.code = fieldValue
               continue
             } else if (
@@ -134,15 +122,13 @@ export class EnpassCsvImporter extends BaseImporter implements Importer {
     return Promise.resolve(result)
   }
 
-  private containsField (fields: any[], name: string) {
+  private containsField(fields: any[], name: string) {
     if (fields == null || name == null) {
       return false
     }
     return (
-      fields.filter(
-        f =>
-          !this.isNullOrWhitespace(f) && f.toLowerCase() === name.toLowerCase()
-      ).length > 0
+      fields.filter(f => !this.isNullOrWhitespace(f) && f.toLowerCase() === name.toLowerCase())
+        .length > 0
     )
   }
 }

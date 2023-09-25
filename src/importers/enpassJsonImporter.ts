@@ -10,14 +10,10 @@ import { Importer } from './importer'
 import { BaseImporter } from './baseImporter'
 
 export class EnpassJsonImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = JSON.parse(data)
-    if (
-      results == null ||
-      results.items == null ||
-      results.items.length === 0
-    ) {
+    if (results == null || results.items == null || results.items.length === 0) {
       result.success = false
       return Promise.resolve(result)
     }
@@ -34,14 +30,10 @@ export class EnpassJsonImporter extends BaseImporter implements Importer {
     })
 
     results.items.forEach((item: any) => {
-      if (
-        item.folders != null &&
-        item.folders.length > 0 &&
-        foldersIndexMap.has(item.folders[0])
-      ) {
+      if (item.folders != null && item.folders.length > 0 && foldersIndexMap.has(item.folders[0])) {
         result.folderRelationships.push([
           result.ciphers.length,
-          foldersIndexMap.get(item.folders[0])
+          foldersIndexMap.get(item.folders[0]),
         ])
       }
 
@@ -49,11 +41,7 @@ export class EnpassJsonImporter extends BaseImporter implements Importer {
       cipher.name = this.getValueOrDefault(item.title)
       cipher.favorite = item.favorite > 0
 
-      if (
-        item.template_type != null &&
-        item.fields != null &&
-        item.fields.length > 0
-      ) {
+      if (item.template_type != null && item.fields != null && item.fields.length > 0) {
         if (
           item.template_type.indexOf('login.') === 0 ||
           item.template_type.indexOf('password.') === 0
@@ -63,10 +51,7 @@ export class EnpassJsonImporter extends BaseImporter implements Importer {
           this.processCard(cipher, item.fields)
         } else if (
           !item.template_type.includes('identity.') &&
-          item.fields.some(
-            (f: any) =>
-              f.type === 'password' && !this.isNullOrWhitespace(f.value)
-          )
+          item.fields.some((f: any) => f.type === 'password' && !this.isNullOrWhitespace(f.value))
         ) {
           this.processLogin(cipher, item.fields)
         } else {
@@ -84,7 +69,7 @@ export class EnpassJsonImporter extends BaseImporter implements Importer {
     return Promise.resolve(result)
   }
 
-  private processLogin (cipher: CipherView, fields: any[]) {
+  private processLogin(cipher: CipherView, fields: any[]) {
     const urls: string[] = []
 
     fields.forEach((field: any) => {
@@ -97,15 +82,9 @@ export class EnpassJsonImporter extends BaseImporter implements Importer {
         this.isNullOrWhitespace(cipher.login.username)
       ) {
         cipher.login.username = field.value
-      } else if (
-        field.type === 'password' &&
-        this.isNullOrWhitespace(cipher.login.password)
-      ) {
+      } else if (field.type === 'password' && this.isNullOrWhitespace(cipher.login.password)) {
         cipher.login.password = field.value
-      } else if (
-        field.type === 'totp' &&
-        this.isNullOrWhitespace(cipher.login.totp)
-      ) {
+      } else if (field.type === 'totp' && this.isNullOrWhitespace(cipher.login.totp)) {
         cipher.login.totp = field.value
       } else if (field.type === 'url') {
         urls.push(field.value)
@@ -121,7 +100,7 @@ export class EnpassJsonImporter extends BaseImporter implements Importer {
     cipher.login.uris = this.makeUriArray(urls)
   }
 
-  private processCard (cipher: CipherView, fields: any[]) {
+  private processCard(cipher: CipherView, fields: any[]) {
     cipher.card = new CardView()
     cipher.type = CipherType.Card
     fields.forEach((field: any) => {
@@ -133,26 +112,14 @@ export class EnpassJsonImporter extends BaseImporter implements Importer {
         return
       }
 
-      if (
-        field.type === 'ccName' &&
-        this.isNullOrWhitespace(cipher.card.cardholderName)
-      ) {
+      if (field.type === 'ccName' && this.isNullOrWhitespace(cipher.card.cardholderName)) {
         cipher.card.cardholderName = field.value
-      } else if (
-        field.type === 'ccNumber' &&
-        this.isNullOrWhitespace(cipher.card.number)
-      ) {
+      } else if (field.type === 'ccNumber' && this.isNullOrWhitespace(cipher.card.number)) {
         cipher.card.number = field.value
         cipher.card.brand = this.getCardBrand(cipher.card.number)
-      } else if (
-        field.type === 'ccCvc' &&
-        this.isNullOrWhitespace(cipher.card.code)
-      ) {
+      } else if (field.type === 'ccCvc' && this.isNullOrWhitespace(cipher.card.code)) {
         cipher.card.code = field.value
-      } else if (
-        field.type === 'ccExpiry' &&
-        this.isNullOrWhitespace(cipher.card.expYear)
-      ) {
+      } else if (field.type === 'ccExpiry' && this.isNullOrWhitespace(cipher.card.expYear)) {
         if (!this.setCardExpiration(cipher, field.value)) {
           this.processKvp(
             cipher,
@@ -172,7 +139,7 @@ export class EnpassJsonImporter extends BaseImporter implements Importer {
     })
   }
 
-  private processNote (cipher: CipherView, fields: any[]) {
+  private processNote(cipher: CipherView, fields: any[]) {
     fields.forEach((field: any) => {
       if (this.isNullOrWhitespace(field.value) || field.type === 'section') {
         return
@@ -186,7 +153,7 @@ export class EnpassJsonImporter extends BaseImporter implements Importer {
     })
   }
 
-  private buildFolderTree (folders: any[]): any[] {
+  private buildFolderTree(folders: any[]): any[] {
     if (folders == null) {
       return []
     }
@@ -197,11 +164,7 @@ export class EnpassJsonImporter extends BaseImporter implements Importer {
       obj.children = []
     })
     folders.forEach((obj: any) => {
-      if (
-        obj.parent_uuid != null &&
-        obj.parent_uuid !== '' &&
-        map.has(obj.parent_uuid)
-      ) {
+      if (obj.parent_uuid != null && obj.parent_uuid !== '' && map.has(obj.parent_uuid)) {
         map.get(obj.parent_uuid).children.push(obj)
       } else {
         folderTree.push(obj)
@@ -210,11 +173,7 @@ export class EnpassJsonImporter extends BaseImporter implements Importer {
     return folderTree
   }
 
-  private flattenFolderTree (
-    titlePrefix: string,
-    tree: any[],
-    map: Map<string, string>
-  ) {
+  private flattenFolderTree(titlePrefix: string, tree: any[], map: Map<string, string>) {
     if (tree == null) {
       return
     }

@@ -14,7 +14,7 @@ export class Collection extends Domain {
   hidePasswords: boolean
   revisionDate: Date
 
-  constructor (obj?: CollectionData, alreadyEncrypted: boolean = false) {
+  constructor(obj?: CollectionData, alreadyEncrypted: boolean = false) {
     super()
     if (obj == null) {
       return
@@ -29,20 +29,19 @@ export class Collection extends Domain {
         name: null,
         externalId: null,
         readOnly: null,
-        hidePasswords: null
+        hidePasswords: null,
       },
       alreadyEncrypted,
       ['id', 'organizationId', 'externalId', 'readOnly', 'hidePasswords']
     )
-    this.revisionDate =
-      obj.revisionDate != null ? new Date(obj.revisionDate) : null
+    this.revisionDate = obj.revisionDate != null ? new Date(obj.revisionDate) : null
   }
 
-  decrypt (): Promise<CollectionView> {
+  decrypt(): Promise<CollectionView> {
     return this.decryptObj(
       new CollectionView(this),
       {
-        name: null
+        name: null,
       },
       this.organizationId
     )

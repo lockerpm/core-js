@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class AviraCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -12,13 +12,7 @@ export class AviraCsvImporter extends BaseImporter implements Importer {
     }
 
     // CS
-    const existingKeys = [
-      'name',
-      'website',
-      'password',
-      'username',
-      'secondary_username'
-    ]
+    const existingKeys = ['name', 'website', 'password', 'username', 'secondary_username']
 
     results.forEach(value => {
       const cipher = this.initLoginCipher()

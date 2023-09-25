@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class PasswordSafeXmlImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const doc = this.parseXml(data)
     if (doc == null) {
@@ -35,20 +35,16 @@ export class PasswordSafeXmlImporter extends BaseImporter implements Importer {
       const url = this.querySelectorDirectChild(entry, 'url')
       const notes = this.querySelectorDirectChild(entry, 'notes')
       const cipher = this.initLoginCipher()
-      cipher.name =
-        title != null ? this.getValueOrDefault(title.textContent, '--') : '--'
+      cipher.name = title != null ? this.getValueOrDefault(title.textContent, '--') : '--'
       cipher.notes =
         notes != null
-          ? this.getValueOrDefault(notes.textContent, '')
-            .split(notesDelimiter)
-            .join('\n')
+          ? this.getValueOrDefault(notes.textContent, '').split(notesDelimiter).join('\n')
           : null
       cipher.login.username =
         username != null ? this.getValueOrDefault(username.textContent) : null
       cipher.login.password =
         password != null ? this.getValueOrDefault(password.textContent) : null
-      cipher.login.uris =
-        url != null ? this.makeUriArray(url.textContent) : null
+      cipher.login.uris = url != null ? this.makeUriArray(url.textContent) : null
 
       if (this.isNullOrWhitespace(cipher.login.username) && email != null) {
         cipher.login.username = this.getValueOrDefault(email.textContent)

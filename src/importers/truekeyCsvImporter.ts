@@ -19,11 +19,11 @@ const PropertiesToIgnore = [
   'tk_export_version',
   'note',
   'title',
-  'document_content'
+  'document_content',
 ]
 
 export class TrueKeyCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -33,8 +33,7 @@ export class TrueKeyCsvImporter extends BaseImporter implements Importer {
 
     results.forEach(value => {
       const cipher = this.initLoginCipher()
-      cipher.favorite =
-        this.getValueOrDefault(value.favorite, '').toLowerCase() === 'true'
+      cipher.favorite = this.getValueOrDefault(value.favorite, '').toLowerCase() === 'true'
       cipher.name = this.getValueOrDefault(value.name, '--')
       cipher.notes = this.getValueOrDefault(value.memo, '')
       cipher.login.username = this.getValueOrDefault(value.login)

@@ -8,7 +8,7 @@ const WebsitesHeader = 'Websites\n\n'
 const Delimiter = '\n---\n'
 
 export class KasperskyTxtImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
 
     let notesData: string
@@ -74,7 +74,7 @@ export class KasperskyTxtImporter extends BaseImporter implements Importer {
     return Promise.resolve(result)
   }
 
-  private parseDataCategory (data: string): Map<string, string>[] {
+  private parseDataCategory(data: string): Map<string, string>[] {
     if (this.isNullOrWhitespace(data) || !data.includes(Delimiter)) {
       return []
     }

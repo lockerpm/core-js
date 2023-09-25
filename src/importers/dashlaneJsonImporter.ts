@@ -18,13 +18,13 @@ const HandledResults = new Set([
   'IDENTITY',
   'PAYMENTMEANS_CREDITCARD',
   'PAYMENTMEAN_PAYPAL',
-  'EMAIL'
+  'EMAIL',
 ])
 
 export class DashlaneJsonImporter extends BaseImporter implements Importer {
   private result: ImportResult
 
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     this.result = new ImportResult()
     const results = JSON.parse(data)
     if (results == null || results.length === 0) {
@@ -61,7 +61,7 @@ export class DashlaneJsonImporter extends BaseImporter implements Importer {
     return Promise.resolve(this.result)
   }
 
-  private processAuth (results: any[]) {
+  private processAuth(results: any[]) {
     // CS
     const existingKeys = [
       'title',
@@ -70,7 +70,7 @@ export class DashlaneJsonImporter extends BaseImporter implements Importer {
       'email',
       'password',
       'domain',
-      'note'
+      'note',
     ]
 
     results.forEach((credential: any) => {
@@ -104,7 +104,7 @@ export class DashlaneJsonImporter extends BaseImporter implements Importer {
     })
   }
 
-  private processIdentity (results: any[]) {
+  private processIdentity(results: any[]) {
     // CS
     const existingKeys = ['fullName', 'pseudo']
 
@@ -137,16 +137,9 @@ export class DashlaneJsonImporter extends BaseImporter implements Importer {
     })
   }
 
-  private processAddress (results: any[]) {
+  private processAddress(results: any[]) {
     // CS
-    const existingKeys = [
-      'addressName',
-      'addressFull',
-      'city',
-      'state',
-      'zipcode',
-      'country'
-    ]
+    const existingKeys = ['addressName', 'addressFull', 'city', 'state', 'zipcode', 'country']
 
     results.forEach((obj: any) => {
       const cipher = new CipherView()
@@ -172,7 +165,7 @@ export class DashlaneJsonImporter extends BaseImporter implements Importer {
     })
   }
 
-  private processCard (results: any[]) {
+  private processCard(results: any[]) {
     // CS
     const existingKeys = ['bank', 'cardNumber', 'owner']
 
@@ -202,11 +195,7 @@ export class DashlaneJsonImporter extends BaseImporter implements Importer {
     })
   }
 
-  private processNote (
-    results: any[],
-    nameProperty: string,
-    name: string = null
-  ) {
+  private processNote(results: any[], nameProperty: string, name: string = null) {
     results.forEach((obj: any) => {
       const cipher = new CipherView()
       cipher.secureNote = new SecureNoteView()

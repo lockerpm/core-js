@@ -1,7 +1,7 @@
-import { PasswordVerificationRequest } from './passwordVerificationRequest';
+import { PasswordVerificationRequest } from './passwordVerificationRequest'
 
 export class UpdateTwoFactorWebAuthnRequest extends PasswordVerificationRequest {
-    deviceResponse: PublicKeyCredential;
-    name: string;
-    id: number;
+  deviceResponse: PublicKeyCredential
+  name: string
+  id: number
 }

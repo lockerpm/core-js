@@ -7,12 +7,8 @@
  * Results are not cached, once the promise has returned, the next call will result in a fresh call
  *
  */
-export function sequentialize (cacheKey: (args: any[]) => string) {
-  return (
-    target: any,
-    propertyKey: string | symbol,
-    descriptor: PropertyDescriptor
-  ) => {
+export function sequentialize(cacheKey: (args: any[]) => string) {
+  return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
     const originalMethod: () => Promise<any> = descriptor.value
     const caches = new Map<any, Map<string, Promise<any>>>()
 
@@ -27,7 +23,7 @@ export function sequentialize (cacheKey: (args: any[]) => string) {
     }
 
     return {
-      value (...args: any[]) {
+      value(...args: any[]) {
         const cache = getCache(this)
         const argsCacheKey = cacheKey(args)
         let response = cache.get(argsCacheKey)
@@ -54,7 +50,7 @@ export function sequentialize (cacheKey: (args: any[]) => string) {
 
         cache.set(argsCacheKey, response)
         return response
-      }
+      },
     }
   }
 }

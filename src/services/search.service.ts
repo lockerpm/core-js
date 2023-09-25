@@ -18,7 +18,7 @@ export class SearchService implements SearchServiceAbstraction {
   private index: lunr.Index = null
   private searchableMinLength = 2
 
-  constructor (
+  constructor(
     private cipherService: CipherService,
     private logService: LogService,
     private i18nService: I18nService
@@ -28,25 +28,20 @@ export class SearchService implements SearchServiceAbstraction {
     }
   }
 
-  clearIndex (): void {
+  clearIndex(): void {
     this.indexedEntityId = null
     this.index = null
   }
 
-  isSearchable (query: string): boolean {
+  isSearchable(query: string): boolean {
     const notSearchable =
       query == null ||
       (this.index == null && query.length < this.searchableMinLength) ||
-      (this.index != null &&
-        query.length < this.searchableMinLength &&
-        query.indexOf('>') !== 0)
+      (this.index != null && query.length < this.searchableMinLength && query.indexOf('>') !== 0)
     return !notSearchable
   }
 
-  async indexCiphers (
-    indexedEntityId?: string,
-    ciphers?: CipherView[]
-  ): Promise<void> {
+  async indexCiphers(indexedEntityId?: string, ciphers?: CipherView[]): Promise<void> {
     if (this.indexing) {
       return
     }
@@ -59,7 +54,7 @@ export class SearchService implements SearchServiceAbstraction {
     builder.ref('id')
     builder.field('shortid', {
       boost: 100,
-      extractor: (c: CipherView) => c.id.substr(0, 8)
+      extractor: (c: CipherView) => c.id.substr(0, 8),
     })
     builder.field('name', { boost: 10 })
     builder.field('subtitle', {
@@ -69,31 +64,31 @@ export class SearchService implements SearchServiceAbstraction {
           return c.subTitle.replace(/\*/g, '')
         }
         return c.subTitle
-      }
+      },
     })
     builder.field('notes')
     builder.field('login.username', {
       extractor: (c: CipherView) =>
-        c.type === CipherType.Login && c.login != null ? c.login.username : null
+        c.type === CipherType.Login && c.login != null ? c.login.username : null,
     })
     builder.field('login.uris', {
       boost: 2,
-      extractor: (c: CipherView) => this.uriExtractor(c)
+      extractor: (c: CipherView) => this.uriExtractor(c),
     })
     builder.field('fields', {
-      extractor: (c: CipherView) => this.fieldExtractor(c, false)
+      extractor: (c: CipherView) => this.fieldExtractor(c, false),
     })
     builder.field('fields_joined', {
-      extractor: (c: CipherView) => this.fieldExtractor(c, true)
+      extractor: (c: CipherView) => this.fieldExtractor(c, true),
     })
     builder.field('attachments', {
-      extractor: (c: CipherView) => this.attachmentExtractor(c, false)
+      extractor: (c: CipherView) => this.attachmentExtractor(c, false),
     })
     builder.field('attachments_joined', {
-      extractor: (c: CipherView) => this.attachmentExtractor(c, true)
+      extractor: (c: CipherView) => this.attachmentExtractor(c, true),
     })
     builder.field('organizationid', {
-      extractor: (c: CipherView) => c.organizationId
+      extractor: (c: CipherView) => c.organizationId,
     })
     ciphers = ciphers || (await this.cipherService.getAllDecrypted())
     ciphers.forEach(c => builder.add(c))
@@ -104,11 +99,9 @@ export class SearchService implements SearchServiceAbstraction {
     this.logService.timeEnd('search indexing')
   }
 
-  async searchCiphers (
+  async searchCiphers(
     query: string,
-    filter:
-      | ((cipher: CipherView) => boolean)
-      | ((cipher: CipherView) => boolean)[] = null,
+    filter: ((cipher: CipherView) => boolean) | ((cipher: CipherView) => boolean)[] = null,
     ciphers: CipherView[] = null
   ): Promise<CipherView[]> {
     const results: CipherView[] = []
@@ -151,8 +144,7 @@ export class SearchService implements SearchServiceAbstraction {
     ciphers.forEach(c => ciphersMap.set(c.id, c))
 
     let searchResults: lunr.Index.Result[] = null
-    const isQueryString =
-      query != null && query.length > 1 && query.indexOf('>') === 0
+    const isQueryString = query != null && query.length > 1 && query.indexOf('>') === 0
     if (isQueryString) {
       try {
         searchResults = index.search(query.substr(1).trim())
@@ -182,11 +174,7 @@ export class SearchService implements SearchServiceAbstraction {
     return results
   }
 
-  searchCiphersBasic (
-    ciphers: CipherView[],
-    query: string,
-    deleted: boolean = false
-  ) {
+  searchCiphersBasic(ciphers: CipherView[], query: string, deleted: boolean = false) {
     query = query.trim().toLowerCase()
     return ciphers.filter(c => {
       if (deleted !== c.isDeleted) {
@@ -201,11 +189,7 @@ export class SearchService implements SearchServiceAbstraction {
       if (c.subTitle != null && c.subTitle.toLowerCase().includes(query)) {
         return true
       }
-      if (
-        c.login &&
-        c.login.uri != null &&
-        c.login.uri.toLowerCase().includes(query)
-      ) {
+      if (c.login && c.login.uri != null && c.login.uri.toLowerCase().includes(query)) {
         return true
       }
       if (c.notes != null && c.notes.toLowerCase().includes(query)) {
@@ -215,14 +199,11 @@ export class SearchService implements SearchServiceAbstraction {
     })
   }
 
-  searchSends (sends: SendView[], query: string) {
+  searchSends(sends: SendView[], query: string) {
     query = query.trim().toLocaleLowerCase()
 
     return sends.filter(s => {
-      if (
-        s.cipher.name != null &&
-        s.cipher.name.toLowerCase().includes(query)
-      ) {
+      if (s.cipher.name != null && s.cipher.name.toLowerCase().includes(query)) {
         return true
       }
       if (
@@ -234,10 +215,7 @@ export class SearchService implements SearchServiceAbstraction {
       ) {
         return true
       }
-      if (
-        s.cipher.notes != null &&
-        s.cipher.notes.toLowerCase().includes(query)
-      ) {
+      if (s.cipher.notes != null && s.cipher.notes.toLowerCase().includes(query)) {
         return true
       }
       // if (
@@ -249,11 +227,11 @@ export class SearchService implements SearchServiceAbstraction {
     })
   }
 
-  getIndexForSearch (): lunr.Index {
+  getIndexForSearch(): lunr.Index {
     return this.index
   }
 
-  private fieldExtractor (c: CipherView, joined: boolean) {
+  private fieldExtractor(c: CipherView, joined: boolean) {
     if (!c.hasFields) {
       return null
     }
@@ -273,7 +251,7 @@ export class SearchService implements SearchServiceAbstraction {
     return joined ? fields.join(' ') : fields
   }
 
-  private attachmentExtractor (c: CipherView, joined: boolean) {
+  private attachmentExtractor(c: CipherView, joined: boolean) {
     if (!c.hasAttachments) {
       return null
     }
@@ -294,7 +272,7 @@ export class SearchService implements SearchServiceAbstraction {
     return joined ? attachments.join(' ') : attachments
   }
 
-  private uriExtractor (c: CipherView) {
+  private uriExtractor(c: CipherView) {
     if (c.type !== CipherType.Login || c.login == null || !c.login.hasUris) {
       return null
     }

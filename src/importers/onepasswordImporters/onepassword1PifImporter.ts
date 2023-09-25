@@ -16,7 +16,7 @@ import { SecureNoteType } from '../../../src/enums/secureNoteType'
 export class OnePassword1PifImporter extends BaseImporter implements Importer {
   result = new ImportResult()
 
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     data.split(this.newLineRegex).forEach(line => {
       if (this.isNullOrWhitespace(line) || line[0] !== '{') {
         return
@@ -42,7 +42,7 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
     return Promise.resolve(this.result)
   }
 
-  private processWinOpVaultItem (item: any, cipher: CipherView) {
+  private processWinOpVaultItem(item: any, cipher: CipherView) {
     if (item.overview != null) {
       cipher.name = this.getValueOrDefault(item.overview.title)
       if (item.overview.URLs != null) {
@@ -73,24 +73,14 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
         cipher.type = CipherType.Identity
         cipher.identity = new IdentityView()
       }
-      if (
-        cipher.type === CipherType.Login &&
-        !this.isNullOrWhitespace(item.details.password)
-      ) {
+      if (cipher.type === CipherType.Login && !this.isNullOrWhitespace(item.details.password)) {
         cipher.login.password = item.details.password
       }
       if (!this.isNullOrWhitespace(item.details.notesPlain)) {
-        cipher.notes =
-          item.details.notesPlain.split(this.newLineRegex).join('\n') + '\n'
+        cipher.notes = item.details.notesPlain.split(this.newLineRegex).join('\n') + '\n'
       }
       if (item.details.fields != null) {
-        this.parseFields(
-          item.details.fields,
-          cipher,
-          'designation',
-          'value',
-          'name'
-        )
+        this.parseFields(item.details.fields, cipher, 'designation', 'value', 'name')
       }
       if (item.details.sections != null) {
         item.details.sections.forEach((section: any) => {
@@ -102,7 +92,7 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
     }
   }
 
-  private processStandardItem (item: any, cipher: CipherView) {
+  private processStandardItem(item: any, cipher: CipherView) {
     cipher.favorite = !!(item.openContents && item.openContents.faveIndex)
 
     // CS
@@ -125,7 +115,7 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
       'sections',
       'unknown_overview',
       'unknown_details',
-      'username'
+      'username',
     ]
 
     cipher.name = this.getValueOrDefault(item.title)
@@ -151,9 +141,7 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
         this.parsePasswordHistory(item.secureContents.passwordHistory, cipher)
       }
       if (!this.isNullOrWhitespace(item.secureContents.notesPlain)) {
-        cipher.notes =
-          item.secureContents.notesPlain.split(this.newLineRegex).join('\n') +
-          '\n'
+        cipher.notes = item.secureContents.notesPlain.split(this.newLineRegex).join('\n') + '\n'
       }
       if (cipher.type === CipherType.Login) {
         if (!this.isNullOrWhitespace(item.secureContents.password)) {
@@ -175,13 +163,7 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
         }
       }
       if (item.secureContents.fields != null) {
-        this.parseFields(
-          item.secureContents.fields,
-          cipher,
-          'designation',
-          'value',
-          'name'
-        )
+        this.parseFields(item.secureContents.fields, cipher, 'designation', 'value', 'name')
       }
       if (item.secureContents.sections != null) {
         item.secureContents.sections.forEach((section: any) => {
@@ -194,13 +176,11 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
       // CS
       if (item.secureContents.unknown_details) {
         if (item.secureContents.unknown_details.sections != null) {
-          item.secureContents.unknown_details.sections.forEach(
-            (section: any) => {
-              if (section.fields != null) {
-                this.parseFields(section.fields, cipher, 'n', 'v', 't')
-              }
+          item.secureContents.unknown_details.sections.forEach((section: any) => {
+            if (section.fields != null) {
+              this.parseFields(section.fields, cipher, 'n', 'v', 't')
             }
-          )
+          })
         }
       }
 
@@ -213,7 +193,7 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
     }
   }
 
-  private parsePasswordHistory (items: any[], cipher: CipherView) {
+  private parsePasswordHistory(items: any[], cipher: CipherView) {
     const maxSize = items.length > 5 ? 5 : items.length
     cipher.passwordHistory = items
       .filter((h: any) => !this.isNullOrWhitespace(h.value) && h.time != null)
@@ -222,14 +202,12 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
       .map((h: any) => {
         const ph = new PasswordHistoryView()
         ph.password = h.value
-        ph.lastUsedDate = new Date(
-          ('' + h.time).length >= 13 ? h.time : h.time * 1000
-        )
+        ph.lastUsedDate = new Date(('' + h.time).length >= 13 ? h.time : h.time * 1000)
         return ph
       })
   }
 
-  private parseFields (
+  private parseFields(
     fields: any[],
     cipher: CipherView,
     designationKey: string,
@@ -283,17 +261,11 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
           return
         }
       } else if (cipher.type === CipherType.Card) {
-        if (
-          this.isNullOrWhitespace(cipher.card.number) &&
-          fieldDesignation === 'ccnum'
-        ) {
+        if (this.isNullOrWhitespace(cipher.card.number) && fieldDesignation === 'ccnum') {
           cipher.card.number = fieldValue
           cipher.card.brand = this.getCardBrand(fieldValue)
           return
-        } else if (
-          this.isNullOrWhitespace(cipher.card.code) &&
-          fieldDesignation === 'cvv'
-        ) {
+        } else if (this.isNullOrWhitespace(cipher.card.code) && fieldDesignation === 'cvv') {
           cipher.card.code = fieldValue
           return
         } else if (
@@ -319,46 +291,25 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
         }
       } else if (cipher.type === CipherType.Identity) {
         const identity = cipher.identity
-        if (
-          this.isNullOrWhitespace(identity.firstName) &&
-          fieldDesignation === 'firstname'
-        ) {
+        if (this.isNullOrWhitespace(identity.firstName) && fieldDesignation === 'firstname') {
           identity.firstName = fieldValue
           return
-        } else if (
-          this.isNullOrWhitespace(identity.lastName) &&
-          fieldDesignation === 'lastname'
-        ) {
+        } else if (this.isNullOrWhitespace(identity.lastName) && fieldDesignation === 'lastname') {
           identity.lastName = fieldValue
           return
-        } else if (
-          this.isNullOrWhitespace(identity.middleName) &&
-          fieldDesignation === 'initial'
-        ) {
+        } else if (this.isNullOrWhitespace(identity.middleName) && fieldDesignation === 'initial') {
           identity.middleName = fieldValue
           return
-        } else if (
-          this.isNullOrWhitespace(identity.phone) &&
-          fieldDesignation === 'defphone'
-        ) {
+        } else if (this.isNullOrWhitespace(identity.phone) && fieldDesignation === 'defphone') {
           identity.phone = fieldValue
           return
-        } else if (
-          this.isNullOrWhitespace(identity.company) &&
-          fieldDesignation === 'company'
-        ) {
+        } else if (this.isNullOrWhitespace(identity.company) && fieldDesignation === 'company') {
           identity.company = fieldValue
           return
-        } else if (
-          this.isNullOrWhitespace(identity.email) &&
-          fieldDesignation === 'email'
-        ) {
+        } else if (this.isNullOrWhitespace(identity.email) && fieldDesignation === 'email') {
           identity.email = fieldValue
           return
-        } else if (
-          this.isNullOrWhitespace(identity.username) &&
-          fieldDesignation === 'username'
-        ) {
+        } else if (this.isNullOrWhitespace(identity.username) && fieldDesignation === 'username') {
           identity.username = fieldValue
           return
         } else if (fieldDesignation === 'address') {
@@ -374,9 +325,7 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
         }
       }
 
-      const fieldName = this.isNullOrWhitespace(field[nameKey])
-        ? 'no_name'
-        : field[nameKey]
+      const fieldName = this.isNullOrWhitespace(field[nameKey]) ? 'no_name' : field[nameKey]
       if (
         fieldName === 'password' &&
         cipher.passwordHistory != null &&

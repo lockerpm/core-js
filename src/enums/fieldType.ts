@@ -1,5 +1,5 @@
 export enum FieldType {
-    Text = 0,
-    Hidden = 1,
-    Boolean = 2,
+  Text = 0,
+  Hidden = 1,
+  Boolean = 2,
 }

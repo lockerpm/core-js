@@ -17,14 +17,14 @@ import { UserService } from '../../src/abstractions/user.service'
 import { Utils } from '../../src/misc/utils'
 
 const Keys = {
-  sendsPrefix: 'sends_'
+  sendsPrefix: 'sends_',
 }
 
 export class SendService implements SendServiceAbstraction {
   decryptedSendCache: SendView[]
 
   // eslint-disable-next-line no-useless-constructor
-  constructor (
+  constructor(
     private cryptoService: CryptoService,
     private cipherService: CipherService,
     private userService: UserService,
@@ -33,16 +33,12 @@ export class SendService implements SendServiceAbstraction {
     private cryptoFunctionService: CryptoFunctionService
   ) {}
 
-  clearCache (): void {
+  clearCache(): void {
     // @ts-ignore
     this.decryptedSendCache = null
   }
 
-  async encrypt (
-    model: SendView,
-    password: string,
-    key?: SymmetricCryptoKey
-  ): Promise<Send> {
+  async encrypt(model: SendView, password: string, key?: SymmetricCryptoKey): Promise<Send> {
     const send = new Send()
     send.id = model.id
     send.disabled = model.disabled
@@ -66,15 +62,12 @@ export class SendService implements SendServiceAbstraction {
       send.password = Utils.fromBufferToB64(passwordHash)
     }
     send.key = await this.cryptoService.encrypt(model.key, key)
-    send.cipher = await this.cipherService.encrypt(
-      model.cipher,
-      model.cryptoKey
-    )
+    send.cipher = await this.cipherService.encrypt(model.cipher, model.cryptoKey)
 
     return send
   }
 
-  async get (id: string): Promise<Send> {
+  async get(id: string): Promise<Send> {
     const userId = await this.userService.getUserId()
     const sends = await this.storageService.get<{ [id: string]: SendData }>(
       Keys.sendsPrefix + userId
@@ -87,7 +80,7 @@ export class SendService implements SendServiceAbstraction {
     return new Send(sends[id])
   }
 
-  async getAll (): Promise<Send[]> {
+  async getAll(): Promise<Send[]> {
     const userId = await this.userService.getUserId()
     const sends = await this.storageService.get<{ [id: string]: SendData }>(
       Keys.sendsPrefix + userId
@@ -101,7 +94,7 @@ export class SendService implements SendServiceAbstraction {
     return response
   }
 
-  async getAllDecrypted (): Promise<SendView[]> {
+  async getAllDecrypted(): Promise<SendView[]> {
     if (this.decryptedSendCache != null) {
       return this.decryptedSendCache
     }
@@ -127,7 +120,7 @@ export class SendService implements SendServiceAbstraction {
     return this.decryptedSendCache
   }
 
-  async upsert (send: SendData | SendData[]): Promise<any> {
+  async upsert(send: SendData | SendData[]): Promise<any> {
     const userId = await this.userService.getUserId()
     let sends = await this.storageService.get<{ [id: string]: SendData }>(
       Keys.sendsPrefix + userId
@@ -140,7 +133,7 @@ export class SendService implements SendServiceAbstraction {
       const s = send as SendData
       sends[s.id] = s
     } else {
-      ;(send as SendData[]).forEach(s => {
+      (send as SendData[]).forEach(s => {
         sends[s.id] = s
       })
     }
@@ -149,18 +142,18 @@ export class SendService implements SendServiceAbstraction {
     this.decryptedSendCache = null
   }
 
-  async replace (sends: { [id: string]: SendData }): Promise<any> {
+  async replace(sends: { [id: string]: SendData }): Promise<any> {
     const userId = await this.userService.getUserId()
     await this.storageService.save(Keys.sendsPrefix + userId, sends)
     this.decryptedSendCache = null
   }
 
-  async clear (userId: string): Promise<any> {
+  async clear(userId: string): Promise<any> {
     await this.storageService.remove(Keys.sendsPrefix + userId)
     this.decryptedSendCache = null
   }
 
-  async delete (id: string | string[]): Promise<any> {
+  async delete(id: string | string[]): Promise<any> {
     const userId = await this.userService.getUserId()
     const sends = await this.storageService.get<{ [id: string]: SendData }>(
       Keys.sendsPrefix + userId
@@ -175,7 +168,7 @@ export class SendService implements SendServiceAbstraction {
       }
       delete sends[id]
     } else {
-      ;(id as string[]).forEach(i => {
+      (id as string[]).forEach(i => {
         delete sends[i]
       })
     }

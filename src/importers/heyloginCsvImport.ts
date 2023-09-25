@@ -4,7 +4,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class HeyLoginCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -13,14 +13,7 @@ export class HeyLoginCsvImporter extends BaseImporter implements Importer {
     }
 
     // CS
-    const existingKeys = [
-      'url',
-      'note',
-      'username',
-      'password',
-      'customFields',
-      'totp'
-    ]
+    const existingKeys = ['url', 'note', 'username', 'password', 'customFields', 'totp']
 
     results.forEach(value => {
       const cipher = this.initLoginCipher()
@@ -36,12 +29,7 @@ export class HeyLoginCsvImporter extends BaseImporter implements Importer {
       try {
         const customFields = JSON.parse(value.customFields)
         customFields.forEach(f => {
-          this.processKvp(
-            cipher,
-            f.name,
-            f.value,
-            f.protected ? FieldType.Hidden : FieldType.Text
-          )
+          this.processKvp(cipher, f.name, f.value, f.protected ? FieldType.Hidden : FieldType.Text)
         })
       } catch (e) {
         //

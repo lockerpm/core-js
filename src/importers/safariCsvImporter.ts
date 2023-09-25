@@ -3,7 +3,7 @@ import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 
 export class SafariCsvImporter extends BaseImporter implements Importer {
-  parse (data: string): Promise<ImportResult> {
+  parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true)
     if (results == null) {
@@ -12,14 +12,7 @@ export class SafariCsvImporter extends BaseImporter implements Importer {
     }
 
     // CS
-    const existingKeys = [
-      'Title',
-      'URL',
-      'Username',
-      'Password',
-      'Notes',
-      'OTPAuth'
-    ]
+    const existingKeys = ['Title', 'URL', 'Username', 'Password', 'Notes', 'OTPAuth']
 
     results.forEach(value => {
       const cipher = this.initLoginCipher()

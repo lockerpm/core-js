@@ -14,7 +14,7 @@ const Keys = {
   kdf: 'kdf',
   kdfIterations: 'kdfIterations',
   organizationsPrefix: 'organizations_',
-  emailVerified: 'emailVerified'
+  emailVerified: 'emailVerified',
 }
 
 export class UserService implements UserServiceAbstraction {
@@ -25,17 +25,9 @@ export class UserService implements UserServiceAbstraction {
   private kdfIterations: number
   private emailVerified: boolean
 
-  constructor (
-    private tokenService: TokenService,
-    private storageService: StorageService
-  ) {}
+  constructor(private tokenService: TokenService, private storageService: StorageService) {}
 
-  setInformation (
-    userId: string,
-    email: string,
-    kdf: KdfType,
-    kdfIterations: number
-  ): Promise<any> {
+  setInformation(userId: string, email: string, kdf: KdfType, kdfIterations: number): Promise<any> {
     this.email = email
     this.userId = userId
     this.kdf = kdf
@@ -45,67 +37,63 @@ export class UserService implements UserServiceAbstraction {
       this.storageService.save(Keys.userEmail, email),
       this.storageService.save(Keys.userId, userId),
       this.storageService.save(Keys.kdf, kdf),
-      this.storageService.save(Keys.kdfIterations, kdfIterations)
+      this.storageService.save(Keys.kdfIterations, kdfIterations),
     ])
   }
 
-  setSecurityStamp (stamp: string): Promise<any> {
+  setSecurityStamp(stamp: string): Promise<any> {
     this.stamp = stamp
     return this.storageService.save(Keys.stamp, stamp)
   }
 
-  setEmailVerified (emailVerified: boolean) {
+  setEmailVerified(emailVerified: boolean) {
     this.emailVerified = emailVerified
     return this.storageService.save(Keys.emailVerified, emailVerified)
   }
 
-  async getUserId (): Promise<string> {
+  async getUserId(): Promise<string> {
     if (this.userId == null) {
       this.userId = await this.storageService.get<string>(Keys.userId)
     }
     return this.userId
   }
 
-  async getEmail (): Promise<string> {
+  async getEmail(): Promise<string> {
     if (this.email == null) {
       this.email = await this.storageService.get<string>(Keys.userEmail)
     }
     return this.email
   }
 
-  async getSecurityStamp (): Promise<string> {
+  async getSecurityStamp(): Promise<string> {
     if (this.stamp == null) {
       this.stamp = await this.storageService.get<string>(Keys.stamp)
     }
     return this.stamp
   }
 
-  async getKdf (): Promise<KdfType> {
+  async getKdf(): Promise<KdfType> {
     if (this.kdf == null) {
       this.kdf = await this.storageService.get<KdfType>(Keys.kdf)
     }
     return this.kdf
   }
 
-  async getKdfIterations (): Promise<number> {
+  async getKdfIterations(): Promise<number> {
     if (this.kdfIterations == null) {
-      this.kdfIterations = await this.storageService.get<number>(
-        Keys.kdfIterations
-      )
+      this.kdfIterations = await this.storageService.get<number>(Keys.kdfIterations)
     }
     return this.kdfIterations
   }
 
-  async getEmailVerified (): Promise<boolean> {
+  async getEmailVerified(): Promise<boolean> {
     if (this.emailVerified == null) {
-      this.emailVerified = await this.storageService.get<boolean>(
-        Keys.emailVerified
-      )
+      this.emailVerified = await this.storageService.get<boolean>(Keys.emailVerified)
     }
     return this.emailVerified
   }
 
-  async clear (): Promise<any> {
+  async clear(): Promise<any> {
     const userId = await this.getUserId()
 
     await Promise.all([
@@ -114,7 +102,7 @@ export class UserService implements UserServiceAbstraction {
       this.storageService.remove(Keys.stamp),
       this.storageService.remove(Keys.kdf),
       this.storageService.remove(Keys.kdfIterations),
-      this.clearOrganizations(userId)
+      this.clearOrganizations(userId),
     ])
 
     this.userId = this.email = this.stamp = null
@@ -122,7 +110,7 @@ export class UserService implements UserServiceAbstraction {
     this.kdfIterations = null
   }
 
-  async isAuthenticated (): Promise<boolean> {
+  async isAuthenticated(): Promise<boolean> {
     const token = await this.tokenService.getToken()
     if (token == null) {
       return false
@@ -132,7 +120,7 @@ export class UserService implements UserServiceAbstraction {
     return userId != null
   }
 
-  async canAccessPremium (): Promise<boolean> {
+  async canAccessPremium(): Promise<boolean> {
     const authed = await this.isAuthenticated()
     if (!authed) {
       return false
@@ -152,10 +140,10 @@ export class UserService implements UserServiceAbstraction {
     return false
   }
 
-  async getOrganization (id: string): Promise<Organization> {
+  async getOrganization(id: string): Promise<Organization> {
     const userId = await this.getUserId()
     const organizations = await this.storageService.get<{
-      [id: string]: OrganizationData
+      [id: string]: OrganizationData;
     }>(Keys.organizationsPrefix + userId)
     if (organizations == null || !organizations.hasOwnProperty(id)) {
       return null
@@ -164,10 +152,10 @@ export class UserService implements UserServiceAbstraction {
     return new Organization(organizations[id])
   }
 
-  async getAllOrganizations (): Promise<Organization[]> {
+  async getAllOrganizations(): Promise<Organization[]> {
     const userId = await this.getUserId()
     const organizations = await this.storageService.get<{
-      [id: string]: OrganizationData
+      [id: string]: OrganizationData;
     }>(Keys.organizationsPrefix + userId)
     const response: Organization[] = []
     for (const id in organizations) {
@@ -178,17 +166,12 @@ export class UserService implements UserServiceAbstraction {
     return response
   }
 
-  async replaceOrganizations (organizations: {
-    [id: string]: OrganizationData
-  }): Promise<any> {
+  async replaceOrganizations(organizations: { [id: string]: OrganizationData }): Promise<any> {
     const userId = await this.getUserId()
-    await this.storageService.save(
-      Keys.organizationsPrefix + userId,
-      organizations
-    )
+    await this.storageService.save(Keys.organizationsPrefix + userId, organizations)
   }
 
-  async clearOrganizations (userId: string): Promise<any> {
+  async clearOrganizations(userId: string): Promise<any> {
     await this.storageService.remove(Keys.organizationsPrefix + userId)
   }
 }
