@@ -14,7 +14,7 @@ import { SecureNoteView } from '../../src/models/view/secureNoteView'
 import { CipherType } from '../../src/enums/cipherType'
 import { FieldType } from '../../src/enums/fieldType'
 import { SecureNoteType } from '../../src/enums/secureNoteType'
-import { CipherMapper } from '../../constants'
+import { CipherMapper } from '../../src/constants'
 
 export class BitwardenCsvImporter extends BaseImporter implements Importer {
   parse(data: string): Promise<ImportResult> {

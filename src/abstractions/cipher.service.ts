@@ -2,28 +2,24 @@ import { CipherType } from '../enums/cipherType'
 import { CipherData } from '../models/data/cipherData'
 import { Cipher } from '../models/domain/cipher'
 import { CipherView } from '../models/view/cipherView'
-import { UriMatchType } from '~/src/enums/uriMatchType'
+import { UriMatchType } from '../enums/uriMatchType'
 
-import { Field } from '~/src/models/domain/field'
-import { SymmetricCryptoKey } from '~/src/models/domain/symmetricCryptoKey'
+import { Field } from '..//models/domain/field'
+import { SymmetricCryptoKey } from '../models/domain/symmetricCryptoKey'
 
-import { FieldView } from '~/src/models/view/fieldView'
+import { FieldView } from '../models/view/fieldView'
 
 export abstract class CipherService {
   decryptedCipherCache: CipherView[]
 
   clearCache: () => void
-  encrypt: (
-    model: CipherView,
-    key?: SymmetricCryptoKey,
-    originalCipher?: Cipher
-  ) => Promise<Cipher>
+  encrypt: (model: CipherView, key?: SymmetricCryptoKey, originalCipher?: Cipher) => Promise<Cipher>
 
   encryptFields: (fieldsModel: FieldView[], key: SymmetricCryptoKey) => Promise<Field[]>
 
   encryptField: (fieldModel: FieldView, key: SymmetricCryptoKey) => Promise<Field>
 
-  get: (id: string) => Promise<Cipher>;
+  get: (id: string) => Promise<Cipher>
   getAll: () => Promise<Cipher[]>
   getAllDecrypted: () => Promise<CipherView[]>
   getAllDecryptedForGrouping: (groupingId: string, folder?: boolean) => Promise<CipherView[]>
