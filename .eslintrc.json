@@ -1,0 +1,29 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "prettier"
+  ],
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "rules": {
+    "indent": ["error", 2],
+    "no-console": "warn",
+    "arrow-parens": ["error", "as-needed"],
+    "curly": ["error", "multi-line"],
+    "import/no-extraneous-dependencies": "off",
+    "require-await": 0,
+    "global-require": 0,
+    "import/no-unresolved": 0,
+    "import/newline-after-import": 0,
+    "no-underscore-dangle": 0,
+    "quotes": ["error", "single"],
+    "semi": ["error", "never"],
+    "@typescript-eslint/no-explicit-any": 0
+  }
+}
