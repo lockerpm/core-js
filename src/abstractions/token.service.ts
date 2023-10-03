@@ -19,6 +19,7 @@ export abstract class TokenService {
   getUserId: () => string
   getEmail: () => string
   getEmailVerified: () => boolean
+  getUsername: () => string
   getName: () => string
   getPremium: () => boolean
   getIssuer: () => string

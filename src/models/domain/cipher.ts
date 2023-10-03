@@ -1,20 +1,23 @@
-import Domain from '../../../src/models/domain/domainBase'
-import {
-  Attachment,
-  Card,
-  EncString,
-  Field,
-  Identity,
-  Login,
-  SecureNote,
-  SymmetricCryptoKey,
-} from '../../../src/models/domain'
-// import { CipherType } from '../../enums/cipherType'
-import { CipherRepromptType } from '../../../src/enums/cipherRepromptType'
+import { CipherRepromptType } from '../../enums/cipherRepromptType'
+import { CipherType } from '../../enums/cipherType'
+
 import { CipherData } from '../data/cipherData'
+
 import { CipherView } from '../view/cipherView'
-import { Password } from '../../../src/models/domain/password'
-import { CipherType } from '../../../src/enums'
+
+import Domain from './domainBase'
+
+import { Attachment } from './attachment'
+import { Card } from './card'
+import { EncString } from './encString'
+import { Field } from './field'
+import { Identity } from './identity'
+import { Login } from './login'
+import { Password } from './password'
+import { SecureNote } from './secureNote'
+import { Secret } from './secret'
+import { Environment } from './environment'
+import { SymmetricCryptoKey } from './symmetricCryptoKey'
 
 export class Cipher extends Domain {
   id: string
@@ -28,20 +31,28 @@ export class Cipher extends Domain {
   edit: boolean
   viewPassword: boolean
   creationDate: Date
+  updatedDate: Date
   revisionDate: Date
   localData: any
   login: Login
   identity: Identity
   card: Card
   secureNote: SecureNote
+  secret: Secret
+  environment: Environment
   attachments: Attachment[]
   fields: Field[]
   passwordHistory: Password[]
   collectionIds: string[]
   deletedDate: Date
   reprompt: CipherRepromptType
+  environmentId: string
 
-  constructor(obj?: CipherData, alreadyEncrypted: boolean = false, localData: any = null) {
+  constructor (
+    obj?: CipherData,
+    alreadyEncrypted: boolean = false,
+    localData: any = null
+  ) {
     super()
     if (obj == null) {
       return
@@ -56,7 +67,7 @@ export class Cipher extends Domain {
         organizationId: null,
         folderId: null,
         name: null,
-        notes: null,
+        notes: null
       },
       alreadyEncrypted,
       ['id', 'userId', 'organizationId', 'folderId']
@@ -71,19 +82,22 @@ export class Cipher extends Domain {
     } else {
       this.viewPassword = true // Default for already synced Ciphers without viewPassword
     }
-    this.creationDate = obj.creationDate != null ? new Date(obj.creationDate) : null
-    this.revisionDate = obj.revisionDate != null ? new Date(obj.revisionDate) : null
-    this.collectionIds = obj.collectionIds
+    this.creationDate =
+      obj.creationDate != null ? new Date(obj.creationDate) : null
+    this.updatedDate =
+      obj.updatedDate != null ? new Date(obj.updatedDate) : null
+    this.revisionDate =
+      obj.revisionDate != null ? new Date(obj.revisionDate) : null
+    this.collectionIds = obj.collectionIds || []
     this.localData = localData
-    this.deletedDate = obj.deletedDate != null ? new Date(obj.deletedDate) : null
+    this.deletedDate =
+      obj.deletedDate != null ? new Date(obj.deletedDate) : null
     this.reprompt = obj.reprompt
+    this.environmentId = obj.environmentId || null
 
     switch (this.type) {
     case CipherType.Login:
-      // @ts-ignore
-      // eslint-disable-next-line no-fallthrough
-    case 8:
-      // Master password item
+    case CipherType.MasterPassword:
       this.login = new Login(obj.login, alreadyEncrypted)
       break
     case CipherType.SecureNote:
@@ -95,30 +109,40 @@ export class Cipher extends Domain {
     case CipherType.Identity:
       this.identity = new Identity(obj.identity, alreadyEncrypted)
       break
+    case CipherType.Secret:
+      this.secret = new Secret(obj.secret, alreadyEncrypted)
+      break
+    case CipherType.Environment:
+      this.environment = new Environment(obj.environment, alreadyEncrypted)
+      break
     default:
       break
     }
 
     if (obj.attachments != null) {
-      this.attachments = obj.attachments.map(a => new Attachment(a, alreadyEncrypted))
+      this.attachments = obj.attachments.map(
+        a => new Attachment(a, alreadyEncrypted)
+      )
     } else {
-      this.attachments = null
+      this.attachments = []
     }
 
     if (obj.fields != null) {
       this.fields = obj.fields.map(f => new Field(f, alreadyEncrypted))
     } else {
-      this.fields = null
+      this.fields = []
     }
 
     if (obj.passwordHistory != null) {
-      this.passwordHistory = obj.passwordHistory.map(ph => new Password(ph, alreadyEncrypted))
+      this.passwordHistory = obj.passwordHistory.map(
+        ph => new Password(ph, alreadyEncrypted)
+      )
     } else {
-      this.passwordHistory = null
+      this.passwordHistory = []
     }
   }
 
-  async decrypt(encKey?: SymmetricCryptoKey): Promise<CipherView> {
+  async decrypt (encKey?: SymmetricCryptoKey): Promise<CipherView> {
     // @ts-ignore
     const model = new CipherView(this)
 
@@ -126,7 +150,7 @@ export class Cipher extends Domain {
       model,
       {
         name: null,
-        notes: null,
+        notes: null
       },
       this.organizationId,
       encKey
@@ -134,17 +158,29 @@ export class Cipher extends Domain {
 
     switch (this.type) {
     case CipherType.Login:
-    case 8:
-      model.login = await this.login.decrypt(this.organizationId, encKey)
+    case CipherType.MasterPassword:
+      model.login = await this.login?.decrypt(this.organizationId, encKey)
       break
     case CipherType.SecureNote:
-      model.secureNote = await this.secureNote.decrypt(this.organizationId, encKey)
+      model.secureNote = await this.secureNote?.decrypt(
+        this.organizationId,
+        encKey
+      )
       break
     case CipherType.Card:
-      model.card = await this.card.decrypt(this.organizationId, encKey)
+      model.card = await this.card?.decrypt(this.organizationId, encKey)
       break
     case CipherType.Identity:
-      model.identity = await this.identity.decrypt(this.organizationId, encKey)
+      model.identity = await this.identity?.decrypt(
+        this.organizationId,
+        encKey
+      )
+      break
+    case CipherType.Secret:
+      model.secret = await this.secret?.decrypt(this.organizationId, encKey)
+      break
+    case CipherType.Environment:
+      model.environment = await this.environment?.decrypt(this.organizationId, encKey)
       break
     default:
       break
@@ -197,7 +233,7 @@ export class Cipher extends Domain {
     return model
   }
 
-  toCipherData(userId: string): CipherData {
+  toCipherData (userId: string): CipherData {
     const c = new CipherData()
     c.id = this.id
     c.organizationId = this.organizationId
@@ -207,32 +243,39 @@ export class Cipher extends Domain {
     c.viewPassword = this.viewPassword
     c.organizationUseTotp = this.organizationUseTotp
     c.favorite = this.favorite
-    c.revisionDate = this.revisionDate != null ? this.revisionDate.toISOString() : null
+    c.revisionDate =
+      this.revisionDate != null ? this.revisionDate.toISOString() : null
     c.type = this.type
     c.collectionIds = this.collectionIds
-    c.deletedDate = this.deletedDate != null ? this.deletedDate.toISOString() : null
+    c.deletedDate =
+      this.deletedDate != null ? this.deletedDate.toISOString() : null
     c.reprompt = this.reprompt
+    c.environmentId = this.environmentId
 
     this.buildDataModel(this, c, {
       name: null,
-      notes: null,
+      notes: null
     })
 
     switch (c.type) {
     case CipherType.Login:
-      // @ts-ignore
-      // eslint-disable-next-line no-fallthrough
-    case 8:
-      c.login = this.login.toLoginData()
+    case CipherType.MasterPassword:
+      c.login = this.login?.toLoginData()
       break
     case CipherType.SecureNote:
-      c.secureNote = this.secureNote.toSecureNoteData()
+      c.secureNote = this.secureNote?.toSecureNoteData()
       break
     case CipherType.Card:
-      c.card = this.card.toCardData()
+      c.card = this.card?.toCardData()
       break
     case CipherType.Identity:
-      c.identity = this.identity.toIdentityData()
+      c.identity = this.identity?.toIdentityData()
+      break
+    case CipherType.Secret:
+      c.secret = this.secret?.toSecretData()
+      break
+    case CipherType.Environment:
+      c.environment = this.environment?.toEnvironmentData()
       break
     default:
       break
@@ -245,7 +288,9 @@ export class Cipher extends Domain {
       c.attachments = this.attachments.map(a => a.toAttachmentData())
     }
     if (this.passwordHistory != null) {
-      c.passwordHistory = this.passwordHistory.map(ph => ph.toPasswordHistoryData())
+      c.passwordHistory = this.passwordHistory.map(ph =>
+        ph.toPasswordHistoryData()
+      )
     }
     return c
   }

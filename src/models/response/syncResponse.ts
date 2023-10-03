@@ -1,10 +1,10 @@
-import { BaseResponse } from '../../../src/models/response/baseResponse'
-import { CipherResponse } from '../response/cipherResponse'
-import { DomainsResponse } from '../../../src/models/response/domainsResponse'
-import { FolderResponse } from '../../../src/models/response/folderResponse'
-import { PolicyResponse } from '../../../src/models/response/policyResponse'
-import { ProfileResponse } from '../../../src/models/response/profileResponse'
-import { SendResponse } from '../../../src/models/response/sendResponse'
+import { BaseResponse } from './baseResponse'
+import { CipherResponse } from './cipherResponse'
+import { DomainsResponse } from './domainsResponse'
+import { FolderResponse } from './folderResponse'
+import { PolicyResponse } from './policyResponse'
+import { ProfileResponse } from './profileResponse'
+import { SendResponse } from './sendResponse'
 import { CollectionDetailsResponse } from './collectionResponse'
 
 export class SyncResponse extends BaseResponse {
@@ -16,7 +16,7 @@ export class SyncResponse extends BaseResponse {
   policies?: PolicyResponse[] = []
   sends: SendResponse[] = []
 
-  constructor(response: any) {
+  constructor (response: any) {
     super(response)
 
     const profile = this.getResponseProperty('Profile')

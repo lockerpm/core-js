@@ -1,13 +1,15 @@
-import { AttachmentResponse } from '../../../src/models/response/attachmentResponse'
-import { BaseResponse } from '../../../src/models/response/baseResponse'
-import { PasswordHistoryResponse } from '../../../src/models/response/passwordHistoryResponse'
+import { AttachmentResponse } from './attachmentResponse'
+import { BaseResponse } from './baseResponse'
+import { PasswordHistoryResponse } from './passwordHistoryResponse'
 
-import { CipherRepromptType } from '../../../src/enums/cipherRepromptType'
-import { CardApi } from '../../../src/models/api/cardApi'
-import { FieldApi } from '../../../src/models/api/fieldApi'
-import { IdentityApi } from '../../../src/models/api/identityApi'
-import { LoginApi } from '../../../src/models/api/loginApi'
-import { SecureNoteApi } from '../../../src/models/api/secureNoteApi'
+import { CipherRepromptType } from '../../enums/cipherRepromptType'
+import { CardApi } from '../../models/api/cardApi'
+import { FieldApi } from '../../models/api/fieldApi'
+import { IdentityApi } from '../../models/api/identityApi'
+import { LoginApi } from '../../models/api/loginApi'
+import { SecureNoteApi } from '../../models/api/secureNoteApi'
+import { SecretApi } from '../../models/api/secretApi'
+import { EnvironmentApi } from '../../models/api/environmentApi'
 
 export class CipherResponse extends BaseResponse {
   id: string
@@ -21,19 +23,23 @@ export class CipherResponse extends BaseResponse {
   card: CardApi
   identity: IdentityApi
   secureNote: SecureNoteApi
+  secret: SecretApi
+  environment: EnvironmentApi
   favorite: boolean
   edit: boolean
   viewPassword: boolean
   organizationUseTotp: boolean
   creationDate: string
+  updatedDate: string
   revisionDate: string
   attachments: AttachmentResponse[]
   passwordHistory: PasswordHistoryResponse[]
   collectionIds: string[]
   deletedDate: string
   reprompt: CipherRepromptType
+  environmentId?: string
 
-  constructor(response: any) {
+  constructor (response: any) {
     super(response)
     this.id = this.getResponseProperty('Id')
     this.organizationId = this.getResponseProperty('OrganizationId')
@@ -50,6 +56,7 @@ export class CipherResponse extends BaseResponse {
     }
     this.organizationUseTotp = this.getResponseProperty('OrganizationUseTotp')
     this.creationDate = this.getResponseProperty('CreationDate')
+    this.updatedDate = this.getResponseProperty('UpdatedDate')
     this.revisionDate = this.getResponseProperty('RevisionDate')
     this.collectionIds = this.getResponseProperty('CollectionIds')
     this.deletedDate = this.getResponseProperty('DeletedDate')
@@ -74,6 +81,16 @@ export class CipherResponse extends BaseResponse {
       this.secureNote = new SecureNoteApi(secureNote)
     }
 
+    const secret = this.getResponseProperty('Secret')
+    if (secret != null) {
+      this.secret = new SecretApi(secret)
+    }
+
+    const environment = this.getResponseProperty('Environment')
+    if (secret != null) {
+      this.environment = new EnvironmentApi(environment)
+    }
+
     const fields = this.getResponseProperty('Fields')
     if (fields != null) {
       this.fields = fields.map((f: any) => new FieldApi(f))
@@ -90,5 +107,6 @@ export class CipherResponse extends BaseResponse {
     }
 
     this.reprompt = this.getResponseProperty('Reprompt') || CipherRepromptType.None
+    this.environmentId = this.getResponseProperty('EnvironmentId') || null
   }
 }

@@ -12,6 +12,7 @@ export abstract class CryptoService {
   setEncKey: (encKey: string) => Promise<{}>
   setEncPrivateKey: (encPrivateKey: string) => Promise<{}>
   setOrgKeys: (orgs: ProfileOrganizationResponse[]) => Promise<{}>
+  addOrgKeys: (orgs: ProfileOrganizationResponse[]) => Promise<{}>
   getKey: () => Promise<SymmetricCryptoKey>
   getKeyHash: () => Promise<string>
   getEncKey: (key?: SymmetricCryptoKey) => Promise<SymmetricCryptoKey>
@@ -44,6 +45,7 @@ export abstract class CryptoService {
     protectedKeyCs?: EncString
   ) => Promise<SymmetricCryptoKey>
   makeShareKey: () => Promise<[EncString, SymmetricCryptoKey]>
+  makeAccessKey: (orgKey: string) => Promise<[EncString, SymmetricCryptoKey]>
   makeKeyPair: (key?: SymmetricCryptoKey) => Promise<[string, EncString]>
   makePinKey: (
     pin: string,
@@ -67,4 +69,5 @@ export abstract class CryptoService {
   decryptFromBytes: (encBuf: ArrayBuffer, key: SymmetricCryptoKey) => Promise<ArrayBuffer>
   randomNumber: (min: number, max: number) => Promise<number>
   validateKey: (key: SymmetricCryptoKey) => Promise<boolean>
+  generateMemberKey: (publicKey: string, org: any) => Promise<string>
 }

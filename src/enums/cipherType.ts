@@ -3,7 +3,10 @@ export enum CipherType {
   SecureNote = 2,
   Card = 3,
   Identity = 4,
+  Secret = 5,
+  // eslint-disable-next-line @typescript-eslint/no-duplicate-enum-values
   TOTP = 5,
+  Environment = 6,
   CryptoWallet = 7,
   MasterPassword = 8,
   DriverLicense = 9,
@@ -13,5 +16,5 @@ export enum CipherType {
   WirelessRouter = 13,
   Server = 14,
   APICipher = 15,
-  Database = 16,
+  Database = 16
 }

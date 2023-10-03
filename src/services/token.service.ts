@@ -16,10 +16,14 @@ export class TokenService implements TokenServiceAbstraction {
   decodedToken: any
   refreshToken: string
 
-  constructor(private storageService: StorageService) {}
+  constructor(private storageService: StorageService) {
+  }
 
   setTokens(accessToken: string, refreshToken: string): Promise<any> {
-    return Promise.all([this.setToken(accessToken), this.setRefreshToken(refreshToken)])
+    return Promise.all([
+      this.setToken(accessToken),
+      this.setRefreshToken(refreshToken),
+    ])
   }
 
   async setToken(token: string): Promise<any> {
@@ -146,13 +150,13 @@ export class TokenService implements TokenServiceAbstraction {
       return 0
     }
 
-    const msRemaining = d.valueOf() - (new Date().valueOf() + offsetSeconds * 1000)
+    const msRemaining = d.valueOf() - (new Date().valueOf() + (offsetSeconds * 1000))
     return Math.round(msRemaining / 1000)
   }
 
   tokenNeedsRefresh(minutes: number = 5): boolean {
     const sRemaining = this.tokenSecondsRemaining()
-    return sRemaining < 60 * minutes
+    return sRemaining < (60 * minutes)
   }
 
   getUserId(): string {
@@ -180,6 +184,15 @@ export class TokenService implements TokenServiceAbstraction {
     }
 
     return decoded.email_verified as boolean
+  }
+
+  getUsername(): string {
+    const decoded = this.decodeToken()
+    if (typeof decoded.username === 'undefined') {
+      return null
+    }
+
+    return decoded.username as string
   }
 
   getName(): string {

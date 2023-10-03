@@ -3,33 +3,52 @@ import { CipherType } from '../../enums/cipherType'
 import { CipherView } from '../view/cipherView'
 
 import { Cipher as CipherDomain } from '../domain/cipher'
-import { EncString } from '../../../src/models/domain/encString'
+import { EncString } from '../domain/encString'
 
-import { Card } from '../../../src/models/export/card'
-import { Field } from '../../../src/models/export/field'
-import { Identity } from '../../../src/models/export/identity'
-import { Login } from '../../../src/models/export/login'
-import { SecureNote } from '../../../src/models/export/secureNote'
+import { Card } from './card'
+import { Field } from './field'
+import { Identity } from './identity'
+import { Login } from './login'
+import { SecureNote } from './secureNote'
+import { Secret } from './secret'
+import { Environment } from './environment'
 
 export class Cipher {
-  static template(): Cipher {
+  type: CipherType
+  folderId: string
+  organizationId: string
+  collectionIds: string[]
+  name: string
+  notes: string
+  favorite: boolean
+  fields: Field[]
+  login: Login
+  secureNote: SecureNote
+  card: Card
+  identity: Identity
+  secret: Secret
+  environment: Environment
+
+  static template (): Cipher {
     const req = new Cipher()
     req.organizationId = null
-    req.collectionIds = null
+    req.collectionIds = []
     req.folderId = null
     req.type = CipherType.Login
     req.name = 'Item name'
     req.notes = 'Some notes about this item.'
     req.favorite = false
     req.fields = []
-    req.login = null
-    req.secureNote = null
-    req.card = null
-    req.identity = null
+    req.login = new Login()
+    req.secureNote = new SecureNote()
+    req.card = new Card()
+    req.identity = new Identity()
+    req.secret = new Secret()
+    req.environment = new Environment()
     return req
   }
 
-  static toView(req: Cipher, view = new CipherView()) {
+  static toView (req: Cipher, view = new CipherView()) {
     // @ts-ignore
     view.type = req.type
     view.folderId = req.folderId
@@ -37,7 +56,9 @@ export class Cipher {
       view.organizationId = req.organizationId
     }
     if (view.collectionIds || req.collectionIds) {
-      const set = new Set((view.collectionIds ?? []).concat(req.collectionIds ?? []))
+      const set = new Set(
+        (view.collectionIds ?? []).concat(req.collectionIds ?? [])
+      )
       view.collectionIds = Array.from(set.values())
     }
     view.name = req.name
@@ -61,12 +82,18 @@ export class Cipher {
     case CipherType.Identity:
       view.identity = Identity.toView(req.identity)
       break
+    case CipherType.Secret:
+      view.secret = Secret.toView(req.secret)
+      break
+    case CipherType.Environment:
+      view.environment = Environment.toView(req.environment)
+      break
     }
 
     return view
   }
 
-  static toDomain(req: Cipher, domain = new CipherDomain()) {
+  static toDomain (req: Cipher, domain = new CipherDomain()) {
     // @ts-ignore
     domain.type = req.type
     domain.folderId = req.folderId
@@ -94,26 +121,19 @@ export class Cipher {
     case CipherType.Identity:
       domain.identity = Identity.toDomain(req.identity)
       break
+    case CipherType.Secret:
+      domain.secret = Secret.toDomain(req.secret)
+      break
+    case CipherType.Environment:
+      domain.environment = Environment.toDomain(req.environment)
+      break
     }
 
     return domain
   }
 
-  type: CipherType
-  folderId: string
-  organizationId: string
-  collectionIds: string[]
-  name: string
-  notes: string
-  favorite: boolean
-  fields: Field[]
-  login: Login
-  secureNote: SecureNote
-  card: Card
-  identity: Identity
-
   // Use build method instead of ctor so that we can control order of JSON stringify for pretty print
-  build(o: CipherView | CipherDomain) {
+  build (o: CipherView | CipherDomain) {
     this.organizationId = o.organizationId
     this.folderId = o.folderId
     this.type = o.type
@@ -122,8 +142,8 @@ export class Cipher {
       this.name = o.name
       this.notes = o.notes
     } else {
-      this.name = o.name?.encryptedString
-      this.notes = o.notes?.encryptedString
+      this.name = o.name?.encryptedString || null
+      this.notes = o.notes?.encryptedString || null
     }
 
     this.favorite = o.favorite
@@ -148,6 +168,12 @@ export class Cipher {
       break
     case CipherType.Identity:
       this.identity = new Identity(o.identity)
+      break
+    case CipherType.Secret:
+      this.secret = new Secret(o.secret)
+      break
+    case CipherType.Environment:
+      this.environment = new Environment(o.environment)
       break
     }
   }
