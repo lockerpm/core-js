@@ -13,7 +13,7 @@
   },
   "rules": {
     "indent": ["error", 2],
-    "no-console": "warn",
+    "no-console": "off",
     "arrow-parens": ["error", "as-needed"],
     "curly": ["error", "multi-line"],
     "import/no-extraneous-dependencies": "off",
@@ -24,6 +24,19 @@
     "no-underscore-dangle": 0,
     "quotes": ["error", "single"],
     "semi": ["error", "never"],
-    "@typescript-eslint/no-explicit-any": 0
+    "no-empty": "off",
+    "no-prototype-builtins": "off",
+    "no-useless-escape": "off",
+    "no-case-declarations": "off",
+    "no-control-regex": "off",
+    "no-fallthrough": "off",
+    "no-useless-catch": "off",
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/no-this-alias": "off",
+    "@typescript-eslint/no-var-requires": "off"
   }
 }

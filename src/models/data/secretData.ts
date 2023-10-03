@@ -1,17 +1,17 @@
-import { SecretApi } from '../api/secretApi';
+import { SecretApi } from '../api/secretApi'
 
 export class SecretData {
-    description: string;
-    key: string;
-    value: string;
+  description: string
+  key: string
+  value: string
 
-    constructor(data?: SecretApi) {
-        if (data == null) {
-            return;
-        }
-
-        this.description = data.description;
-        this.key = data.key;
-        this.value = data.value;
+  constructor(data?: SecretApi) {
+    if (data == null) {
+      return
     }
+
+    this.description = data.description
+    this.key = data.key
+    this.value = data.value
+  }
 }
