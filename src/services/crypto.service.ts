@@ -88,9 +88,9 @@ export class CryptoService implements CryptoServiceAbstraction {
     return this.storageService.save(Keys.encOrgKeys, orgKeys)
   }
 
-  addOrgKeys (orgs: ProfileOrganizationResponse[]): Promise<{}> {
+  async addOrgKeys (orgs: ProfileOrganizationResponse[]): Promise<{}> {
     const orgKeys: any = {}
-    const storeOrgKeys = this.storageService.get<any>(Keys.encOrgKeys)
+    const storeOrgKeys = await this.storageService.get<any>(Keys.encOrgKeys)
     orgs.forEach(org => {
       orgKeys[org.id] = org.key
     })
