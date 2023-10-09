@@ -114,7 +114,6 @@ export class SearchService implements SearchServiceAbstraction {
 
     if (ciphers == null) {
       ciphers = await this.cipherService.getAllDecrypted()
-      // console.log(ciphers.length)
     }
 
     if (filter != null && Array.isArray(filter) && filter.length > 0) {
