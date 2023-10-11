@@ -27,10 +27,12 @@ import { CryptoFunctionService } from './src/abstractions/cryptoFunction.service
 import { StorageService } from './src/abstractions/storage.service'
 import { CipherService } from './src/services/cipher.service'
 import { CryptoService } from './src/services/crypto.service'
+import { TotpService } from './src/services/totp.service'
 
 const i18nService = new I18nService(window.navigator.language, 'locales')
 const broadcasterService = new BroadcasterService()
 const messagingService = new BroadcasterMessagingService(broadcasterService)
+
 const platformUtilsService = new WebPlatformUtilsService(
   i18nService,
   messagingService
@@ -146,6 +148,12 @@ const importService = new ImportService(
   collectionService,
   platformUtilsService
 )
+
+const totpService = new TotpService(
+  storageService,
+  cryptoFunctionService,
+)
+
 containerService.attachToWindow(window)
 
 const CsCore = async () => {
@@ -170,7 +178,8 @@ const CsCore = async () => {
     exportService,
     importService,
     cryptoFunctionService,
-    sendService
+    sendService,
+    totpService
   }
 }
 
