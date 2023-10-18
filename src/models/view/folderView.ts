@@ -7,6 +7,7 @@ export class FolderView implements View, ITreeNodeObject {
   id: string = null
   name: string = null
   revisionDate: Date = null
+  creationDate: Date = null
 
   constructor(f?: Folder) {
     if (!f) {
@@ -14,6 +15,8 @@ export class FolderView implements View, ITreeNodeObject {
     }
 
     this.id = f.id
+    this.name = f.name
     this.revisionDate = f.revisionDate
+    this.creationDate = f.creationDate
   }
 }

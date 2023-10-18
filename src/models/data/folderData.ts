@@ -5,11 +5,13 @@ export class FolderData {
   userId: string
   name: string
   revisionDate: string
+  creationDate: string
 
   constructor(response: FolderResponse, userId: string) {
     this.userId = userId
     this.name = response.name
     this.id = response.id
     this.revisionDate = response.revisionDate
+    this.creationDate = response.creationDate
   }
 }
