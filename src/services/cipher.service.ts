@@ -1,4 +1,3 @@
-// import { CipherType } from '../enums/cipherType'
 import { FieldType } from '../../src/enums/fieldType'
 import { UriMatchType } from '../../src/enums/uriMatchType'
 
@@ -355,13 +354,13 @@ export class CipherService implements CipherServiceAbstraction {
 
   @sequentialize(() => 'getAllDecrypted')
   async getAllDecrypted(): Promise<CipherView[]> {
-    // if (this.decryptedCipherCache != null) {
-    //   const userId = await this.userService.getUserId()
-    //   if ((this.searchService().indexedEntityId ?? userId) !== userId) {
-    //     await this.searchService().indexCiphers(userId, this.decryptedCipherCache)
-    //   }
-    //   return this.decryptedCipherCache
-    // }
+    if (this.decryptedCipherCache != null) {
+      const userId = await this.userService.getUserId()
+      if ((this.searchService().indexedEntityId ?? userId) !== userId) {
+        await this.searchService().indexCiphers(userId, this.decryptedCipherCache)
+      }
+      return this.decryptedCipherCache
+    }
 
     const decCiphers: CipherView[] = []
     const hasKey = await this.cryptoService.hasKey()
@@ -380,6 +379,26 @@ export class CipherService implements CipherServiceAbstraction {
     decCiphers.sort(this.getLocaleSortingFunction())
     this.decryptedCipherCache = decCiphers
     return this.decryptedCipherCache
+  }
+
+  async getSingleDecrypted(id: string): Promise<CipherView> {
+    let res: CipherView
+    if (this.decryptedCipherCache != null) {
+      res = this.decryptedCipherCache.find(c => c.id === id)
+      if (res) {
+        return res
+      }
+    }
+
+    const hasKey = await this.cryptoService.hasKey()
+    if (!hasKey) {
+      throw new Error('No key.')
+    }
+
+    const cipher = await this.get(id)
+    res = await cipher.decrypt()
+    this.updateDecryptedCache([res])
+    return res
   }
 
   async getAllDecryptedForGrouping(
