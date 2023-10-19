@@ -11,6 +11,6 @@ export class FolderResponse extends BaseResponse {
     this.id = this.getResponseProperty('Id')
     this.name = this.getResponseProperty('Name')
     this.revisionDate = this.getResponseProperty('RevisionDate')
-    this.creationDate = this.getResponseProperty('creationDate')
+    this.creationDate = this.getResponseProperty('CreationDate')
   }
 }

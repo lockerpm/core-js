@@ -6,6 +6,7 @@ export class CollectionResponse extends BaseResponse {
   organizationId: string
   name: string
   externalId: string
+  creationDate: string
   revisionDate: string
 
   constructor(response: any) {
@@ -14,6 +15,7 @@ export class CollectionResponse extends BaseResponse {
     this.organizationId = this.getResponseProperty('OrganizationId')
     this.name = this.getResponseProperty('Name')
     this.externalId = this.getResponseProperty('ExternalId')
+    this.creationDate = this.getResponseProperty('CreationDate')
     this.revisionDate = this.getResponseProperty('RevisionDate')
   }
 }
