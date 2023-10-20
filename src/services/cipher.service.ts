@@ -354,23 +354,30 @@ export class CipherService implements CipherServiceAbstraction {
 
   @sequentialize(() => 'getAllDecrypted')
   async getAllDecrypted(): Promise<CipherView[]> {
+    let decCiphers: CipherView[] = []
+
     if (this.decryptedCipherCache != null) {
       const userId = await this.userService.getUserId()
       if ((this.searchService().indexedEntityId ?? userId) !== userId) {
         await this.searchService().indexCiphers(userId, this.decryptedCipherCache)
       }
-      return this.decryptedCipherCache
+      
+      // Filter invalid cipher to decrypt again
+      decCiphers = this.decryptedCipherCache.filter(c => !!c.name)
     }
 
-    const decCiphers: CipherView[] = []
     const hasKey = await this.cryptoService.hasKey()
     if (!hasKey) {
       throw new Error('No key.')
     }
 
     const promises: any[] = []
-    const ciphers = await this.getAll()
-    // console.log('all ciphers: ', ciphers.length)
+    let ciphers = await this.getAll()
+    
+    // only decrypt what is not decrypted
+    const decryptedCipherIds = decCiphers.map(c => c.id)
+    ciphers = ciphers.filter(c => !decryptedCipherIds.includes(c.id))
+    
     ciphers.forEach(cipher => {
       promises.push(cipher.decrypt().then(c => decCiphers.push(c)))
     })
@@ -385,7 +392,8 @@ export class CipherService implements CipherServiceAbstraction {
     let res: CipherView
     if (this.decryptedCipherCache != null) {
       res = this.decryptedCipherCache.find(c => c.id === id)
-      if (res) {
+      if (res && res.name) {
+        // If item is not decrypted -> try to decrypt again
         return res
       }
     }
