@@ -90,8 +90,11 @@ export class CollectionService implements CollectionServiceAbstraction {
   }
 
   async getAllDecrypted(): Promise<CollectionView[]> {
+    let decCollections: CollectionView[] = []
+
     if (this.decryptedCollectionCache != null) {
-      return this.decryptedCollectionCache
+      // Filter invalid collection to decrypt again
+      decCollections = this.decryptedCollectionCache.filter(c => !!c.name)
     }
 
     const hasKey = await this.cryptoService.hasKey()
@@ -99,8 +102,15 @@ export class CollectionService implements CollectionServiceAbstraction {
       throw new Error('No key.')
     }
 
-    const collections = await this.getAll()
-    this.decryptedCollectionCache = await this.decryptMany(collections)
+    let collections = await this.getAll()
+
+    // only decrypt what is not decrypted
+    const decryptedCollectionIds = decCollections.map(c => c.id)
+    collections = collections.filter(c => !decryptedCollectionIds.includes(c.id))
+
+    const newlyDecrypted = await this.decryptMany(collections)
+    this.decryptedCollectionCache = [...decCollections, ...newlyDecrypted].sort(Utils.getSortFunction(this.i18nService, 'name'))
+
     return this.decryptedCollectionCache
   }
 
