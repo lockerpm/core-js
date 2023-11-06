@@ -6,6 +6,7 @@ import { WebPlatformUtilsService } from './src/services/webPlatformUtils.service
 
 import { BroadcasterService } from './src/services/broadcaster.service'
 import { ApiService } from './src/services/api.service'
+import { AuditService } from './src/services/audit.service'
 import { CollectionService } from './src/services/collection.service'
 import { ConsoleLogService } from './src/services/consoleLog.service'
 import { ContainerService } from './src/services/container.service'
@@ -58,6 +59,7 @@ const apiService = new ApiService(
   async (expired: boolean) =>
     messagingService.send('logout', { expired: expired })
 )
+const auditService = new AuditService(cryptoFunctionService, apiService)
 const userService = new UserService(tokenService, storageService)
 const settingsService = new SettingsService(userService, storageService)
 export let searchService: SearchService = null
@@ -179,7 +181,8 @@ const CsCore = async () => {
     importService,
     cryptoFunctionService,
     sendService,
-    totpService
+    totpService,
+    auditService
   }
 }
 
