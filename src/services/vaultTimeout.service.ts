@@ -79,16 +79,16 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
 
     // This has the potential to be removed. Evaluate after all platforms complete with auto-logout
     let vaultTimeout = this.platformUtilsService.lockTimeout()
-    if (vaultTimeout == null) {
+    if (!vaultTimeout) {
       vaultTimeout = await this.storageService.get<number>(ConstantsService.vaultTimeoutKey)
     }
 
-    if (vaultTimeout == null || vaultTimeout < 0) {
+    if (!vaultTimeout || vaultTimeout < 0) {
       return
     }
 
     const lastActive = await this.storageService.get<number>(ConstantsService.lastActiveKey)
-    if (lastActive == null) {
+    if (!lastActive) {
       return
     }
 
