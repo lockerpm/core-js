@@ -188,7 +188,8 @@ export class CryptoService implements CryptoServiceAbstraction {
       return null
     }
 
-    this.privateKey = await this.decryptToBytes(new EncString(encPrivateKey), null)
+    const encKey = await this.getEncKey()
+    this.privateKey = await this.decryptToBytes(new EncString(encPrivateKey), encKey)
     return this.privateKey
   }
 
