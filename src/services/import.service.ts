@@ -102,8 +102,8 @@ export class ImportService implements ImportServiceAbstraction {
 
   regularImportOptions: ImportOption[] = [
     { id: 'keepassxcsv', name: 'KeePassX (csv)' },
-    { id: '1passwordwincsv', name: '1Password 6 and 7 Windows (csv)' },
-    { id: '1passwordmaccsv', name: '1Password 6 and 7 Mac (csv)' },
+    { id: '1passwordwincsv', name: '1Password 7 and 8 Windows (csv)' },
+    { id: '1passwordmaccsv', name: '1Password 7 and 8 Mac (csv)' },
     { id: 'roboformcsv', name: 'RoboForm (csv)' },
     { id: 'keepercsv', name: 'Keeper (csv)' },
     { id: 'enpasscsv', name: 'Enpass (csv)' },
