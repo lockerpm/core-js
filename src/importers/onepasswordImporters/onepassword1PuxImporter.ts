@@ -73,6 +73,9 @@ type DataFormat = {
                 menu?: string
                 creditCardType?: string
                 creditCardNumber?: string
+                email?: {
+                  email_address: string
+                }
               }
             }[]
           }[]
@@ -104,7 +107,6 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
             const cipher = this.initLoginCipher()
             cipher.name = item.overview.title
             cipher.notes = item.details.notesPlain
-            this.processKvp(cipher, 'subtitle', item.overview.subtitle)
             this.processKvp(cipher, 'tags', item.overview.tags?.join(', '))
 
             // Parse by category
@@ -231,6 +233,7 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
           || field.value.creditCardType
           || field.value.creditCardNumber
           || field.value.concealed
+          || field.value.email?.email_address
         let type = FieldType.Text
         if (field.value.date) {
           const date = new Date(field.value.date * 1000)
