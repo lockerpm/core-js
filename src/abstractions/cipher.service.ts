@@ -60,6 +60,8 @@ export abstract class CipherService {
 
   restoreWithServer: (id: string) => Promise<any>
   restoreManyWithServer: (ids: string[]) => Promise<any>
+  
   replaceSome: (ciphers: { [id: string]: CipherData }) => Promise<any>
   updateDecryptedCache: (ciphers: CipherView[]) => void
+  getSingleDecrypted: (id: string) => Promise<CipherView>
 }

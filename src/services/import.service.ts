@@ -57,6 +57,7 @@ import { MSecureCsvImporter } from '../importers/msecureCsvImporter'
 import { MykiCsvImporter } from '../importers/mykiCsvImporter'
 import { NordPassCsvImporter } from '../importers/nordpassCsvImporter'
 import { OnePassword1PifImporter } from '../importers/onepasswordImporters/onepassword1PifImporter'
+import { OnePassword1PuxImporter } from '../importers/onepasswordImporters/onepassword1PuxImporter'
 import { OnePasswordMacCsvImporter } from '../importers/onepasswordImporters/onepasswordMacCsvImporter'
 import { OnePasswordWinCsvImporter } from '../importers/onepasswordImporters/onepasswordWinCsvImporter'
 import { PadlockCsvImporter } from '../importers/padlockCsvImporter'
@@ -95,6 +96,7 @@ export class ImportService implements ImportServiceAbstraction {
     { id: 'firefoxcsv', name: 'Firefox (csv)' },
     { id: 'safaricsv', name: 'Safari (csv)' },
     { id: 'keepass2xml', name: 'KeePass 2 (xml)' },
+    { id: '1password1pux', name: '1Password (1pux)' },
     { id: '1password1pif', name: '1Password (1pif)' },
     { id: 'dashlanecsv', name: 'Dashlane (csv)' },
     { id: 'dashlanejson', name: 'Dashlane (json)' },
@@ -102,8 +104,8 @@ export class ImportService implements ImportServiceAbstraction {
 
   regularImportOptions: ImportOption[] = [
     { id: 'keepassxcsv', name: 'KeePassX (csv)' },
-    { id: '1passwordwincsv', name: '1Password 6 and 7 Windows (csv)' },
-    { id: '1passwordmaccsv', name: '1Password 6 and 7 Mac (csv)' },
+    { id: '1passwordwincsv', name: '1Password 7 and 8 Windows (csv)' },
+    { id: '1passwordmaccsv', name: '1Password 7 and 8 Mac (csv)' },
     { id: 'roboformcsv', name: 'RoboForm (csv)' },
     { id: 'keepercsv', name: 'Keeper (csv)' },
     { id: 'enpasscsv', name: 'Enpass (csv)' },
@@ -250,6 +252,8 @@ export class ImportService implements ImportServiceAbstraction {
       return new MeldiumCsvImporter()
     case '1password1pif':
       return new OnePassword1PifImporter()
+      case '1password1pux':
+      return new OnePassword1PuxImporter()
     case '1passwordwincsv':
       return new OnePasswordWinCsvImporter()
     case '1passwordmaccsv':
