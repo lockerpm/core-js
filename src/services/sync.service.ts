@@ -383,11 +383,7 @@ export class SyncService implements SyncServiceAbstraction {
     return await this.cipherService.replace(ciphers)
   }
 
-<<<<<<< HEAD
-  async syncSomeCiphers (userId: string, response: CipherResponse[]) {
-=======
   async syncSomeCiphers(userId: string, response: CipherResponse[]) {
->>>>>>> 0821fc7a714814c976738f856d54955d73e557b8
     const ciphers: { [id: string]: CipherData } = {}
     response.forEach(c => {
       ciphers[c.id] = new CipherData(c, userId)
@@ -395,11 +391,7 @@ export class SyncService implements SyncServiceAbstraction {
     return await this.cipherService.replaceSome(ciphers)
   }
 
-<<<<<<< HEAD
-  private async syncSends (userId: string, response: SendResponse[]) {
-=======
   async syncSends(userId: string, response: SendResponse[]) {
->>>>>>> 0821fc7a714814c976738f856d54955d73e557b8
     const sends: { [id: string]: SendData } = {}
     response.forEach(s => {
       sends[s.id] = new SendData(s, userId)
@@ -407,11 +399,7 @@ export class SyncService implements SyncServiceAbstraction {
     return await this.sendService.replace(sends)
   }
 
-<<<<<<< HEAD
-  private async syncSettings (userId: string, response: DomainsResponse) {
-=======
   async syncSettings(userId: string, response: DomainsResponse) {
->>>>>>> 0821fc7a714814c976738f856d54955d73e557b8
     let eqDomains: string[][] = []
     if (response != null && response.equivalentDomains != null) {
       eqDomains = eqDomains.concat(response.equivalentDomains)
@@ -428,11 +416,7 @@ export class SyncService implements SyncServiceAbstraction {
     return this.settingsService.setEquivalentDomains(eqDomains)
   }
 
-<<<<<<< HEAD
-  private async syncPolicies (response: PolicyResponse[]) {
-=======
   async syncPolicies(response: PolicyResponse[]) {
->>>>>>> 0821fc7a714814c976738f856d54955d73e557b8
     const policies: { [id: string]: PolicyData } = {}
     if (response != null) {
       response.forEach(p => {
