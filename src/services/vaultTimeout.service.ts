@@ -139,6 +139,14 @@ export class VaultTimeoutService implements VaultTimeoutServiceAbstraction {
   }
 
   async logOut(): Promise<void> {
+    await this.lock()
+    await this.cryptoService.clearKeys()
+    await this.userService.clear()
+    const userId = await this.userService.getUserId()
+    if (userId) {
+      await this.cipherService.clear(userId)
+    }
+    this.messagingService.send('logout')
     if (this.loggedOutCallback != null) {
       await this.loggedOutCallback()
     }
