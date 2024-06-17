@@ -88,6 +88,18 @@ export class CryptoService implements CryptoServiceAbstraction {
     return this.storageService.save(Keys.encOrgKeys, orgKeys)
   }
 
+  async addOrgKeys (orgs: ProfileOrganizationResponse[]): Promise<{}> {
+    const orgKeys: any = {}
+    const storeOrgKeys = await this.storageService.get<any>(Keys.encOrgKeys)
+    orgs.forEach(org => {
+      orgKeys[org.id] = org.key
+    })
+
+    this.orgKeys = null
+    return this.storageService.save(Keys.encOrgKeys, { ...storeOrgKeys, ...orgKeys })
+  }
+
+
   async getKey(): Promise<SymmetricCryptoKey> {
     if (this.key != null) {
       return this.key
@@ -188,7 +200,7 @@ export class CryptoService implements CryptoServiceAbstraction {
       return null
     }
 
-    const encKey = await this.getEncKey()
+    const encKey = await this.getEncKey() || null
     this.privateKey = await this.decryptToBytes(new EncString(encPrivateKey), encKey)
     return this.privateKey
   }
@@ -229,7 +241,7 @@ export class CryptoService implements CryptoServiceAbstraction {
         continue
       }
 
-      const decValue = await this.rsaDecrypt(encOrgKeys[orgId])
+      const decValue = await this.rsaDecrypt(encOrgKeys[orgId] || '')
       orgKeys.set(orgId, new SymmetricCryptoKey(decValue))
       setKey = true
     }
@@ -247,11 +259,11 @@ export class CryptoService implements CryptoServiceAbstraction {
     }
 
     const orgKeys = await this.getOrgKeys()
-    if (orgKeys == null || !orgKeys.has(orgId)) {
+    if (orgKeys == null || !orgKeys.has(`${orgId}`)) {
       return null
     }
 
-    return orgKeys.get(orgId)
+    return orgKeys.get(`${orgId}`)
   }
 
   async hasKey(): Promise<boolean> {
@@ -379,6 +391,15 @@ export class CryptoService implements CryptoServiceAbstraction {
     return [encShareKey, new SymmetricCryptoKey(shareKey)]
   }
 
+  async makeAccessKey (orgId: string): Promise<[EncString, SymmetricCryptoKey]> {
+    const orgKey = await this.getOrgKey(orgId)
+    const accessKey = await this.cryptoFunctionService.randomBytes(32)
+    const longerKey = new SymmetricCryptoKey(accessKey)
+    const realAccessKey = await this.stretchKey(longerKey)
+    const encOrgKey = await this.encrypt(orgKey.key, realAccessKey)
+    return [encOrgKey, longerKey]
+  }
+
   async makeKeyPair(key?: SymmetricCryptoKey): Promise<[string, EncString]> {
     const keyPair = await this.cryptoFunctionService.rsaGenerateKeyPair(2048)
     const publicB64 = Utils.fromBufferToB64(keyPair[0])
@@ -481,7 +502,7 @@ export class CryptoService implements CryptoServiceAbstraction {
     return new EncString(EncryptionType.Rsa2048_OaepSha1_B64, Utils.fromBufferToB64(encBytes))
   }
 
-  async rsaDecrypt(encValue: string, privateKey?: ArrayBuffer): Promise<ArrayBuffer> {
+  async rsaDecrypt(encValue: string): Promise<ArrayBuffer> {
     const headerPieces = encValue.split('.')
     let encType: EncryptionType = null
     let encPieces: string[]
@@ -512,9 +533,7 @@ export class CryptoService implements CryptoServiceAbstraction {
     }
 
     const data = Utils.fromB64ToArray(encPieces[0]).buffer
-    if (!privateKey) {
-      privateKey = await this.getPrivateKey()
-    }
+    const privateKey = await this.getPrivateKey()
     if (privateKey == null) {
       throw new Error('No private key.')
     }
@@ -863,5 +882,12 @@ export class CryptoService implements CryptoServiceAbstraction {
       kdf,
       kdfIterations,
     }
+  }
+
+  async generateMemberKey (publicKey: string, org: any) {
+    const pk = Utils.fromB64ToArray(publicKey)
+    const orgKey = await this.getOrgKey(org.id)
+    const key = await this.rsaEncrypt(orgKey.key, pk.buffer)
+    return key.encryptedString
   }
 }

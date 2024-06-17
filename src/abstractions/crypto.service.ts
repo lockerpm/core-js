@@ -12,6 +12,7 @@ export abstract class CryptoService {
   setEncKey: (encKey: string) => Promise<{}>
   setEncPrivateKey: (encPrivateKey: string) => Promise<{}>
   setOrgKeys: (orgs: ProfileOrganizationResponse[]) => Promise<{}>
+  addOrgKeys: (orgs: ProfileOrganizationResponse[]) => Promise<{}>
   getKey: () => Promise<SymmetricCryptoKey>
   getKeyHash: () => Promise<string>
   getEncKey: (key?: SymmetricCryptoKey) => Promise<SymmetricCryptoKey>
