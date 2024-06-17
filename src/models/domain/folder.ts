@@ -9,6 +9,7 @@ export class Folder extends Domain {
   id: string
   name: EncString
   revisionDate: Date
+  creationDate: Date
 
   constructor(obj?: FolderData, alreadyEncrypted: boolean = false) {
     super()
@@ -28,6 +29,7 @@ export class Folder extends Domain {
     )
 
     this.revisionDate = obj.revisionDate != null ? new Date(obj.revisionDate) : null
+    this.creationDate = obj.creationDate != null ? new Date(obj.creationDate) : null
   }
 
   decrypt(): Promise<FolderView> {

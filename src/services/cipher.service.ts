@@ -340,6 +340,27 @@ export class CipherService implements CipherServiceAbstraction {
     return this.decryptedCipherCache
   }
 
+  async getSingleDecrypted(id: string): Promise<CipherView> {
+    let res: CipherView
+    if (this.decryptedCipherCache != null) {
+      res = this.decryptedCipherCache.find(c => c.id === id)
+      if (res && res.name) {
+        // If item is not decrypted -> try to decrypt again
+        return res
+      }
+    }
+
+    const hasKey = await this.cryptoService.hasKey()
+    if (!hasKey) {
+      throw new Error('No key.')
+    }
+
+    const cipher = await this.get(id)
+    res = await cipher.decrypt()
+    this.updateDecryptedCache([res])
+    return res
+  }
+
   async getAllDecryptedForGrouping(
     groupingId: string,
     folder: boolean = true
@@ -364,34 +385,29 @@ export class CipherService implements CipherServiceAbstraction {
     })
   }
 
-
-  async getAllDecryptedForUrl(
-    url: string,
-    includeOtherTypes?: CipherType[],
-    defaultMatch: UriMatchType = null
-  ): Promise<CipherView[]> {
+  async getAllDecryptedForUrl (url: string, includeOtherTypes?: CipherType[],
+    defaultMatch: UriMatchType = null): Promise<CipherView[]> {
     if (url == null && includeOtherTypes == null) {
       return Promise.resolve([])
     }
 
     const domain = Utils.getDomain(url)
-    const eqDomainsPromise =
-      domain == null
-        ? Promise.resolve([])
-        : this.settingsService.getEquivalentDomains().then((eqDomains: any[][]) => {
-          let matches: any[] = []
-          eqDomains.forEach(eqDomain => {
-            if (eqDomain.length && eqDomain.includes(domain)) {
-              matches = matches.concat(eqDomain)
-            }
-          })
-
-          if (!matches.length) {
-            matches.push(domain)
+    const eqDomainsPromise = domain == null
+      ? Promise.resolve([])
+      : this.settingsService.getEquivalentDomains().then((eqDomains: any[][]) => {
+        let matches: any[] = []
+        eqDomains.forEach(eqDomain => {
+          if (eqDomain.length && eqDomain.includes(domain)) {
+            matches = matches.concat(eqDomain)
           }
-
-          return matches
         })
+
+        if (!matches.length) {
+          matches.push(domain)
+        }
+
+        return matches
+      })
 
     const result = await Promise.all([eqDomainsPromise, this.getAllDecrypted()])
     const matchingDomains = result[0]
@@ -455,7 +471,7 @@ export class CipherService implements CipherServiceAbstraction {
               if (regex.test(url)) {
                 return true
               }
-            } catch {}
+            } catch { }
             break
           case UriMatchType.Never:
           default:
@@ -690,9 +706,9 @@ export class CipherService implements CipherServiceAbstraction {
   }
 
   /**
-   * @deprecated Mar 25 2021: This method has been deprecated in favor of direct uploads.
-   * This method still exists for backward compatibility with old server versions.
-   */
+     * @deprecated Mar 25 2021: This method has been deprecated in favor of direct uploads.
+     * This method still exists for backward compatibility with old server versions.
+     */
   async legacyServerAttachmentFileUpload (admin: boolean, cipherId: string, encFileName: EncString,
     encData: EncArrayBuffer, key: EncString) {
     const fd = new FormData()

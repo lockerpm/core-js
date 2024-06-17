@@ -6,6 +6,7 @@ import { WebPlatformUtilsService } from './src/services/webPlatformUtils.service
 
 import { BroadcasterService } from './src/services/broadcaster.service'
 import { ApiService } from './src/services/api.service'
+import { AuditService } from './src/services/audit.service'
 import { CollectionService } from './src/services/collection.service'
 import { ConsoleLogService } from './src/services/consoleLog.service'
 import { ContainerService } from './src/services/container.service'
@@ -27,10 +28,12 @@ import { CryptoFunctionService } from './src/abstractions/cryptoFunction.service
 import { StorageService } from './src/abstractions/storage.service'
 import { CipherService } from './src/services/cipher.service'
 import { CryptoService } from './src/services/crypto.service'
+import { TotpService } from './src/services/totp.service'
 
 const i18nService = new I18nService(window.navigator.language, 'locales')
 const broadcasterService = new BroadcasterService()
 const messagingService = new BroadcasterMessagingService(broadcasterService)
+
 const platformUtilsService = new WebPlatformUtilsService(
   i18nService,
   messagingService
@@ -56,6 +59,7 @@ const apiService = new ApiService(
   async (expired: boolean) =>
     messagingService.send('logout', { expired: expired })
 )
+const auditService = new AuditService(cryptoFunctionService, apiService)
 const userService = new UserService(tokenService, storageService)
 const settingsService = new SettingsService(userService, storageService)
 export let searchService: SearchService = null
@@ -146,6 +150,12 @@ const importService = new ImportService(
   collectionService,
   platformUtilsService
 )
+
+const totpService = new TotpService(
+  storageService,
+  cryptoFunctionService,
+)
+
 containerService.attachToWindow(window)
 
 const CsCore = async () => {
@@ -170,7 +180,9 @@ const CsCore = async () => {
     exportService,
     importService,
     cryptoFunctionService,
-    sendService
+    sendService,
+    totpService,
+    auditService
   }
 }
 

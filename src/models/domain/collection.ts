@@ -12,6 +12,7 @@ export class Collection extends Domain {
   externalId: string
   readOnly: boolean
   hidePasswords: boolean
+  creationDate: Date
   revisionDate: Date
 
   constructor(obj?: CollectionData, alreadyEncrypted: boolean = false) {
@@ -34,6 +35,7 @@ export class Collection extends Domain {
       alreadyEncrypted,
       ['id', 'organizationId', 'externalId', 'readOnly', 'hidePasswords']
     )
+    this.creationDate = obj.creationDate != null ? new Date(obj.creationDate) : null
     this.revisionDate = obj.revisionDate != null ? new Date(obj.revisionDate) : null
   }
 
