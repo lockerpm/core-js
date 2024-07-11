@@ -864,4 +864,11 @@ export class CryptoService implements CryptoServiceAbstraction {
       kdfIterations,
     }
   }
+
+  async generateMemberKey (publicKey: string, org: any) {
+    const pk = Utils.fromB64ToArray(publicKey)
+    const orgKey = await this.getOrgKey(org.id)
+    const key = await this.rsaEncrypt(orgKey.key, pk.buffer)
+    return key.encryptedString
+  }
 }
