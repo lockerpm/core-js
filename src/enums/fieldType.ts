@@ -4,6 +4,7 @@ export enum FieldType {
   Boolean = 2,
   Url = 4,
   Email = 5,
+  Address = 6,
   Date = 7,
   MonthYear = 8,
   Phone = 9
