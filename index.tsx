@@ -62,7 +62,7 @@ const apiService = new ApiService(
 const auditService = new AuditService(cryptoFunctionService, apiService)
 const userService = new UserService(tokenService, storageService)
 const settingsService = new SettingsService(userService, storageService)
-export let searchService: SearchService = null
+export let searchService: any = null
 const fileUploadService = new FileUploadService(consoleLogService, apiService)
 const cipherService = new CipherService(
   cryptoService,
@@ -113,7 +113,7 @@ const vaultTimeoutService = new VaultTimeoutService(
   searchService,
   userService,
   tokenService,
-  null,
+  undefined,
   async () => messagingService.send('logout', { expired: false })
 )
 const syncService = new SyncService(

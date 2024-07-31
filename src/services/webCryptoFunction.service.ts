@@ -191,7 +191,7 @@ export class WebCryptoFunctionService implements CryptoFunctionService {
     return true
   }
 
-  hmacFast(value: string, key: string, algorithm: 'sha1' | 'sha256' | 'sha512'): Promise<string> {
+  hmacFast(value: ArrayBuffer | string, key: ArrayBuffer | string, algorithm: 'sha1' | 'sha256' | 'sha512'): Promise<string> {
     const hmac = (forge as any).hmac.create()
     hmac.start(algorithm, key)
     hmac.update(value)
@@ -199,7 +199,7 @@ export class WebCryptoFunctionService implements CryptoFunctionService {
     return Promise.resolve(bytes)
   }
 
-  async compareFast(a: string, b: string): Promise<boolean> {
+  async compareFast(a: ArrayBuffer | string, b: ArrayBuffer | string): Promise<boolean> {
     const rand = await this.randomBytes(32)
     const bytes = new Uint32Array(rand)
     const buffer = forge.util.createBuffer()
@@ -267,7 +267,7 @@ export class WebCryptoFunctionService implements CryptoFunctionService {
     return p
   }
 
-  aesDecryptFast(parameters: DecryptParameters<string>): Promise<string> {
+  aesDecryptFast(parameters: DecryptParameters<ArrayBuffer | string>): Promise<string> {
     const dataBuffer = (forge as any).util.createBuffer(parameters.data)
     const decipher = (forge as any).cipher.createDecipher('AES-CBC', parameters.encKey)
     decipher.start({ iv: parameters.iv })
