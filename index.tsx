@@ -29,6 +29,7 @@ import { StorageService } from './src/abstractions/storage.service'
 import { CipherService } from './src/services/cipher.service'
 import { CryptoService } from './src/services/crypto.service'
 import { TotpService } from './src/services/totp.service'
+import { Utils } from './src/misc/utils'
 
 const i18nService = new I18nService(window.navigator.language, 'locales')
 const broadcasterService = new BroadcasterService()
@@ -158,6 +159,7 @@ const totpService = new TotpService(
 
 const CsCore = async (global = window) => {
   containerService.attachToWindow(global)
+  Utils.global = global
   await (storageService as HtmlStorageService).init()
   vaultTimeoutService.init(true)
   return {
