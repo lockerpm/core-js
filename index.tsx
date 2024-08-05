@@ -156,9 +156,8 @@ const totpService = new TotpService(
   cryptoFunctionService,
 )
 
-containerService.attachToWindow(window)
-
-const CsCore = async () => {
+const CsCore = async (global = window) => {
+  containerService.attachToWindow(global)
   await (storageService as HtmlStorageService).init()
   vaultTimeoutService.init(true)
   return {
