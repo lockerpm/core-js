@@ -28,7 +28,7 @@ export class WebPlatformUtilsService implements PlatformUtilsService {
       this.browserCache = DeviceType.VivaldiBrowser
     } else if (navigator.userAgent.indexOf(' Safari/') !== -1 && navigator.userAgent.indexOf('Chrome') === -1) {
       this.browserCache = DeviceType.SafariBrowser
-    } else if ((window as any).chrome && navigator.userAgent.indexOf(' Chrome/') !== -1) {
+    } else if ((self as any).chrome && navigator.userAgent.indexOf(' Chrome/') !== -1) {
       this.browserCache = DeviceType.ChromeBrowser
     } else if (navigator.userAgent.indexOf(' Trident/') !== -1) {
       this.browserCache = DeviceType.IEBrowser
@@ -246,10 +246,10 @@ export class WebPlatformUtilsService implements PlatformUtilsService {
   }
 
   copyToClipboard(text: string, options?: any): void {
-    let win = window
-    let doc = window.document
-    if (options && (options.window || options.win)) {
-      win = options.window || options.win
+    let win = self
+    let doc = self.document
+    if (options && (options.self || options.win)) {
+      win = options.self || options.win
       doc = win.document
     } else if (options && options.doc) {
       doc = options.doc

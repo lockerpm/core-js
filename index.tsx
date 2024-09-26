@@ -1,5 +1,6 @@
 import { BroadcasterMessagingService } from './src/services/broadcasterMessaging.service'
 import { HtmlStorageService } from './src/services/htmlStorage.service'
+import { BrowserStorageService } from './src/services/browserStorage.service'
 import { I18nService } from './src/services/i18nNew.service'
 import { MemoryStorageService } from './src/services/memoryStorage.service'
 import { WebPlatformUtilsService } from './src/services/webPlatformUtils.service'
@@ -31,136 +32,143 @@ import { CryptoService } from './src/services/crypto.service'
 import { TotpService } from './src/services/totp.service'
 import { Utils } from './src/misc/utils'
 
-const i18nService = new I18nService(window.navigator.language, 'locales')
-const broadcasterService = new BroadcasterService()
-const messagingService = new BroadcasterMessagingService(broadcasterService)
+const CsCore = async (global = self, platform = 'web') => {
+  let searchService: any = null
 
-const platformUtilsService = new WebPlatformUtilsService(
-  i18nService,
-  messagingService
-)
-const storageService: StorageService = new HtmlStorageService(
-  platformUtilsService
-)
-const secureStorageService: StorageService = new MemoryStorageService()
-const cryptoFunctionService: CryptoFunctionService = new WebCryptoFunctionService(window, platformUtilsService)
-const consoleLogService = new ConsoleLogService(false)
-const cryptoService = new CryptoService(
-  storageService,
-  platformUtilsService.isDev() ? storageService : secureStorageService,
-  cryptoFunctionService,
-  platformUtilsService,
-  consoleLogService
-)
+  const i18nService = new I18nService(self.navigator.language, 'locales')
+  const broadcasterService = new BroadcasterService()
+  const messagingService = new BroadcasterMessagingService(broadcasterService)
 
-const tokenService = new TokenService(storageService)
-const apiService = new ApiService(
-  tokenService,
-  platformUtilsService,
-  async (expired: boolean) =>
-    messagingService.send('logout', { expired: expired })
-)
-const auditService = new AuditService(cryptoFunctionService, apiService)
-const userService = new UserService(tokenService, storageService)
-const settingsService = new SettingsService(userService, storageService)
-export let searchService: any = null
-const fileUploadService = new FileUploadService(consoleLogService, apiService)
-const cipherService = new CipherService(
-  cryptoService,
-  userService,
-  settingsService,
-  apiService,
-  fileUploadService,
-  storageService,
-  i18nService,
-  () => searchService
-)
-const folderService = new FolderService(
-  cryptoService,
-  userService,
-  apiService,
-  storageService,
-  i18nService,
-  cipherService
-)
-const collectionService = new CollectionService(
-  cryptoService,
-  userService,
-  storageService,
-  i18nService
-)
-searchService = new SearchService(
-  cipherService,
-  consoleLogService,
-  i18nService
-)
-const policyService = new PolicyService(userService, storageService)
-const sendService = new SendService(
-  cryptoService,
-  cipherService,
-  userService,
-  storageService,
-  i18nService,
-  cryptoFunctionService
-)
-const vaultTimeoutService = new VaultTimeoutService(
-  cipherService,
-  folderService,
-  collectionService,
-  cryptoService,
-  platformUtilsService,
-  storageService,
-  messagingService,
-  searchService,
-  userService,
-  tokenService,
-  undefined,
-  async () => messagingService.send('logout', { expired: false })
-)
-const syncService = new SyncService(
-  userService,
-  apiService,
-  settingsService,
-  folderService,
-  cipherService,
-  cryptoService,
-  collectionService,
-  storageService,
-  messagingService,
-  policyService,
-  sendService,
-  async (expired: boolean) =>
-    messagingService.send('logout-11111', { expired: expired })
-)
-const passwordGenerationService = new PasswordGenerationService(
-  cryptoService,
-  storageService,
-  policyService
-)
-const containerService = new ContainerService(cryptoService)
-const exportService = new ExportService(
-  folderService,
-  cipherService,
-  apiService
-)
-const importService = new ImportService(
-  cipherService,
-  folderService,
-  apiService,
-  i18nService,
-  collectionService,
-  platformUtilsService
-)
+  const platformUtilsService = new WebPlatformUtilsService(
+    i18nService,
+    messagingService
+  )
 
-const totpService = new TotpService(
-  storageService,
-  cryptoFunctionService,
-)
+  const storageService: StorageService = platform == 'extension' ? new BrowserStorageService(
+    platformUtilsService
+  ) : new HtmlStorageService(
+    platformUtilsService
+  )
 
-const CsCore = async (global = window) => {
+  const secureStorageService: StorageService = new MemoryStorageService()
+  const cryptoFunctionService: CryptoFunctionService = new WebCryptoFunctionService(self, platformUtilsService)
+  const consoleLogService = new ConsoleLogService(false)
+  const cryptoService = new CryptoService(
+    storageService,
+    platformUtilsService.isDev() ? storageService : secureStorageService,
+    cryptoFunctionService,
+    platformUtilsService,
+    consoleLogService
+  )
+
+  const tokenService = new TokenService(storageService)
+  const apiService = new ApiService(
+    tokenService,
+    platformUtilsService,
+    async (expired: boolean) =>
+      messagingService.send('logout', { expired: expired })
+  )
+  const auditService = new AuditService(cryptoFunctionService, apiService)
+  const userService = new UserService(tokenService, storageService)
+  const settingsService = new SettingsService(userService, storageService)
+  const fileUploadService = new FileUploadService(consoleLogService, apiService)
+  const cipherService = new CipherService(
+    cryptoService,
+    userService,
+    settingsService,
+    apiService,
+    fileUploadService,
+    storageService,
+    i18nService,
+    () => searchService
+  )
+  const folderService = new FolderService(
+    cryptoService,
+    userService,
+    apiService,
+    storageService,
+    i18nService,
+    cipherService
+  )
+  const collectionService = new CollectionService(
+    cryptoService,
+    userService,
+    storageService,
+    i18nService
+  )
+  searchService = new SearchService(
+    cipherService,
+    consoleLogService,
+    i18nService
+  )
+  const policyService = new PolicyService(userService, storageService)
+  const sendService = new SendService(
+    cryptoService,
+    cipherService,
+    userService,
+    storageService,
+    i18nService,
+    cryptoFunctionService
+  )
+  const vaultTimeoutService = new VaultTimeoutService(
+    cipherService,
+    folderService,
+    collectionService,
+    cryptoService,
+    platformUtilsService,
+    storageService,
+    messagingService,
+    searchService,
+    userService,
+    tokenService,
+    undefined,
+    async () => messagingService.send('logout', { expired: false })
+  )
+  const syncService = new SyncService(
+    userService,
+    apiService,
+    settingsService,
+    folderService,
+    cipherService,
+    cryptoService,
+    collectionService,
+    storageService,
+    messagingService,
+    policyService,
+    sendService,
+    async (expired: boolean) =>
+      messagingService.send('logout-11111', { expired: expired })
+  )
+  const passwordGenerationService = new PasswordGenerationService(
+    cryptoService,
+    storageService,
+    policyService
+  )
+  const containerService = new ContainerService(cryptoService)
+
+  const exportService = new ExportService(
+    folderService,
+    cipherService,
+    apiService
+  )
+
+  const importService = new ImportService(
+    cipherService,
+    folderService,
+    apiService,
+    i18nService,
+    collectionService,
+    platformUtilsService
+  )
+
+  const totpService = new TotpService(
+    storageService,
+    cryptoFunctionService,
+  )
+
+  storageService.init()
   containerService.attachToWindow(global)
   Utils.global = global
-  await (storageService as HtmlStorageService).init()
   vaultTimeoutService.init(true)
   return {
     cryptoService,
