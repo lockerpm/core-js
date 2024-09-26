@@ -2,8 +2,6 @@ import { LogLevelType } from '../enums/logLevelType'
 
 import { LogService as LogServiceAbstraction } from '../abstractions/log.service'
 
-import * as hrtime from 'browser-hrtime'
-
 export class ConsoleLogService implements LogServiceAbstraction {
   protected timersMap: Map<string, [number, number]> = new Map()
 
@@ -59,15 +57,20 @@ export class ConsoleLogService implements LogServiceAbstraction {
   }
 
   time(label: string = 'default') {
-    if (!this.timersMap.has(label)) {
+    if (!!window && !this.timersMap.has(label)) {
+      const hrtime = require('browser-hrtime')
       this.timersMap.set(label, hrtime())
     }
   }
 
   timeEnd(label: string = 'default'): [number, number] {
-    const elapsed = hrtime(this.timersMap.get(label))
-    this.timersMap.delete(label)
-    this.write(LogLevelType.Info, `${label}: ${elapsed[0] * 1000 + elapsed[1] / 10e6}ms`)
-    return elapsed
+    if (window) {
+      const hrtime = require('browser-hrtime')
+      const elapsed = hrtime(this.timersMap.get(label))
+      this.timersMap.delete(label)
+      this.write(LogLevelType.Info, `${label}: ${elapsed[0] * 1000 + elapsed[1] / 10e6}ms`)
+      return elapsed
+    }
+    return [0, 0]
   }
 }
