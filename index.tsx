@@ -191,7 +191,8 @@ const CsCore = async (global = self, platform = 'web') => {
     cryptoFunctionService,
     sendService,
     totpService,
-    auditService
+    auditService,
+    policyService
   }
 }
 
