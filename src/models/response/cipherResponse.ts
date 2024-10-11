@@ -38,6 +38,8 @@ export class CipherResponse extends BaseResponse {
   deletedDate: string
   reprompt: CipherRepromptType
   environmentId?: string
+  lastUseDate: number
+  numUse: number
 
   constructor (response: any) {
     super(response)
@@ -60,7 +62,9 @@ export class CipherResponse extends BaseResponse {
     this.revisionDate = this.getResponseProperty('RevisionDate')
     this.collectionIds = this.getResponseProperty('CollectionIds')
     this.deletedDate = this.getResponseProperty('DeletedDate')
-
+    this.lastUseDate = this.getResponseProperty('LastUseDate')
+    this.numUse = this.getResponseProperty('NumUse')
+    
     const login = this.getResponseProperty('Login')
     if (login != null) {
       this.login = new LoginApi(login)

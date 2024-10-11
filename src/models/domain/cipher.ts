@@ -47,6 +47,8 @@ export class Cipher extends Domain {
   deletedDate: Date
   reprompt: CipherRepromptType
   environmentId: string
+  lastUseDate: number
+  numUse: number
 
   constructor (
     obj?: CipherData,
@@ -94,6 +96,8 @@ export class Cipher extends Domain {
       obj.deletedDate != null ? new Date(obj.deletedDate) : null
     this.reprompt = obj.reprompt
     this.environmentId = obj.environmentId || null
+    this.lastUseDate = obj.lastUseDate
+    this.numUse = obj.numUse
 
     switch (this.type) {
     case CipherType.Login:

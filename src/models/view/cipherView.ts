@@ -43,6 +43,8 @@ export class CipherView implements View {
   deletedDate: Date = null
   reprompt: CipherRepromptType = null
   environmentId: string
+  lastUseDate: number
+  numUse: number
 
   constructor (c?: Cipher) {
     if (!c) {
@@ -65,6 +67,8 @@ export class CipherView implements View {
     this.deletedDate = c.deletedDate
     this.reprompt = c.reprompt
     this.environmentId = c.environmentId
+    this.lastUseDate = c.lastUseDate
+    this.numUse = c.numUse
   }
 
   get subTitle (): string {

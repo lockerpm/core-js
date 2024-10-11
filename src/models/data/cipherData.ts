@@ -42,6 +42,8 @@ export class CipherData {
   deletedDate: string
   reprompt: CipherRepromptType
   environmentId?: string
+  lastUseDate: number
+  numUse: number
 
   constructor (
     response?: CipherResponse,
@@ -71,6 +73,8 @@ export class CipherData {
     this.deletedDate = response.deletedDate
     this.reprompt = response.reprompt
     this.environmentId = response.environmentId
+    this.lastUseDate = response.lastUseDate
+    this.numUse = response.numUse
 
     switch (this.type) {
     case CipherType.Login:
