@@ -84,6 +84,7 @@ import { HeyLoginCsvImporter } from '../importers/heyloginCsvImport'
 import { LockerCsvImporter } from '../importers/lockerCsvImporter'
 import { LockerJsonImporter } from '../importers/lockerJsonImporter'
 import { SafariCsvImporter } from '../importers/safariCsvImporter'
+import { ProtonPassCsvImporter } from '../importers/protonPassCsvImporter'
 
 export class ImportService implements ImportServiceAbstraction {
   featuredImportOptions = [
@@ -151,6 +152,7 @@ export class ImportService implements ImportServiceAbstraction {
     { id: 'yoticsv', name: 'Yoti (csv)' },
     { id: 'nordpasscsv', name: 'Nordpass (csv)' },
     { id: 'heylogincsv', name: 'HeyLogin (csv)' },
+    { id: 'protonpasscsv', name: 'Proton Pass (csv)' },
   ]
 
   // eslint-disable-next-line no-useless-constructor
@@ -334,6 +336,8 @@ export class ImportService implements ImportServiceAbstraction {
       return new HeyLoginCsvImporter()
     case 'safaricsv':
       return new SafariCsvImporter()
+    case 'protonpasscsv':
+      return new ProtonPassCsvImporter()
     default:
       return null
     }
