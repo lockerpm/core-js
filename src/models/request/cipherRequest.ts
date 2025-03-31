@@ -30,8 +30,7 @@ export class CipherRequest {
   identity: IdentityApi
   fields: FieldApi[]
   passwordHistory: PasswordHistoryRequest[]
-  attachments: { [id: string]: string; }
-  attachments2: { [id: string]: AttachmentRequest; }
+  attachments: AttachmentRequest[]
   lastKnownRevisionDate: Date
   reprompt: CipherRepromptType
   environmentId: string
@@ -150,18 +149,12 @@ export class CipherRequest {
     }
 
     if (cipher.attachments != null) {
-      this.attachments = {}
-      this.attachments2 = {}
+      this.attachments = []
       cipher.attachments.forEach(attachment => {
-        const fileName = attachment.fileName ? attachment.fileName.encryptedString : null
-        this.attachments[attachment.id] = fileName
-        const attachmentRequest = new AttachmentRequest()
-        attachmentRequest.fileName = fileName
-        if (attachment.key != null) {
-          attachmentRequest.key = attachment.key.encryptedString
-        }
-        this.attachments2[attachment.id] = attachmentRequest
+        const attachmentRequest = new AttachmentRequest(attachment)
+        this.attachments.push(attachmentRequest)
       })
     }
+
   }
 }
