@@ -207,7 +207,7 @@ export class CipherService implements CipherServiceAbstraction {
 
   async encryptAttachments(
     attachmentsModel: AttachmentView[],
-    key: SymmetricCryptoKey
+    key: SymmetricCryptoKey,
   ): Promise<Attachment[]> {
     if (attachmentsModel == null || attachmentsModel.length === 0) {
       return null
@@ -215,23 +215,20 @@ export class CipherService implements CipherServiceAbstraction {
 
     const promises: Promise<any>[] = []
     const encAttachments: Attachment[] = []
-    attachmentsModel.forEach(async model => {
+    attachmentsModel.forEach(async (model) => {
       const attachment = new Attachment()
       attachment.id = model.id
       attachment.size = model.size
-      attachment.sizeName = model.sizeName
-      attachment.url = model.url
       const promise = this.encryptObjProperty(
         model,
         attachment,
         {
+          url: null,
           fileName: null,
+          key: null,
         },
-        key
+        key,
       ).then(async () => {
-        if (model.key != null) {
-          attachment.key = await this.cryptoService.encrypt(model.key.key, key)
-        }
         encAttachments.push(attachment)
       })
       promises.push(promise)
