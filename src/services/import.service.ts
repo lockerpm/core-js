@@ -5,7 +5,7 @@ import { FolderService } from '../../src/abstractions/folder.service'
 import { I18nService } from '../../src/abstractions/i18n.service'
 import {
   ImportOption,
-  ImportService as ImportServiceAbstraction,
+  ImportService as ImportServiceAbstraction
 } from '../../src/abstractions/import.service'
 import { PlatformUtilsService } from '../../src/abstractions/platformUtils.service'
 
@@ -37,8 +37,8 @@ import { ButtercupCsvImporter } from '../importers/buttercupCsvImporter'
 import { ChromeCsvImporter } from '../importers/chromeCsvImporter'
 import { ClipperzHtmlImporter } from '../importers/clipperzHtmlImporter'
 import { CodebookCsvImporter } from '../importers/codebookCsvImporter'
-import { DashlaneCsvImporter } from '../importers/dashlaneCsvImporter'
-import { DashlaneJsonImporter } from '../importers/dashlaneJsonImporter'
+import { DashlaneCsvImporter } from '../importers/dashlaneImporters/dashlaneCsvImporter'
+import { DashlaneJsonImporter } from '../importers/dashlaneImporters/dashlaneJsonImporter'
 import { EncryptrCsvImporter } from '../importers/encryptrCsvImporter'
 import { EnpassCsvImporter } from '../importers/enpassCsvImporter'
 import { EnpassJsonImporter } from '../importers/enpassJsonImporter'
@@ -100,7 +100,7 @@ export class ImportService implements ImportServiceAbstraction {
     { id: '1password1pux', name: '1Password (1pux)' },
     { id: '1password1pif', name: '1Password (1pif)' },
     { id: 'dashlanecsv', name: 'Dashlane (csv)' },
-    { id: 'dashlanejson', name: 'Dashlane (json)' },
+    { id: 'dashlanejson', name: 'Dashlane (json)' }
   ]
 
   regularImportOptions: ImportOption[] = [
@@ -152,7 +152,7 @@ export class ImportService implements ImportServiceAbstraction {
     { id: 'yoticsv', name: 'Yoti (csv)' },
     { id: 'nordpasscsv', name: 'Nordpass (csv)' },
     { id: 'heylogincsv', name: 'HeyLogin (csv)' },
-    { id: 'protonpasscsv', name: 'Proton Pass (csv)' },
+    { id: 'protonpasscsv', name: 'Proton Pass (csv)' }
   ]
 
   // eslint-disable-next-line no-useless-constructor
@@ -254,7 +254,7 @@ export class ImportService implements ImportServiceAbstraction {
       return new MeldiumCsvImporter()
     case '1password1pif':
       return new OnePassword1PifImporter()
-      case '1password1pux':
+    case '1password1pux':
       return new OnePassword1PuxImporter()
     case '1passwordwincsv':
       return new OnePasswordWinCsvImporter()

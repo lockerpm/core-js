@@ -1,7 +1,6 @@
 {
-  "eslint.packageManager": "yarn",
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "editor.formatOnSave": true,
   "eslint.alwaysShowStatus": true,

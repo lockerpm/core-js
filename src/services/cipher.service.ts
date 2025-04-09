@@ -57,11 +57,11 @@ import { CipherType } from '../../src/enums'
 const Keys = {
   ciphersPrefix: 'ciphers_',
   localData: 'sitesLocalData',
-  neverDomains: 'neverDomains',
+  neverDomains: 'neverDomains'
 }
 
 const DomainMatchBlacklist = new Map<string, Set<string>>([
-  ['google.com', new Set(['script.google.com'])],
+  ['google.com', new Set(['script.google.com'])]
 ])
 export class CipherService implements CipherServiceAbstraction {
   // tslint:disable-next-line
@@ -186,7 +186,7 @@ export class CipherService implements CipherServiceAbstraction {
         cipher,
         {
           name: null,
-          notes: null,
+          notes: null
         },
         key
       ),
@@ -199,7 +199,7 @@ export class CipherService implements CipherServiceAbstraction {
       }),
       this.encryptAttachments(model.attachments, key).then(attachments => {
         cipher.attachments = attachments
-      }),
+      })
     ])
 
     return cipher
@@ -225,7 +225,7 @@ export class CipherService implements CipherServiceAbstraction {
         model,
         attachment,
         {
-          fileName: null,
+          fileName: null
         },
         key
       ).then(async () => {
@@ -274,7 +274,7 @@ export class CipherService implements CipherServiceAbstraction {
       field,
       {
         name: null,
-        value: null,
+        value: null
       },
       key
     )
@@ -316,7 +316,7 @@ export class CipherService implements CipherServiceAbstraction {
       phModel,
       ph,
       {
-        password: null,
+        password: null
       },
       key
     )
@@ -361,7 +361,7 @@ export class CipherService implements CipherServiceAbstraction {
       if ((this.searchService().indexedEntityId ?? userId) !== userId) {
         await this.searchService().indexCiphers(userId, this.decryptedCipherCache)
       }
-      
+
       // Filter invalid cipher to decrypt again
       decCiphers = this.decryptedCipherCache.filter(c => !!c.name)
     }
@@ -373,11 +373,11 @@ export class CipherService implements CipherServiceAbstraction {
 
     const promises: any[] = []
     let ciphers = await this.getAll()
-    
+
     // only decrypt what is not decrypted
     const decryptedCipherIds = decCiphers.map(c => c.id)
     ciphers = ciphers.filter(c => !decryptedCipherIds.includes(c.id))
-    
+
     ciphers.forEach(cipher => {
       promises.push(cipher.decrypt().then(c => decCiphers.push(c)))
     })
@@ -580,7 +580,7 @@ export class CipherService implements CipherServiceAbstraction {
       ciphersLocalData[id].lastUsedDate = new Date().getTime()
     } else {
       ciphersLocalData[id] = {
-        lastUsedDate: new Date().getTime(),
+        lastUsedDate: new Date().getTime()
       }
     }
 
@@ -609,7 +609,7 @@ export class CipherService implements CipherServiceAbstraction {
       ciphersLocalData[id].lastLaunched = new Date().getTime()
     } else {
       ciphersLocalData[id] = {
-        lastUsedDate: new Date().getTime(),
+        lastUsedDate: new Date().getTime()
       }
     }
 
@@ -751,7 +751,7 @@ export class CipherService implements CipherServiceAbstraction {
       key: dataEncKey[1].encryptedString,
       fileName: encFileName.encryptedString,
       fileSize: encData.buffer.byteLength,
-      adminRequest: admin,
+      adminRequest: admin
     }
 
     let response: CipherResponse
@@ -805,7 +805,7 @@ export class CipherService implements CipherServiceAbstraction {
     const fd = new FormData()
     try {
       const blob = new Blob([encData.buffer], {
-        type: 'application/octet-stream',
+        type: 'application/octet-stream'
       })
       fd.append('key', key.encryptedString)
       fd.append('data', blob, encFileName.encryptedString)
@@ -817,7 +817,7 @@ export class CipherService implements CipherServiceAbstraction {
           Buffer.from(encData.buffer) as any,
           {
             filepath: encFileName.encryptedString,
-            contentType: 'application/octet-stream',
+            contentType: 'application/octet-stream'
           } as any
         )
       } else {
@@ -863,7 +863,7 @@ export class CipherService implements CipherServiceAbstraction {
       }
       ciphers[c.id] = c
     } else {
-      (cipher as CipherData[]).forEach(c => {
+      ;(cipher as CipherData[]).forEach(c => {
         if (ciphers[c.id]) {
           c.creationDate = ciphers[c.id].creationDate || c.revisionDate
         }
@@ -922,7 +922,7 @@ export class CipherService implements CipherServiceAbstraction {
       }
       delete ciphers[id]
     } else {
-      (id as string[]).forEach(i => {
+      ;(id as string[]).forEach(i => {
         delete ciphers[i]
       })
     }
@@ -1059,7 +1059,7 @@ export class CipherService implements CipherServiceAbstraction {
     if (typeof id === 'string') {
       setDeletedDate(id)
     } else {
-      (id as string[]).forEach(setDeletedDate)
+      ;(id as string[]).forEach(setDeletedDate)
     }
 
     await this.storageService.save(Keys.ciphersPrefix + userId, ciphers)
@@ -1096,7 +1096,7 @@ export class CipherService implements CipherServiceAbstraction {
     }
 
     if (cipher.constructor.name === 'Array') {
-      (cipher as { id: string; revisionDate: string }[]).forEach(clearDeletedDate)
+      ;(cipher as { id: string; revisionDate: string }[]).forEach(clearDeletedDate)
     } else {
       clearDeletedDate(cipher as { id: string; revisionDate: string })
     }
@@ -1144,7 +1144,7 @@ export class CipherService implements CipherServiceAbstraction {
     const fd = new FormData()
     try {
       const blob = new Blob([encData.buffer], {
-        type: 'application/octet-stream',
+        type: 'application/octet-stream'
       })
       fd.append('key', dataEncKey[1].encryptedString)
       fd.append('data', blob, encFileName.encryptedString)
@@ -1156,7 +1156,7 @@ export class CipherService implements CipherServiceAbstraction {
           Buffer.from(encData.buffer) as any,
           {
             filepath: encFileName.encryptedString,
-            contentType: 'application/octet-stream',
+            contentType: 'application/octet-stream'
           } as any
         )
       } else {
@@ -1191,7 +1191,7 @@ export class CipherService implements CipherServiceAbstraction {
       }
 
       // tslint:disable-next-line
-      (function (theProp, theObj) {
+      ;(function (theProp, theObj) {
         const p = Promise.resolve()
           .then(() => {
             const modelProp = (model as any)[map[theProp] || theProp]
@@ -1201,7 +1201,7 @@ export class CipherService implements CipherServiceAbstraction {
             return null
           })
           .then((val: EncString) => {
-            (theObj as any)[theProp] = val
+            ;(theObj as any)[theProp] = val
           })
         promises.push(p)
       })(prop, obj)
@@ -1221,7 +1221,7 @@ export class CipherService implements CipherServiceAbstraction {
         {
           username: null,
           password: null,
-          totp: null,
+          totp: null
         },
         key
       )
@@ -1235,7 +1235,7 @@ export class CipherService implements CipherServiceAbstraction {
             model.login.uris[i],
             loginUri,
             {
-              uri: null,
+              uri: null
             },
             key
           )
@@ -1258,7 +1258,7 @@ export class CipherService implements CipherServiceAbstraction {
           number: null,
           expMonth: null,
           expYear: null,
-          code: null,
+          code: null
         },
         key
       )
@@ -1286,7 +1286,7 @@ export class CipherService implements CipherServiceAbstraction {
           ssn: null,
           username: null,
           passportNumber: null,
-          licenseNumber: null,
+          licenseNumber: null
         },
         key
       )
