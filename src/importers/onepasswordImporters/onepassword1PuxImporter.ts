@@ -234,12 +234,13 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
       }
 
       // If all fields have empty title -> then it's a custom note with multiple lines
-      if (
-        section.fields.every((f: FieldsEntity) => !f.title)
-      ) {
-        const content = section.fields.map((f: FieldsEntity) => {
-          return Object.values(f.value)[0] || ''
-        }).filter(i => !!i).join('\n')
+      if (section.fields.every((f: FieldsEntity) => !f.title)) {
+        const content = section.fields
+          .map((f: FieldsEntity) => {
+            return Object.values(f.value)[0] || ''
+          })
+          .filter(i => !!i)
+          .join('\n')
         if (content) {
           this.processKvp(cipher, section.title, content, FieldType.Text)
         }
@@ -400,21 +401,23 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
       if (valueKey === 'date' && value.date != null) {
         return new Date(value.date * 1000).toUTCString()
       }
-  
+
       if (valueKey === 'monthYear' && value.monthYear != null) {
         return value.monthYear.toString()
       }
-  
+
       let res = (value as any)[valueKey]
       if (typeof res === 'object') {
-        res = Object.values(res).map((i: any) => {
-          if (typeof i === 'object') {
-            return Object.values(i).join(', ')
-          }
-          return i
-        }).join(', ')
+        res = Object.values(res)
+          .map((i: any) => {
+            if (typeof i === 'object') {
+              return Object.values(i).join(', ')
+            }
+            return i
+          })
+          .join(', ')
       }
-  
+
       return res
     } catch (error) {
       return JSON.stringify((value as any)[valueKey])
