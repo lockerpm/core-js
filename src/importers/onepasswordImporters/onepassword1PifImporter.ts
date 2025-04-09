@@ -104,7 +104,7 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
           this.processKvp(cipher, k, item.openContents[k])
         })
     }
-    // CS
+
     // CS
     const existingKeys = [
       'passwordHistory',
@@ -115,7 +115,7 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
       'sections',
       'unknown_overview',
       'unknown_details',
-      'username',
+      'username'
     ]
 
     cipher.name = this.getValueOrDefault(item.title)
@@ -232,6 +232,7 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
             return
           }
         } else if (['password', 'credential'].includes(fieldDesignation)) {
+          // CS
           if (this.isNullOrWhitespace(cipher.login.password)) {
             cipher.login.password = fieldValue
             return
@@ -263,7 +264,7 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
       } else if (cipher.type === CipherType.Card) {
         if (this.isNullOrWhitespace(cipher.card.number) && fieldDesignation === 'ccnum') {
           cipher.card.number = fieldValue
-          cipher.card.brand = this.getCardBrand(fieldValue)
+          cipher.card.brand = this.getCardBrand(fieldValue)!
           return
         } else if (this.isNullOrWhitespace(cipher.card.code) && fieldDesignation === 'cvv') {
           cipher.card.code = fieldValue
@@ -339,12 +340,12 @@ export class OnePassword1PifImporter extends BaseImporter implements Importer {
       if (field.k === 'concealed') {
         fieldType = FieldType.Hidden
       } else if (field.k === 'date') {
-        fieldType = 7
+        fieldType = FieldType.Date
         fieldValue += '000'
       } else if (field.k === 'URL') {
-        fieldType = 4
+        fieldType = FieldType.URL
       } else if (field.k === 'address') {
-        fieldType = 6
+        fieldType = FieldType.Address
       } else {
         fieldType = FieldType.Text
       }
