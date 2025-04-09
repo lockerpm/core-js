@@ -165,10 +165,15 @@ export class CipherService implements CipherServiceAbstraction {
       }
     }
     await Promise.all([
-      this.encryptObjProperty(model, cipher, {
-        name: null,
-        notes: null
-      }, key),
+      this.encryptObjProperty(
+        model,
+        cipher,
+        {
+          name: null,
+          notes: null
+        },
+        key
+      ),
       this.encryptCipherData(cipher, model, key),
       this.encryptFields(model.fields, key).then(fields => {
         cipher.fields = fields
@@ -243,10 +248,15 @@ export class CipherService implements CipherServiceAbstraction {
       fieldModel.value = 'false'
     }
 
-    await this.encryptObjProperty(fieldModel, field, {
-      name: null,
-      value: null
-    }, key)
+    await this.encryptObjProperty(
+      fieldModel,
+      field,
+      {
+        name: null,
+        value: null
+      },
+      key
+    )
 
     return field
   }
@@ -273,9 +283,14 @@ export class CipherService implements CipherServiceAbstraction {
     const ph = new Password()
     ph.lastUsedDate = phModel.lastUsedDate
 
-    await this.encryptObjProperty(phModel, ph, {
-      password: null
-    }, key)
+    await this.encryptObjProperty(
+      phModel,
+      ph,
+      {
+        password: null
+      },
+      key
+    )
 
     return ph
   }
@@ -315,7 +330,7 @@ export class CipherService implements CipherServiceAbstraction {
       if ((this.searchService().indexedEntityId ?? userId) !== userId) {
         await this.searchService().indexCiphers(userId, this.decryptedCipherCache)
       }
-      
+
       // Filter invalid cipher to decrypt again
       decCiphers = this.decryptedCipherCache.filter(c => !!c.name)
     }
@@ -327,11 +342,11 @@ export class CipherService implements CipherServiceAbstraction {
 
     const promises: any[] = []
     let ciphers = await this.getAll()
-    
+
     // only decrypt what is not decrypted
     const decryptedCipherIds = decCiphers.map(c => c.id)
     ciphers = ciphers.filter(c => !decryptedCipherIds.includes(c.id))
-    
+
     ciphers.forEach(cipher => {
       promises.push(cipher.decrypt().then(c => decCiphers.push(c)))
     })
@@ -715,16 +730,22 @@ export class CipherService implements CipherServiceAbstraction {
     encData: EncArrayBuffer, key: EncString) {
     const fd = new FormData()
     try {
-      const blob = new Blob([encData.buffer], { type: 'application/octet-stream' })
+      const blob = new Blob([encData.buffer], {
+        type: 'application/octet-stream'
+      })
       fd.append('key', key.encryptedString)
       fd.append('data', blob, encFileName.encryptedString)
     } catch (e) {
       if (Utils.isNode && !Utils.isBrowser) {
         fd.append('key', key.encryptedString)
-        fd.append('data', Buffer.from(encData.buffer) as any, {
-          filepath: encFileName.encryptedString,
-          contentType: 'application/octet-stream'
-        } as any)
+        fd.append(
+          'data',
+          Buffer.from(encData.buffer) as any,
+          {
+            filepath: encFileName.encryptedString,
+            contentType: 'application/octet-stream'
+          } as any
+        )
       } else {
         throw e
       }
@@ -765,6 +786,9 @@ export class CipherService implements CipherServiceAbstraction {
       ciphers[c.id] = c
     } else {
       (cipher as CipherData[]).forEach(c => {
+        if (ciphers[c.id]) {
+          c.creationDate = ciphers[c.id].creationDate || c.revisionDate
+        }
         ciphers[c.id] = c
       })
     }
@@ -818,7 +842,7 @@ export class CipherService implements CipherServiceAbstraction {
       }
       delete ciphers[id]
     } else {
-      (id as string[]).forEach(i => {
+      ;(id as string[]).forEach(i => {
         delete ciphers[i]
       })
     }
@@ -974,7 +998,7 @@ export class CipherService implements CipherServiceAbstraction {
     if (typeof id === 'string') {
       setDeletedDate(id)
     } else {
-      (id as string[]).forEach(setDeletedDate)
+      ;(id as string[]).forEach(setDeletedDate)
     }
 
     await this.storageService.save(Keys.ciphersPrefix + userId, ciphers)
@@ -1051,16 +1075,22 @@ export class CipherService implements CipherServiceAbstraction {
 
     const fd = new FormData()
     try {
-      const blob = new Blob([encData.buffer], { type: 'application/octet-stream' })
+      const blob = new Blob([encData.buffer], {
+        type: 'application/octet-stream'
+      })
       fd.append('key', dataEncKey[1].encryptedString)
       fd.append('data', blob, encFileName.encryptedString)
     } catch (e) {
       if (Utils.isNode && !Utils.isBrowser) {
         fd.append('key', dataEncKey[1].encryptedString)
-        fd.append('data', Buffer.from(encData.buffer) as any, {
-          filepath: encFileName.encryptedString,
-          contentType: 'application/octet-stream'
-        } as any)
+        fd.append(
+          'data',
+          Buffer.from(encData.buffer) as any,
+          {
+            filepath: encFileName.encryptedString,
+            contentType: 'application/octet-stream'
+          } as any
+        )
       } else {
         throw e
       }
@@ -1085,15 +1115,17 @@ export class CipherService implements CipherServiceAbstraction {
 
       // tslint:disable-next-line
       (function (theProp, theObj) {
-        const p = Promise.resolve().then(() => {
-          const modelProp = (model as any)[(map[theProp] || theProp)]
-          if (modelProp && modelProp !== '') {
-            return self.cryptoService.encrypt(modelProp, key)
-          }
-          return null
-        }).then((val: EncString) => {
-          (theObj as any)[theProp] = val
-        })
+        const p = Promise.resolve()
+          .then(() => {
+            const modelProp = (model as any)[map[theProp] || theProp]
+            if (modelProp && modelProp !== '') {
+              return self.cryptoService.encrypt(modelProp, key)
+            }
+            return null
+          })
+          .then((val: EncString) => {
+            ;(theObj as any)[theProp] = val
+          })
         promises.push(p)
       })(prop, obj)
     }
@@ -1106,20 +1138,30 @@ export class CipherService implements CipherServiceAbstraction {
     case CipherType.Login:
       cipher.login = new Login()
       cipher.login.passwordRevisionDate = model.login.passwordRevisionDate
-      await this.encryptObjProperty(model.login, cipher.login, {
-        username: null,
-        password: null,
-        totp: null
-      }, key)
+      await this.encryptObjProperty(
+        model.login,
+        cipher.login,
+        {
+          username: null,
+          password: null,
+          totp: null
+        },
+        key
+      )
 
       if (model.login.uris != null) {
         cipher.login.uris = []
         for (let i = 0; i < model.login.uris.length; i++) {
           const loginUri = new LoginUri()
           loginUri.match = model.login.uris[i].match
-          await this.encryptObjProperty(model.login.uris[i], loginUri, {
-            uri: null
-          }, key)
+          await this.encryptObjProperty(
+            model.login.uris[i],
+            loginUri,
+            {
+              uri: null
+            },
+            key
+          )
           cipher.login.uris.push(loginUri)
         }
       }

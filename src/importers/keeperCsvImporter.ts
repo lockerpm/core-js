@@ -1,5 +1,4 @@
 import { ImportResult } from '../../src/models/domain/importResult'
-import { FolderView } from '../../src/models/view/folderView'
 import { BaseImporter } from './baseImporter'
 import { Importer } from './importer'
 

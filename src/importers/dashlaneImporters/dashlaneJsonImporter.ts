@@ -1,14 +1,12 @@
-import { ImportResult } from '../../src/models/domain/importResult'
-
-import { CardView } from '../../src/models/view/cardView'
-import { CipherView } from '../../src/models/view/cipherView'
-import { IdentityView } from '../../src/models/view/identityView'
-import { SecureNoteView } from '../../src/models/view/secureNoteView'
-
-import { CipherType } from '../../src/enums/cipherType'
-import { SecureNoteType } from '../../src/enums/secureNoteType'
-import { Importer } from './importer'
-import { BaseImporter } from './baseImporter'
+import { BaseImporter } from '../baseImporter'
+import { Importer } from '../importer'
+import { ImportResult } from '../../models/domain/importResult'
+import { CardView } from '../../models/view/cardView'
+import { CipherView } from '../../models/view/cipherView'
+import { IdentityView } from '../../models/view/identityView'
+import { SecureNoteView } from '../../models/view/secureNoteView'
+import { CipherType } from '../../enums/cipherType'
+import { SecureNoteType } from '../../enums/secureNoteType'
 
 const HandledResults = new Set([
   'ADDRESS',
@@ -18,7 +16,7 @@ const HandledResults = new Set([
   'IDENTITY',
   'PAYMENTMEANS_CREDITCARD',
   'PAYMENTMEAN_PAYPAL',
-  'EMAIL',
+  'EMAIL'
 ])
 
 export class DashlaneJsonImporter extends BaseImporter implements Importer {
@@ -63,15 +61,7 @@ export class DashlaneJsonImporter extends BaseImporter implements Importer {
 
   private processAuth(results: any[]) {
     // CS
-    const existingKeys = [
-      'title',
-      'login',
-      'secondaryLogin',
-      'email',
-      'password',
-      'domain',
-      'note',
-    ]
+    const existingKeys = ['title', 'login', 'secondaryLogin', 'email', 'password', 'domain', 'note']
 
     results.forEach((credential: any) => {
       const cipher = this.initLoginCipher()
