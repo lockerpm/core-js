@@ -123,7 +123,10 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
         }
 
         if (!this.isNullOrWhitespace(item.details.notesPlain || '')) {
-          cipher.notes = item.details.notesPlain?.split(this.newLineRegex).join('\n') + '\n'
+          if (cipher.notes) {
+            cipher.notes += '\n'
+          }
+          cipher.notes += item.details.notesPlain?.split(this.newLineRegex).join('\n') + '\n'
         }
 
         this.convertToNoteIfNeeded(cipher)
@@ -230,6 +233,20 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
         return
       }
 
+      // If all fields have empty title -> then it's a custom note with multiple lines
+      if (
+        section.fields.every((f: FieldsEntity) => !f.title)
+      ) {
+        const content = section.fields.map((f: FieldsEntity) => {
+          return Object.values(f.value)[0] || ''
+        }).filter(i => !!i).join('\n')
+        if (content) {
+          this.processKvp(cipher, section.title, content, FieldType.Text)
+        }
+        return
+      }
+
+      // Process normally
       this.parseSectionFields(category, section.fields, cipher)
     })
   }
@@ -239,11 +256,7 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
       const valueKey = Object.keys(field.value)[0]
       const anyField = field as any
 
-      if (
-        anyField.value == null ||
-        anyField.value[valueKey] == null ||
-        anyField.value[valueKey] === ''
-      ) {
+      if (!anyField.value?.[valueKey]) {
         return
       }
 
@@ -376,22 +389,36 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
 
     // Naive approach of checking if the fields id is usable
     // eslint-disable-next-line prefer-regex-literals
-    if (id.length > 25 && RegExp(/[0-9]{2}[A-Z]{2}/, 'i').test(id)) {
+    if (id.length > 25 && RegExp(/^[a-z0-9]+$/, 'i').test(id)) {
       return title
     }
     return id
   }
 
   private extractValue(value: Value, valueKey: string): string {
-    if (valueKey === 'date' && value.date != null) {
-      return new Date(value.date * 1000).toUTCString()
+    try {
+      if (valueKey === 'date' && value.date != null) {
+        return new Date(value.date * 1000).toUTCString()
+      }
+  
+      if (valueKey === 'monthYear' && value.monthYear != null) {
+        return value.monthYear.toString()
+      }
+  
+      let res = (value as any)[valueKey]
+      if (typeof res === 'object') {
+        res = Object.values(res).map((i: any) => {
+          if (typeof i === 'object') {
+            return Object.values(i).join(', ')
+          }
+          return i
+        }).join(', ')
+      }
+  
+      return res
+    } catch (error) {
+      return JSON.stringify((value as any)[valueKey])
     }
-
-    if (valueKey === 'monthYear' && value.monthYear != null) {
-      return value.monthYear.toString()
-    }
-
-    return (value as any)[valueKey]
   }
 
   private fillLogin(field: FieldsEntity, fieldValue: string, cipher: CipherView): boolean {

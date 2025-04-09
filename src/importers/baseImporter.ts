@@ -412,10 +412,10 @@ export abstract class BaseImporter {
       field.value = value
 
       // CS
-      if (type === 7 || type === 8) {
+      if (type === FieldType.Date || type === FieldType.MonthYear) {
         try {
           const val = parseInt(value)
-          field.value = moment(val).format(type === 8 ? 'MM/YYYY' : 'DD/MM/YYYY')
+          field.value = moment(val).format(type === FieldType.MonthYear ? 'MM/YYYY' : 'DD/MM/YYYY')
         } catch (error) {
           //
         }
