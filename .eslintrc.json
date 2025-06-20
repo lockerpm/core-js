@@ -12,7 +12,7 @@
     "sourceType": "module"
   },
   "rules": {
-    "indent": ["error", 2],
+    "indent": ["error", 2, { "SwitchCase": 1 }],
     "no-console": "warn",
     "arrow-parens": ["error", "as-needed"],
     "curly": ["error", "multi-line"],
