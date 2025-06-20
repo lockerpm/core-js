@@ -52,34 +52,34 @@ export class HeyLoginCsvImporter extends BaseImporter implements Importer {
       cipher.notes = this.getValueOrDefault(value.note)
 
       switch (value.type) {
-      case 'login': {
-        cipher.login.username = this.getValueOrDefault(value.username)
-        cipher.login.password = this.getValueOrDefault(value.password)
-        cipher.login.totp = this.getValueOrDefault(value.totpUrl || value.totp)
-        cipher.login.uris = this.makeUriArray(value.url)
-        break
-      }
-      case 'wifi': {
-        cipher.login.password = this.getValueOrDefault(value.password)
-        this.processKvp(cipher, 'SSID', value.wifiSsid, FieldType.Text)
-        break
-      }
-      case 'creditCard': {
-        cipher.card = new CardView()
-        cipher.type = CipherType.Card
-        cipher.card.cardholderName = this.getValueOrDefault(value.creditCardHolder)
-        cipher.card.number = this.getValueOrDefault(value.creditCardNumber)
-        if (value.creditCardExpiration) {
-          const parts = value.creditCardExpiration.split('/')
-          if (parts.length === 2) {
-            cipher.card.expMonth = this.getValueOrDefault(parts[0])
-            cipher.card.expYear = this.getValueOrDefault(parts[1])
-          }
+        case 'login': {
+          cipher.login.username = this.getValueOrDefault(value.username)
+          cipher.login.password = this.getValueOrDefault(value.password)
+          cipher.login.totp = this.getValueOrDefault(value.totpUrl || value.totp)
+          cipher.login.uris = this.makeUriArray(value.url)
+          break
         }
-        cipher.card.code = this.getValueOrDefault(value.creditCardSecurityCode)
-        this.processKvp(cipher, 'PIN', value.creditCardPin, FieldType.Hidden)
-        break
-      }
+        case 'wifi': {
+          cipher.login.password = this.getValueOrDefault(value.password)
+          this.processKvp(cipher, 'SSID', value.wifiSsid, FieldType.Text)
+          break
+        }
+        case 'creditCard': {
+          cipher.card = new CardView()
+          cipher.type = CipherType.Card
+          cipher.card.cardholderName = this.getValueOrDefault(value.creditCardHolder)
+          cipher.card.number = this.getValueOrDefault(value.creditCardNumber)
+          if (value.creditCardExpiration) {
+            const parts = value.creditCardExpiration.split('/')
+            if (parts.length === 2) {
+              cipher.card.expMonth = this.getValueOrDefault(parts[0])
+              cipher.card.expYear = this.getValueOrDefault(parts[1])
+            }
+          }
+          cipher.card.code = this.getValueOrDefault(value.creditCardSecurityCode)
+          this.processKvp(cipher, 'PIN', value.creditCardPin, FieldType.Hidden)
+          break
+        }
       }
 
       // Custom fields
