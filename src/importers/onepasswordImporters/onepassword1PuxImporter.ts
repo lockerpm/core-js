@@ -146,6 +146,20 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
 
         this.convertToNoteIfNeeded(cipher)
         this.cleanupCipher(cipher)
+
+        // Convert attachments to the new format
+        if (cipher.attachments && cipher.attachments.length > 0) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          cipher.attachments = cipher.attachments.map(attachment => ({
+            id: attachment.id,
+            fileName: attachment.fileName,
+            size: parseInt(attachment.size),
+            url: '<redacted>',
+            key: '<redacted>'
+          }))
+        }
+
         this.result.ciphers.push(cipher)
       })
     })
@@ -202,6 +216,9 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
       attachment.id = documentId
       attachment.fileName = fileName
       attachment.size = decryptedSize.toString()
+      if (!cipher.attachments) {
+        cipher.attachments = []
+      }
       cipher.attachments.push(attachment)
     }
   }
@@ -261,8 +278,9 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
         return
       }
 
-      // If all fields have empty title -> then it's a custom note with multiple lines
-      if (section.fields.every((f: FieldsEntity) => !f.title)) {
+      // If all fields have empty title and does not include any file
+      // then it's a custom note with multiple lines
+      if (section.fields.every((f: FieldsEntity) => !f.title && !f.value?.file)) {
         const content = section.fields
           .map((f: FieldsEntity) => {
             return Object.values(f.value)[0] || ''
@@ -415,6 +433,9 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
         attachment.id = documentId
         attachment.fileName = fileName
         attachment.size = decryptedSize.toString()
+        if (!cipher.attachments) {
+          cipher.attachments = []
+        }
         cipher.attachments.push(attachment)
         return
       }
