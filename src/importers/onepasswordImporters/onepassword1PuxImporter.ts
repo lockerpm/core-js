@@ -11,7 +11,7 @@ import { SecureNoteView } from '../../models/view/secureNoteView'
 import { CipherType } from '../../enums/cipherType'
 import { FieldType } from '../../enums/fieldType'
 import { SecureNoteType } from '../../enums/secureNoteType'
-import { LoginView } from '../../models/view'
+import { AttachmentView, LoginView } from '../../models/view'
 
 import {
   CategoryEnum,
@@ -158,6 +158,7 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
     return Promise.resolve(this.result)
   }
 
+  // Process item.overview
   private processOverview(overview: Overview, cipher: CipherView) {
     if (overview == null) {
       return
@@ -181,10 +182,31 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
     }
   }
 
-  private capitalize(inputString: string): string {
-    return inputString.trim().replace(/\w\S*/g, w => w.replace(/^\w/, c => c.toUpperCase()))
+  // Process item.details old fields
+  private processDetails(category: CategoryEnum, details: Details, cipher: CipherView) {
+    if (category !== CategoryEnum.Password) {
+      return
+    }
+    if (!details) {
+      return
+    }
+    if (details.notesPlain) {
+      cipher.notes = details.notesPlain
+    }
+    if (details.password) {
+      cipher.login.password = details.password
+    }
+    if (details.documentAttributes) {
+      const { fileName, documentId, decryptedSize } = details.documentAttributes
+      const attachment = new AttachmentView()
+      attachment.id = documentId
+      attachment.fileName = fileName
+      attachment.size = decryptedSize.toString()
+      cipher.attachments.push(attachment)
+    }
   }
 
+  // Process item.details.loginFields
   private processLoginFields(item: Item, cipher: CipherView) {
     if (item.details == null) {
       return
@@ -228,16 +250,7 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
     })
   }
 
-  private processDetails(category: CategoryEnum, details: Details, cipher: CipherView) {
-    if (category !== CategoryEnum.Password) {
-      return
-    }
-    if (!details) {
-      return
-    }
-    cipher.login.password = details.password || ''
-  }
-
+  // Process item.details.sections
   private processSections(category: CategoryEnum, sections: SectionsEntity[], cipher: CipherView) {
     if (sections == null || sections.length === 0) {
       return
@@ -267,6 +280,7 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
     })
   }
 
+  // Process item.details.sections.fields
   private parseSectionFields(category: CategoryEnum, fields: FieldsEntity[], cipher: CipherView) {
     fields.forEach((field: FieldsEntity) => {
       const valueKey = Object.keys(field.value)[0]
@@ -279,6 +293,7 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
       const fieldName = this.getFieldName(field.id, field.title)
       const fieldValue = this.extractValue(field.value, valueKey)
 
+      // Fill in the cipher based on the field type
       if (cipher.type === CipherType.Login) {
         if (this.fillLogin(field, fieldValue, cipher)) {
           return
@@ -393,51 +408,23 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
         cipher.reprompt = CipherRepromptType.Password
       }
 
+      // Handle file attachments
+      if (valueKey === 'file' && field.value.file) {
+        const { fileName, documentId, decryptedSize } = field.value.file
+        const attachment = new AttachmentView()
+        attachment.id = documentId
+        attachment.fileName = fileName
+        attachment.size = decryptedSize.toString()
+        cipher.attachments.push(attachment)
+        return
+      }
+
       const fieldType = valueKey === 'concealed' ? FieldType.Hidden : FieldType.Text
       this.processKvp(cipher, fieldName, fieldValue, fieldType)
     })
   }
 
-  private getFieldName(id: string, title: string): string {
-    if (this.isNullOrWhitespace(title)) {
-      return id
-    }
-
-    // Naive approach of checking if the fields id is usable
-    // eslint-disable-next-line prefer-regex-literals
-    if (id.length > 25 && RegExp(/^[a-z0-9]+$/, 'i').test(id)) {
-      return title
-    }
-    return id
-  }
-
-  private extractValue(value: Value, valueKey: string): string {
-    try {
-      if (valueKey === 'date' && value.date != null) {
-        return new Date(value.date * 1000).toUTCString()
-      }
-
-      if (valueKey === 'monthYear' && value.monthYear != null) {
-        return value.monthYear.toString()
-      }
-
-      let res = (value as any)[valueKey]
-      if (typeof res === 'object') {
-        res = Object.values(res)
-          .map((i: any) => {
-            if (typeof i === 'object') {
-              return Object.values(i).join(', ')
-            }
-            return i
-          })
-          .join(', ')
-      }
-
-      return res
-    } catch (error) {
-      return JSON.stringify((value as any)[valueKey])
-    }
-  }
+  // ------------------------ FILL METHODS ------------------------
 
   private fillLogin(field: FieldsEntity, fieldValue: string, cipher: CipherView): boolean {
     const fieldName = this.getFieldName(field.id, field.title)
@@ -691,6 +678,53 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
     }
 
     return false
+  }
+
+  // ------------------------ SUPPORTING METHODS ------------------------
+
+  private capitalize(inputString: string): string {
+    return inputString.trim().replace(/\w\S*/g, w => w.replace(/^\w/, c => c.toUpperCase()))
+  }
+
+  private getFieldName(id: string, title: string): string {
+    if (this.isNullOrWhitespace(title)) {
+      return id
+    }
+
+    // Naive approach of checking if the fields id is usable
+    // eslint-disable-next-line prefer-regex-literals
+    if (id.length > 25 && RegExp(/^[a-z0-9]+$/, 'i').test(id)) {
+      return title
+    }
+    return id
+  }
+
+  private extractValue(value: Value, valueKey: string): string {
+    try {
+      if (valueKey === 'date' && value.date != null) {
+        return new Date(value.date * 1000).toUTCString()
+      }
+
+      if (valueKey === 'monthYear' && value.monthYear != null) {
+        return value.monthYear.toString()
+      }
+
+      let res = (value as any)[valueKey]
+      if (typeof res === 'object') {
+        res = Object.values(res)
+          .map((i: any) => {
+            if (typeof i === 'object') {
+              return Object.values(i).join(', ')
+            }
+            return i
+          })
+          .join(', ')
+      }
+
+      return res
+    } catch (error) {
+      return JSON.stringify((value as any)[valueKey])
+    }
   }
 
   private parsePasswordHistory(historyItems: PasswordHistoryEntity[], cipher: CipherView) {
