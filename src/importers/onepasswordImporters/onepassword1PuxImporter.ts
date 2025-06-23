@@ -62,41 +62,41 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
 
         const category = item.categoryUuid as CategoryEnum
         switch (category) {
-        case CategoryEnum.Login:
-        case CategoryEnum.Database:
-        case CategoryEnum.Password:
-        case CategoryEnum.WirelessRouter:
-        case CategoryEnum.Server:
-        case CategoryEnum.API_Credential:
-          cipher.type = CipherType.Login
-          cipher.login = new LoginView()
-          break
-        case CategoryEnum.CreditCard:
-        case CategoryEnum.BankAccount:
-          cipher.type = CipherType.Card
-          cipher.card = new CardView()
-          break
-        case CategoryEnum.SecureNote:
-        case CategoryEnum.SoftwareLicense:
-        case CategoryEnum.EmailAccount:
-        case CategoryEnum.MedicalRecord:
-          // case CategoryEnum.Document:
-          cipher.type = CipherType.SecureNote
-          cipher.secureNote = new SecureNoteView()
-          cipher.secureNote.type = SecureNoteType.Generic
-          break
-        case CategoryEnum.Identity:
-        case CategoryEnum.DriversLicense:
-        case CategoryEnum.OutdoorLicense:
-        case CategoryEnum.Membership:
-        case CategoryEnum.Passport:
-        case CategoryEnum.RewardsProgram:
-        case CategoryEnum.SocialSecurityNumber:
-          cipher.type = CipherType.Identity
-          cipher.identity = new IdentityView()
-          break
-        default:
-          break
+          case CategoryEnum.Login:
+          case CategoryEnum.Database:
+          case CategoryEnum.Password:
+          case CategoryEnum.WirelessRouter:
+          case CategoryEnum.Server:
+          case CategoryEnum.API_Credential:
+            cipher.type = CipherType.Login
+            cipher.login = new LoginView()
+            break
+          case CategoryEnum.CreditCard:
+          case CategoryEnum.BankAccount:
+            cipher.type = CipherType.Card
+            cipher.card = new CardView()
+            break
+          case CategoryEnum.SecureNote:
+          case CategoryEnum.SoftwareLicense:
+          case CategoryEnum.EmailAccount:
+          case CategoryEnum.MedicalRecord:
+            // case CategoryEnum.Document:
+            cipher.type = CipherType.SecureNote
+            cipher.secureNote = new SecureNoteView()
+            cipher.secureNote.type = SecureNoteType.Generic
+            break
+          case CategoryEnum.Identity:
+          case CategoryEnum.DriversLicense:
+          case CategoryEnum.OutdoorLicense:
+          case CategoryEnum.Membership:
+          case CategoryEnum.Passport:
+          case CategoryEnum.RewardsProgram:
+          case CategoryEnum.SocialSecurityNumber:
+            cipher.type = CipherType.Identity
+            cipher.identity = new IdentityView()
+            break
+          default:
+            break
         }
 
         cipher.favorite = item.favIndex === 1
@@ -128,6 +128,21 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
           }
           cipher.notes += item.details.notesPlain?.split(this.newLineRegex).join('\n') + '\n'
         }
+
+        // Add new TOTP cipher if it exists in custom fields
+        cipher.fields
+          .filter(f => f.type === FieldType.TOTP)
+          .forEach((f, index) => {
+            const totpCipher = new CipherView()
+            totpCipher.name = `${cipher.name} - TOTP ${index + 2}`
+            totpCipher.type = CipherType.TOTP
+            totpCipher.secureNote = new SecureNoteView()
+            totpCipher.secureNote.type = SecureNoteType.Generic
+            totpCipher.notes = `otpauth://totp/${encodeURIComponent(cipher.name)}?secret=${
+              f.value
+            }&issuer=${encodeURIComponent(cipher.name)}&algorithm=sha1&digits=6&period=30`
+            this.result.ciphers.push(totpCipher)
+          })
 
         this.convertToNoteIfNeeded(cipher)
         this.cleanupCipher(cipher)
@@ -199,15 +214,15 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
       let fieldValue = loginField.value
       let fieldType: FieldType = FieldType.Text
       switch (loginField.fieldType) {
-      case LoginFieldTypeEnum.Password:
-        fieldType = FieldType.Hidden
-        break
-      case LoginFieldTypeEnum.CheckBox:
-        fieldValue = loginField.value !== '' ? 'true' : 'false'
-        fieldType = FieldType.Text
-        break
-      default:
-        break
+        case LoginFieldTypeEnum.Password:
+          fieldType = FieldType.Hidden
+          break
+        case LoginFieldTypeEnum.CheckBox:
+          fieldValue = loginField.value !== '' ? 'true' : 'false'
+          fieldType = FieldType.Text
+          break
+        default:
+          break
       }
       this.processKvp(cipher, loginField.name, fieldValue, fieldType)
     })
@@ -270,26 +285,26 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
         }
 
         switch (category) {
-        case CategoryEnum.Login:
-        case CategoryEnum.Database:
-        case CategoryEnum.EmailAccount:
-        case CategoryEnum.WirelessRouter:
-          break
+          case CategoryEnum.Login:
+          case CategoryEnum.Database:
+          case CategoryEnum.EmailAccount:
+          case CategoryEnum.WirelessRouter:
+            break
 
-        case CategoryEnum.Server:
-          if (this.isNullOrWhitespace(cipher.login.uri) && field.id === 'url') {
-            cipher.login.uris = this.makeUriArray(fieldValue)
-            return
-          }
-          break
+          case CategoryEnum.Server:
+            if (this.isNullOrWhitespace(cipher.login.uri) && field.id === 'url') {
+              cipher.login.uris = this.makeUriArray(fieldValue)
+              return
+            }
+            break
 
-        case CategoryEnum.API_Credential:
-          if (this.fillApiCredentials(field, fieldValue, cipher)) {
-            return
-          }
-          break
-        default:
-          break
+          case CategoryEnum.API_Credential:
+            if (this.fillApiCredentials(field, fieldValue, cipher)) {
+              return
+            }
+            break
+          default:
+            break
         }
       } else if (cipher.type === CipherType.Card) {
         if (this.fillCreditCard(field, fieldValue, cipher)) {
@@ -319,40 +334,40 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
         }
 
         switch (category) {
-        case CategoryEnum.Identity:
-          break
-        case CategoryEnum.DriversLicense:
-          if (this.fillDriversLicense(field, fieldValue, cipher)) {
-            return
-          }
-          break
-        case CategoryEnum.OutdoorLicense:
-          if (this.fillOutdoorLicense(field, fieldValue, cipher)) {
-            return
-          }
-          break
-        case CategoryEnum.Membership:
-          if (this.fillMembership(field, fieldValue, cipher)) {
-            return
-          }
-          break
-        case CategoryEnum.Passport:
-          if (this.fillPassport(field, fieldValue, cipher)) {
-            return
-          }
-          break
-        case CategoryEnum.RewardsProgram:
-          if (this.fillRewardsProgram(field, fieldValue, cipher)) {
-            return
-          }
-          break
-        case CategoryEnum.SocialSecurityNumber:
-          if (this.fillSSN(field, fieldValue, cipher)) {
-            return
-          }
-          break
-        default:
-          break
+          case CategoryEnum.Identity:
+            break
+          case CategoryEnum.DriversLicense:
+            if (this.fillDriversLicense(field, fieldValue, cipher)) {
+              return
+            }
+            break
+          case CategoryEnum.OutdoorLicense:
+            if (this.fillOutdoorLicense(field, fieldValue, cipher)) {
+              return
+            }
+            break
+          case CategoryEnum.Membership:
+            if (this.fillMembership(field, fieldValue, cipher)) {
+              return
+            }
+            break
+          case CategoryEnum.Passport:
+            if (this.fillPassport(field, fieldValue, cipher)) {
+              return
+            }
+            break
+          case CategoryEnum.RewardsProgram:
+            if (this.fillRewardsProgram(field, fieldValue, cipher)) {
+              return
+            }
+            break
+          case CategoryEnum.SocialSecurityNumber:
+            if (this.fillSSN(field, fieldValue, cipher)) {
+              return
+            }
+            break
+          default:
+            break
         }
       }
 
@@ -437,12 +452,12 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
       return true
     }
 
-    if (
-      this.isNullOrWhitespace(cipher.login.totp) &&
-      field.id != null &&
-      field.id?.startsWith('TOTP_')
-    ) {
-      cipher.login.totp = fieldValue
+    if (field.id != null && field.id?.startsWith('TOTP_')) {
+      if (this.isNullOrWhitespace(cipher.login.totp)) {
+        cipher.login.totp = fieldValue
+      } else {
+        this.processKvp(cipher, fieldName, fieldValue, FieldType.TOTP)
+      }
       return true
     }
 
