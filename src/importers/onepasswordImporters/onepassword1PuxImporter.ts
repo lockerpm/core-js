@@ -129,19 +129,30 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
           cipher.notes += item.details.notesPlain?.split(this.newLineRegex).join('\n') + '\n'
         }
 
+        const createTotpCipher = (name: string, issuer: string, totp: string) => {
+          const totpCipher = new CipherView()
+          totpCipher.name = name
+          totpCipher.type = CipherType.TOTP
+          totpCipher.secureNote = new SecureNoteView()
+          totpCipher.secureNote.type = SecureNoteType.Generic
+          totpCipher.notes = `otpauth://totp/${encodeURIComponent(
+            issuer
+          )}?secret=${totp}&issuer=${encodeURIComponent(issuer)}&algorithm=sha1&digits=6&period=30`
+          return totpCipher
+        }
+
+        // Add new TOTP cipher if it exists in login
+        if (cipher.login.totp) {
+          this.result.ciphers.push(createTotpCipher(cipher.name, cipher.name, cipher.login.totp))
+        }
+
         // Add new TOTP cipher if it exists in custom fields
         cipher.fields
           .filter(f => f.type === FieldType.TOTP)
           .forEach((f, index) => {
-            const totpCipher = new CipherView()
-            totpCipher.name = `${cipher.name} - TOTP ${index + 2}`
-            totpCipher.type = CipherType.TOTP
-            totpCipher.secureNote = new SecureNoteView()
-            totpCipher.secureNote.type = SecureNoteType.Generic
-            totpCipher.notes = `otpauth://totp/${encodeURIComponent(cipher.name)}?secret=${
-              f.value
-            }&issuer=${encodeURIComponent(cipher.name)}&algorithm=sha1&digits=6&period=30`
-            this.result.ciphers.push(totpCipher)
+            this.result.ciphers.push(
+              createTotpCipher(`${cipher.name} - TOTP ${index + 2}`, cipher.name, f.value)
+            )
           })
 
         this.convertToNoteIfNeeded(cipher)
@@ -149,15 +160,19 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
 
         // Convert attachments to the new format
         if (cipher.attachments && cipher.attachments.length > 0) {
+          // TODO: temporary remove all attachments
+          // Later we can add them back, and uncomment the code below
+          cipher.attachments = []
+
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          cipher.attachments = cipher.attachments.map(attachment => ({
-            id: attachment.id,
-            fileName: attachment.fileName,
-            size: parseInt(attachment.size),
-            url: '<redacted>',
-            key: '<redacted>'
-          }))
+          // cipher.attachments = cipher.attachments.map(attachment => ({
+          //   id: attachment.id,
+          //   fileName: attachment.fileName,
+          //   size: parseInt(attachment.size),
+          //   url: '<redacted>',
+          //   key: '<redacted>'
+          // }))
         }
 
         this.result.ciphers.push(cipher)
