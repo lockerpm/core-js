@@ -115,6 +115,7 @@ export interface Value {
   creditCardType?: string | null
   creditCardNumber?: string | null
   reference?: string | null
+  file?: DocumentAttributes | null
 }
 
 export interface Email {
