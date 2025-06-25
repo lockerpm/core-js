@@ -8,5 +8,6 @@ export enum FieldType {
   Address = 6,
   Date = 7,
   MonthYear = 8,
-  Phone = 9
+  Phone = 9,
+  TOTP = 10
 }
