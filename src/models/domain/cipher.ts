@@ -17,6 +17,7 @@ import { Password } from './password'
 import { SecureNote } from './secureNote'
 import { Secret } from './secret'
 import { Environment } from './environment'
+import { LeakedSecret } from './leakedSecret'
 import { SymmetricCryptoKey } from './symmetricCryptoKey'
 
 export class Cipher extends Domain {
@@ -40,6 +41,7 @@ export class Cipher extends Domain {
   secureNote: SecureNote
   secret: Secret
   environment: Environment
+  leakedSecret: LeakedSecret
   attachments: Attachment[]
   fields: Field[]
   passwordHistory: Password[]
@@ -115,6 +117,9 @@ export class Cipher extends Domain {
     case CipherType.Environment:
       this.environment = new Environment(obj.environment, alreadyEncrypted)
       break
+    case CipherType.LeakedSecret:
+      this.leakedSecret = new LeakedSecret(obj.leakedSecret, alreadyEncrypted)
+      break
     default:
       break
     }
@@ -181,6 +186,9 @@ export class Cipher extends Domain {
       break
     case CipherType.Environment:
       model.environment = await this.environment?.decrypt(this.organizationId, encKey)
+      break
+    case CipherType.LeakedSecret:
+      model.leakedSecret = await this.leakedSecret?.decrypt(this.organizationId, encKey)
       break
     default:
       break
@@ -276,6 +284,9 @@ export class Cipher extends Domain {
       break
     case CipherType.Environment:
       c.environment = this.environment?.toEnvironmentData()
+      break
+    case CipherType.LeakedSecret:
+      c.leakedSecret = this.leakedSecret?.toLeakSecretData()
       break
     default:
       break

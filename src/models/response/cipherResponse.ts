@@ -10,6 +10,7 @@ import { LoginApi } from '../../models/api/loginApi'
 import { SecureNoteApi } from '../../models/api/secureNoteApi'
 import { SecretApi } from '../../models/api/secretApi'
 import { EnvironmentApi } from '../../models/api/environmentApi'
+import { LeakedSecretApi } from '../../models/api/leakedSecretApi'
 
 export class CipherResponse extends BaseResponse {
   id: string
@@ -25,6 +26,7 @@ export class CipherResponse extends BaseResponse {
   secureNote: SecureNoteApi
   secret: SecretApi
   environment: EnvironmentApi
+  leakedSecret: LeakedSecretApi
   favorite: boolean
   edit: boolean
   viewPassword: boolean
@@ -87,8 +89,13 @@ export class CipherResponse extends BaseResponse {
     }
 
     const environment = this.getResponseProperty('Environment')
-    if (secret != null) {
+    if (environment != null) {
       this.environment = new EnvironmentApi(environment)
+    }
+
+    const leakedSecret = this.getResponseProperty('LeakedSecret')
+    if (leakedSecret != null) {
+      this.leakedSecret = new LeakedSecretApi(leakedSecret)
     }
 
     const fields = this.getResponseProperty('Fields')

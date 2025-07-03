@@ -10,6 +10,7 @@ import { PasswordHistoryData } from './passwordHistoryData'
 import { SecureNoteData } from './secureNoteData'
 import { SecretData } from './secretData'
 import { EnvironmentData } from './environmentData'
+import { LeakedSecretData } from './leakedSecretData'
 
 import { CipherResponse } from '../response/cipherResponse'
 
@@ -39,6 +40,7 @@ export class CipherData {
   collectionIds?: string[]
   secret?: SecretData
   environment?: EnvironmentData
+  leakedSecret?: LeakedSecretData
   deletedDate: string
   reprompt: CipherRepromptType
   environmentId?: string
@@ -91,6 +93,9 @@ export class CipherData {
       break
     case CipherType.Environment:
       this.environment = new EnvironmentData(response.environment)
+      break
+    case CipherType.LeakedSecret:
+      this.leakedSecret = new LeakedSecretData(response.leakedSecret)
       break
     default:
       break

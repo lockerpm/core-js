@@ -12,6 +12,7 @@ import { PasswordHistoryView } from './passwordHistoryView'
 import { SecureNoteView } from './secureNoteView'
 import { SecretView } from './secretView'
 import { EnvironmentView } from './environmentView'
+import { LeakedSecretView } from './leakedSecretView'
 
 import { View } from './view'
 
@@ -33,6 +34,7 @@ export class CipherView implements View {
   secureNote: SecureNoteView = new SecureNoteView()
   secret: SecretView = new SecretView()
   environment: EnvironmentView = new EnvironmentView()
+  leakedSecret: LeakedSecretView = new LeakedSecretView()
   attachments: AttachmentView[] = []
   fields: FieldView[] = []
   passwordHistory: PasswordHistoryView[] = []
@@ -82,6 +84,8 @@ export class CipherView implements View {
       return this.secret.key
     case CipherType.Environment:
       return this.environment.name
+    case CipherType.LeakedSecret:
+      return this.leakedSecret.key
     default:
       break
     }

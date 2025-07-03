@@ -11,6 +11,7 @@ import { LoginUriApi } from '../api/loginUriApi'
 import { SecureNoteApi } from '../api/secureNoteApi'
 import { SecretApi } from '../api/secretApi'
 import { EnvironmentApi } from '../api/environmentApi'
+import { LeakedSecretApi } from '../api/leakedSecretApi'
 
 import { AttachmentRequest } from './attachmentRequest'
 import { PasswordHistoryRequest } from './passwordHistoryRequest'
@@ -27,6 +28,7 @@ export class CipherRequest {
   card: CardApi
   secret: SecretApi
   environment: EnvironmentApi
+  leakedSecret: LeakedSecretApi
   identity: IdentityApi
   fields: FieldApi[]
   passwordHistory: PasswordHistoryRequest[]
@@ -124,6 +126,12 @@ export class CipherRequest {
       this.environment.description = cipher.environment.description != null ? cipher.environment.description.encryptedString : null
       this.environment.name = cipher.environment.name != null ? cipher.environment.name.encryptedString : null
       this.environment.externalUrl = cipher.environment.externalUrl != null ? cipher.environment.externalUrl.encryptedString : null
+      break
+    case CipherType.LeakedSecret:
+      this.leakedSecret = new LeakedSecretApi()
+      this.leakedSecret.description = cipher.leakedSecret.description != null ? cipher.leakedSecret.description.encryptedString : null
+      this.leakedSecret.key = cipher.leakedSecret.key != null ? cipher.leakedSecret.key.encryptedString : null
+      this.leakedSecret.value = cipher.leakedSecret.value != null ? cipher.leakedSecret.value.encryptedString : null
       break
     default:
       break

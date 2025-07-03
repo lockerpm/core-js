@@ -12,6 +12,7 @@ import { Login } from './login'
 import { SecureNote } from './secureNote'
 import { Secret } from './secret'
 import { Environment } from './environment'
+import { LeakedSecret } from './leakedSecret'
 
 export class Cipher {
   type: CipherType
@@ -28,6 +29,7 @@ export class Cipher {
   identity: Identity
   secret: Secret
   environment: Environment
+  leakedSecret: LeakedSecret
 
   static template (): Cipher {
     const req = new Cipher()
@@ -45,6 +47,7 @@ export class Cipher {
     req.identity = new Identity()
     req.secret = new Secret()
     req.environment = new Environment()
+    req.leakedSecret = new LeakedSecret()
     return req
   }
 
@@ -88,6 +91,9 @@ export class Cipher {
     case CipherType.Environment:
       view.environment = Environment.toView(req.environment)
       break
+    case CipherType.LeakedSecret:
+      view.leakedSecret = LeakedSecret.toView(req.leakedSecret)
+      break
     }
 
     return view
@@ -126,6 +132,9 @@ export class Cipher {
       break
     case CipherType.Environment:
       domain.environment = Environment.toDomain(req.environment)
+      break
+    case CipherType.LeakedSecret:
+      domain.leakedSecret = LeakedSecret.toDomain(req.leakedSecret)
       break
     }
 
@@ -174,6 +183,9 @@ export class Cipher {
       break
     case CipherType.Environment:
       this.environment = new Environment(o.environment)
+      break
+    case CipherType.LeakedSecret:
+      this.leakedSecret = new LeakedSecret(o.leakedSecret)
       break
     }
   }
