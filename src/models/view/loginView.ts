@@ -1,15 +1,16 @@
 import { LoginUriView } from './loginUriView'
+import { Fido2CredentialView } from './fido2CredentialView'
 import { View } from './view'
 
 import { Utils } from '../../misc/utils'
 import { Login } from '../domain/login'
 
 export class LoginView implements View {
-  username: string = null
   password: string = null
   passwordRevisionDate?: Date = null
   totp: string = null
   uris: LoginUriView[] = null
+  fido2Credentials: Fido2CredentialView[] = null
 
   constructor(l?: Login) {
     if (!l) {
@@ -51,5 +52,9 @@ export class LoginView implements View {
 
   get hasUris(): boolean {
     return this.uris != null && this.uris.length > 0
+  }
+
+  get hasFido2Credentials(): boolean {
+    return this.fido2Credentials != null && this.fido2Credentials.length > 0
   }
 }
