@@ -25,6 +25,7 @@ export class Fido2Credential extends Domain {
       return
     }
 
+    this.creationDate = obj.creationDate != null ? new Date(obj.creationDate) : null
     this.buildDomainModel(
       this,
       obj,
@@ -45,12 +46,13 @@ export class Fido2Credential extends Domain {
       alreadyEncrypted,
       []
     )
-    this.creationDate = obj.creationDate != null ? new Date(obj.creationDate) : null
   }
 
   decrypt(orgId: string, encKey?: SymmetricCryptoKey): Promise<Fido2CredentialView> {
+    const cred = new Fido2CredentialView()
+    cred.creationDate = this.creationDate
     return this.decryptObj(
-      new Fido2CredentialView(),
+      cred,
       {
         credentialId: null,
         keyType: null,
@@ -73,20 +75,25 @@ export class Fido2Credential extends Domain {
   toFido2CredentialData(): Fido2CredentialData {
     const i = new Fido2CredentialData()
     i.creationDate = this.creationDate?.toISOString() || ''
-    this.buildDataModel(this, i, {
-      credentialId: null,
-      keyType: null,
-      keyAlgorithm: null,
-      keyCurve: null,
-      keyValue: null,
-      rpId: null,
-      userHandle: null,
-      userName: null,
-      counter: null,
-      rpName: null,
-      userDisplayName: null,
-      discoverable: null
-    })
+    this.buildDataModel(
+      this,
+      i,
+      {
+        credentialId: null,
+        keyType: null,
+        keyAlgorithm: null,
+        keyCurve: null,
+        keyValue: null,
+        rpId: null,
+        userHandle: null,
+        userName: null,
+        counter: null,
+        rpName: null,
+        userDisplayName: null,
+        discoverable: null
+      },
+      ['creationDate']
+    )
     return i
   }
 }
