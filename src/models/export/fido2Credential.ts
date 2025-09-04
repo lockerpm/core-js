@@ -23,9 +23,9 @@ export class Fido2Credential {
 
   static toView(req: Fido2Credential, view = new Fido2CredentialView()) {
     view.credentialId = req.credentialId
-    view.keyType = req.keyType as 'public-key'
-    view.keyAlgorithm = req.keyAlgorithm as 'ECDSA'
-    view.keyCurve = req.keyCurve as 'P-256'
+    view.keyType = req.keyType
+    view.keyAlgorithm = req.keyAlgorithm
+    view.keyCurve = req.keyCurve
     view.keyValue = req.keyValue
     view.rpId = req.rpId
     view.userHandle = req.userHandle

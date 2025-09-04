@@ -2,9 +2,9 @@ import { Fido2CredentialApi } from '../api/fido2CredentialApi'
 
 export class Fido2CredentialData {
   credentialId: string
-  keyType: 'public-key'
-  keyAlgorithm: 'ECDSA'
-  keyCurve: 'P-256'
+  keyType: string
+  keyAlgorithm: string
+  keyCurve: string
   keyValue: string
   rpId: string
   userHandle: string

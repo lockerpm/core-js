@@ -2,9 +2,9 @@ import { BaseResponse } from '../response/baseResponse'
 
 export class Fido2CredentialApi extends BaseResponse {
   credentialId: string
-  keyType: 'public-key'
-  keyAlgorithm: 'ECDSA'
-  keyCurve: 'P-256'
+  keyType: string
+  keyAlgorithm: string
+  keyCurve: string
   keyValue: string
   rpId: string
   userHandle: string

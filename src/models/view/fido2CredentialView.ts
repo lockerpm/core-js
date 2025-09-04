@@ -2,9 +2,9 @@ import { View } from './view'
 
 export class Fido2CredentialView implements View {
   credentialId: string
-  keyType = 'public-key'
-  keyAlgorithm = 'ECDSA'
-  keyCurve = 'P-256'
+  keyType: string = 'public-key'
+  keyAlgorithm: string = 'ECDSA'
+  keyCurve: string = 'P-256'
   keyValue: string
   rpId: string
   userHandle: string
