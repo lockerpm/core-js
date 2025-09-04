@@ -6,6 +6,7 @@ import { Utils } from '../../misc/utils'
 import { Login } from '../domain/login'
 
 export class LoginView implements View {
+  username: string = null
   password: string = null
   passwordRevisionDate?: Date = null
   totp: string = null
