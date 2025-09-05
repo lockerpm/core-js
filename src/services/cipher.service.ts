@@ -1375,7 +1375,7 @@ export class CipherService implements CipherServiceAbstraction {
   }
 
   updateDecryptedCache(ciphers: CipherView[]) {
-    const decCiphers = [...this.decryptedCipherCache] || []
+    const decCiphers = this.decryptedCipherCache ? [...this.decryptedCipherCache] : []
     for (const cipher of ciphers) {
       const cachedIndex = decCiphers.findIndex(c => c.id === cipher.id)
       if (cachedIndex >= 0) {
