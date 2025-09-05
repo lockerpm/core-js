@@ -5,17 +5,17 @@ export class Fido2Utils {
       throw new Error('Buffer is null or undefined')
       // return null
     }
-    return Fido2Utils.fromBufferToB64(buffer)
+    return Fido2Utils.fromBufferToB64(buffer.buffer)
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=/g, '')
   }
 
-  static stringToBuffer(str: string): Uint8Array {
+  static stringToBuffer(str: string): Uint8Array<ArrayBuffer> {
     return Fido2Utils.fromB64ToArray(Fido2Utils.fromUrlB64ToB64(str))
   }
 
-  static bufferSourceToUint8Array(bufferSource: BufferSource): Uint8Array {
+  static bufferSourceToUint8Array(bufferSource: BufferSource): Uint8Array<ArrayBuffer> {
     if (Fido2Utils.isArrayBuffer(bufferSource)) {
       return new Uint8Array(bufferSource)
     } else {
@@ -41,7 +41,7 @@ export class Fido2Utils {
     return globalThis.btoa(binary)
   }
 
-  static fromB64ToArray(str: string): Uint8Array {
+  static fromB64ToArray(str: string): Uint8Array<ArrayBuffer> {
     if (str == null) {
       throw new Error('Input string is null or undefined')
       // return null

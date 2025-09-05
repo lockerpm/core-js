@@ -1,7 +1,7 @@
 import { Fido2Utils } from './fido2-utils'
 import { guidToRawFormat } from './guid-utils'
 
-export function parseCredentialId(encodedCredentialId: string): Uint8Array | null {
+export function parseCredentialId(encodedCredentialId: string): Uint8Array<ArrayBuffer> | null {
   try {
     if (encodedCredentialId.startsWith('b64.')) {
       return Fido2Utils.stringToBuffer(encodedCredentialId.slice(4))
@@ -16,7 +16,13 @@ export function parseCredentialId(encodedCredentialId: string): Uint8Array | nul
 /**
  * Compares two credential IDs for equality.
  */
-export function compareCredentialIds(a: Uint8Array, b: Uint8Array): boolean {
+export function compareCredentialIds(
+  a: Uint8Array<ArrayBuffer> | null,
+  b: Uint8Array<ArrayBuffer> | null
+): boolean {
+  if (a == null || b == null) {
+    return false
+  }
   if (a.length !== b.length) {
     return false
   }

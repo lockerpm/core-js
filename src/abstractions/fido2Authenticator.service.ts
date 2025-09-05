@@ -42,14 +42,17 @@ export abstract class Fido2AuthenticatorService {
    * @param rpId The Relying Party's ID
    * @returns A promise that resolves with an array of discoverable credentials
    */
-  abstract silentCredentialDiscovery: (rpId: string) => Promise<Fido2CredentialView[]>
+  abstract silentCredentialDiscovery: (
+    rpId: string,
+    allowedCredentialIds?: string[]
+  ) => Promise<Fido2CredentialView[]>
 
   /**
    * Discover excluded credentials, change visibility to public to be used in UI
    */
   abstract findExcludedCredentials: (
     credentials: PublicKeyCredentialDescriptor[]
-  ) => Promise<string[]>
+  ) => Promise<Fido2CredentialView[]>
 }
 
 // FIXME: update to use a const object instead of a typescript enum
@@ -74,7 +77,7 @@ export class Fido2AuthenticatorError extends Error {
 }
 
 export interface PublicKeyCredentialDescriptor {
-  id: Uint8Array
+  id: Uint8Array<ArrayBuffer>
   transports?: ('ble' | 'hybrid' | 'internal' | 'nfc' | 'usb')[]
   type: 'public-key'
 }
@@ -159,9 +162,9 @@ export interface Fido2AuthenticatorGetAssertionParams {
 
 export interface Fido2AuthenticatorGetAssertionResult {
   selectedCredential: {
-    id: Uint8Array
-    userHandle?: Uint8Array
+    id: Uint8Array<ArrayBuffer>
+    userHandle?: Uint8Array<ArrayBuffer>
   }
-  authenticatorData: Uint8Array
-  signature: Uint8Array
+  authenticatorData: Uint8Array<ArrayBuffer>
+  signature: Uint8Array<ArrayBuffer>
 }

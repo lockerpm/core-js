@@ -1,5 +1,5 @@
 export class Utils {
-  static fromB64ToArray(str: string): Uint8Array | null {
+  static fromB64ToArray(str: string): Uint8Array<ArrayBuffer> | null {
     if (str == null) {
       return null
     }
@@ -12,11 +12,11 @@ export class Utils {
     return bytes
   }
 
-  static fromUrlB64ToArray(str: string): Uint8Array | null {
+  static fromUrlB64ToArray(str: string): Uint8Array<ArrayBuffer> | null {
     return Utils.fromB64ToArray(Utils.fromUrlB64ToB64(str))
   }
 
-  static fromHexToArray(str: string): Uint8Array {
+  static fromHexToArray(str: string): Uint8Array<ArrayBuffer> {
     const bytes = new Uint8Array(str.length / 2)
     for (let i = 0; i < str.length; i += 2) {
       bytes[i / 2] = parseInt(str.substr(i, 2), 16)
@@ -24,7 +24,7 @@ export class Utils {
     return bytes
   }
 
-  static fromUtf8ToArray(str: string): Uint8Array {
+  static fromUtf8ToArray(str: string): Uint8Array<ArrayBuffer> {
     const strUtf8 = unescape(encodeURIComponent(str))
     const arr = new Uint8Array(strUtf8.length)
     for (let i = 0; i < strUtf8.length; i++) {
@@ -33,7 +33,7 @@ export class Utils {
     return arr
   }
 
-  static fromByteStringToArray(str: string): Uint8Array | null {
+  static fromByteStringToArray(str: string): Uint8Array<ArrayBuffer> | null {
     if (str == null) {
       return null
     }
@@ -121,7 +121,7 @@ export class Utils {
   }
 
   static fromUtf8ToUrlB64(utfStr: string): string {
-    return Utils.fromBufferToUrlB64(Utils.fromUtf8ToArray(utfStr))
+    return Utils.fromBufferToUrlB64(Utils.fromUtf8ToArray(utfStr).buffer)
   }
 
   // ref: http://stackoverflow.com/a/2117523/1090359

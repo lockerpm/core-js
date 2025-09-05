@@ -7,7 +7,8 @@ import {
   Fido2AuthenticatorGetAssertionResult,
   Fido2AuthenticatorMakeCredentialResult,
   Fido2AuthenticatorMakeCredentialsParams,
-  Fido2AuthenticatorService as Fido2AuthenticatorServiceAbstraction
+  Fido2AuthenticatorService as Fido2AuthenticatorServiceAbstraction,
+  PublicKeyCredentialDescriptor
 } from '../abstractions/fido2Authenticator.service'
 import { CipherType } from '../enums'
 import { checkForAbort, Utils } from '../misc/fido2/common'
@@ -247,12 +248,24 @@ export class Fido2AuthenticatorService implements Fido2AuthenticatorServiceAbstr
     }
   }
 
-  async silentCredentialDiscovery(rpId: string): Promise<Fido2CredentialView[]> {
+  async silentCredentialDiscovery(
+    rpId: string,
+    allowedCredentialIds?: string[]
+  ): Promise<Fido2CredentialView[]> {
     const credentials = await this.findCredentialsByRp(rpId)
+    const allowedGuidFormat =
+      allowedCredentialIds?.map(id => guidToStandardFormat(Fido2Utils.stringToBuffer(id))) || []
     const res: Fido2CredentialView[] = []
+
     credentials.forEach(cred =>
       cred.login.fido2Credentials.forEach(c => {
         if (c.rpId === rpId) {
+          if (allowedGuidFormat.length > 0) {
+            if (allowedGuidFormat.includes(c.credentialId)) {
+              res.push(c)
+            }
+            return
+          }
           res.push(c)
         }
       })
@@ -261,7 +274,9 @@ export class Fido2AuthenticatorService implements Fido2AuthenticatorServiceAbstr
   }
 
   // Change visibility to public to use in UI
-  async findExcludedCredentials(credentials: PublicKeyCredentialDescriptor[]): Promise<string[]> {
+  async findExcludedCredentials(
+    credentials: PublicKeyCredentialDescriptor[]
+  ): Promise<Fido2CredentialView[]> {
     const ids: string[] = []
 
     for (const credential of credentials) {
@@ -277,15 +292,18 @@ export class Fido2AuthenticatorService implements Fido2AuthenticatorServiceAbstr
     }
 
     const ciphers = await this.cipherService.getAllDecrypted()
-    return ciphers
-      .filter(
-        cipher =>
-          !cipher.isDeleted &&
-          cipher.type === CipherType.Login &&
-          cipher.login.hasFido2Credentials &&
-          ids.includes(cipher.login.fido2Credentials[0].credentialId)
-      )
-      .map(cipher => cipher.id)
+    return (
+      // NOTE: currently, only one FIDO2 credential is supported per login
+      ciphers
+        .filter(
+          cipher =>
+            !cipher.isDeleted &&
+            cipher.type === CipherType.Login &&
+            cipher.login.hasFido2Credentials &&
+            ids.includes(cipher.login.fido2Credentials[0].credentialId)
+        )
+        .map(cipher => cipher.login.fido2Credentials[0])
+    )
   }
 
   // ------------------------ PRIVATE METHODS ------------------------
@@ -361,12 +379,12 @@ async function createKeyView(
   fido2Credential.keyAlgorithm = 'ECDSA'
   fido2Credential.keyCurve = 'P-256'
   fido2Credential.keyValue = Fido2Utils.bufferToString(pkcs8Key)
-  fido2Credential.rpId = params.rpEntity.id
+  fido2Credential.rpId = params.rpEntity.id!
   fido2Credential.userHandle = Fido2Utils.bufferToString(params.userEntity.id)
-  fido2Credential.userName = params.userEntity.name
+  fido2Credential.userName = params.userEntity.name!
   fido2Credential.counter = 0
   fido2Credential.rpName = params.rpEntity.name
-  fido2Credential.userDisplayName = params.userEntity.displayName
+  fido2Credential.userDisplayName = params.userEntity.displayName!
   fido2Credential.discoverable = params.requireResidentKey
   fido2Credential.creationDate = new Date()
 
