@@ -1,9 +1,11 @@
 import { LoginApi } from '../api/loginApi'
 
 import { LoginUriData } from './loginUriData'
+import { Fido2CredentialData } from './fido2CredentialData'
 
 export class LoginData {
   uris: LoginUriData[]
+  fido2Credentials: Fido2CredentialData[]
   username: string
   password: string
   passwordRevisionDate: string
@@ -21,6 +23,10 @@ export class LoginData {
 
     if (data.uris) {
       this.uris = data.uris.map(u => new LoginUriData(u))
+    }
+
+    if (data.fido2Credentials) {
+      this.fido2Credentials = data.fido2Credentials.map(c => new Fido2CredentialData(c))
     }
   }
 }
