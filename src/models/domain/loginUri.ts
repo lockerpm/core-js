@@ -23,7 +23,7 @@ export class LoginUri extends Domain {
       this,
       obj,
       {
-        uri: null,
+        uri: null
       },
       alreadyEncrypted,
       []
@@ -34,7 +34,7 @@ export class LoginUri extends Domain {
     return this.decryptObj(
       new LoginUriView(this),
       {
-        uri: null,
+        uri: null
       },
       orgId,
       encKey
@@ -47,7 +47,7 @@ export class LoginUri extends Domain {
       this,
       u,
       {
-        uri: null,
+        uri: null
       },
       ['match']
     )
