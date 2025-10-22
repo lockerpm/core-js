@@ -31,15 +31,13 @@ import { CipherShareRequest } from '../models/request/cipherShareRequest'
 import { CipherResponse } from '../models/response/cipherResponse'
 import { ErrorResponse } from '../models/response/errorResponse'
 
-import {
-  AttachmentView,
-  CipherView,
-  FieldView,
-  PasswordHistoryView,
-  View
-} from '../models/view'
+import { AttachmentView } from '../../src/models/view/attachmentView'
+import { CipherView } from '../models/view/cipherView'
+import { FieldView } from '../../src/models/view/fieldView'
+import { PasswordHistoryView } from '../../src/models/view/passwordHistoryView'
+import { View } from '../../src/models/view/view'
 
-
+import { SortedCiphersCache } from '../models/domain/sortedCiphersCache'
 
 import { ApiService } from '../abstractions/api.service'
 import { CipherService as CipherServiceAbstraction } from '../abstractions/cipher.service'
