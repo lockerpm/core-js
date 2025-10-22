@@ -3,26 +3,20 @@ import { UriMatchType } from '../enums/uriMatchType'
 
 import { CipherData } from '../models/data/cipherData'
 
-import Domain from '../models/domain/domainBase'
-
-import {
-  Attachment,
-  Secret,
-  Environment,
-  Card,
-  Cipher,
-  EncArrayBuffer,
-  EncString,
-  Field,
-  Identity,
-  Login,
-  LoginUri,
-  Password,
-  SecureNote,
-  SymmetricCryptoKey,
-  SortedCiphersCache
-} from '../models/domain'
-
+import { Attachment } from '../../src/models/domain/attachment'
+import { Card } from '../../src/models/domain/card'
+import { Cipher } from '../models/domain/cipher'
+import Domain from '../../src/models/domain/domainBase'
+import { EncArrayBuffer } from '../../src/models/domain/encArrayBuffer'
+import { EncString } from '../../src/models/domain/encString'
+import { Field } from '../../src/models/domain/field'
+import { Identity } from '../../src/models/domain/identity'
+import { Login } from '../../src/models/domain/login'
+import { LoginUri } from '../../src/models/domain/loginUri'
+import { Fido2Credential } from '../models/domain/fido2Credential'
+import { Password } from '../../src/models/domain/password'
+import { SecureNote } from '../../src/models/domain/secureNote'
+import { SymmetricCryptoKey } from '../../src/models/domain/symmetricCryptoKey'
 
 import { AttachmentRequest } from '../models/request/attachmentRequest'
 import { CipherBulkDeleteRequest } from '../models/request/cipherBulkDeleteRequest'
@@ -454,45 +448,45 @@ export class CipherService implements CipherServiceAbstraction {
 
           const match = u.match == null ? defaultMatch : u.match
           switch (match) {
-          case UriMatchType.Domain:
-            if (domain != null && u.domain != null && matchingDomains.includes(u.domain)) {
-              if (DomainMatchBlacklist.has(u.domain)) {
-                const domainUrlHost = Utils.getHost(url)
-                if (!DomainMatchBlacklist.get(u.domain).has(domainUrlHost)) {
+            case UriMatchType.Domain:
+              if (domain != null && u.domain != null && matchingDomains.includes(u.domain)) {
+                if (DomainMatchBlacklist.has(u.domain)) {
+                  const domainUrlHost = Utils.getHost(url)
+                  if (!DomainMatchBlacklist.get(u.domain).has(domainUrlHost)) {
+                    return true
+                  }
+                } else {
                   return true
                 }
-              } else {
+              }
+              break
+            case UriMatchType.Host:
+              const urlHost = Utils.getHost(url)
+              if (urlHost != null && urlHost === Utils.getHost(u.uri)) {
                 return true
               }
-            }
-            break
-          case UriMatchType.Host:
-            const urlHost = Utils.getHost(url)
-            if (urlHost != null && urlHost === Utils.getHost(u.uri)) {
-              return true
-            }
-            break
-          case UriMatchType.Exact:
-            if (url === u.uri) {
-              return true
-            }
-            break
-          case UriMatchType.StartsWith:
-            if (url.startsWith(u.uri)) {
-              return true
-            }
-            break
-          case UriMatchType.RegularExpression:
-            try {
-              const regex = new RegExp(u.uri, 'i')
-              if (regex.test(url)) {
+              break
+            case UriMatchType.Exact:
+              if (url === u.uri) {
                 return true
               }
-            } catch { }
-            break
-          case UriMatchType.Never:
-          default:
-            break
+              break
+            case UriMatchType.StartsWith:
+              if (url.startsWith(u.uri)) {
+                return true
+              }
+              break
+            case UriMatchType.RegularExpression:
+              try {
+                const regex = new RegExp(u.uri, 'i')
+                if (regex.test(url)) {
+                  return true
+                }
+              } catch {}
+              break
+            case UriMatchType.Never:
+            default:
+              break
           }
         }
       }
@@ -1118,6 +1112,9 @@ export class CipherService implements CipherServiceAbstraction {
         const p = Promise.resolve()
           .then(() => {
             const modelProp = (model as any)[map[theProp] || theProp]
+            if (typeof modelProp === 'boolean' || typeof modelProp === 'number') {
+              return self.cryptoService.encrypt(modelProp.toString(), key)
+            }
             if (modelProp && modelProp !== '') {
               return self.cryptoService.encrypt(modelProp, key)
             }
@@ -1135,93 +1132,132 @@ export class CipherService implements CipherServiceAbstraction {
 
   private async encryptCipherData (cipher: Cipher, model: CipherView, key: SymmetricCryptoKey) {
     switch (cipher.type) {
-    case CipherType.Login:
-      cipher.login = new Login()
-      cipher.login.passwordRevisionDate = model.login.passwordRevisionDate
-      await this.encryptObjProperty(
-        model.login,
-        cipher.login,
-        {
-          username: null,
-          password: null,
-          totp: null
-        },
-        key
-      )
+      case CipherType.Login:
+        cipher.login = new Login()
+        cipher.login.passwordRevisionDate = model.login.passwordRevisionDate
+        await this.encryptObjProperty(
+          model.login,
+          cipher.login,
+          {
+            username: null,
+            password: null,
+            totp: null
+          },
+          key
+        )
 
-      if (model.login.uris != null) {
-        cipher.login.uris = []
-        for (let i = 0; i < model.login.uris.length; i++) {
-          const loginUri = new LoginUri()
-          loginUri.match = model.login.uris[i].match
-          await this.encryptObjProperty(
-            model.login.uris[i],
-            loginUri,
-            {
-              uri: null
-            },
-            key
-          )
-          cipher.login.uris.push(loginUri)
+        if (model.login.uris != null) {
+          cipher.login.uris = []
+          for (let i = 0; i < model.login.uris.length; i++) {
+            const loginUri = new LoginUri()
+            loginUri.match = model.login.uris[i].match
+            await this.encryptObjProperty(
+              model.login.uris[i],
+              loginUri,
+              {
+                uri: null
+              },
+              key
+            )
+            cipher.login.uris.push(loginUri)
+          }
         }
-      }
-      return
-    case CipherType.SecureNote:
-      cipher.secureNote = new SecureNote()
-      cipher.secureNote.type = model.secureNote.type
-      return
-    case CipherType.Card:
-      cipher.card = new Card()
-      await this.encryptObjProperty(model.card, cipher.card, {
-        cardholderName: null,
-        brand: null,
-        number: null,
-        expMonth: null,
-        expYear: null,
-        code: null
-      }, key)
-      return
-    case CipherType.Identity:
-      cipher.identity = new Identity()
-      await this.encryptObjProperty(model.identity, cipher.identity, {
-        title: null,
-        firstName: null,
-        middleName: null,
-        lastName: null,
-        address1: null,
-        address2: null,
-        address3: null,
-        city: null,
-        state: null,
-        postalCode: null,
-        country: null,
-        company: null,
-        email: null,
-        phone: null,
-        ssn: null,
-        username: null,
-        passportNumber: null,
-        licenseNumber: null
-      }, key)
-      return
-    case CipherType.Secret:
-      cipher.secret = new Secret()
-      await this.encryptObjProperty(model.secret, cipher.secret, {
-        description: null,
-        key: null,
-        value: null,
-      }, key)
-      return
-    case CipherType.Environment:
-      cipher.environment = new Environment()
-      await this.encryptObjProperty(model.environment, cipher.environment, {
-        description: null,
-        name: null,
-        externalUrl: null,
-      }, key)
-      return
-    default:
-      throw new Error('Unknown cipher type.')
+
+        if (model.login.fido2Credentials != null) {
+          cipher.login.fido2Credentials = []
+          for (let i = 0; i < model.login.fido2Credentials.length; i++) {
+            const cred = new Fido2Credential()
+            cred.creationDate = model.login.fido2Credentials[i].creationDate
+            await this.encryptObjProperty(
+              model.login.fido2Credentials[i],
+              cred,
+              {
+                credentialId: null,
+                keyType: null,
+                keyAlgorithm: null,
+                keyCurve: null,
+                keyValue: null,
+                rpId: null,
+                userHandle: null,
+                userName: null,
+                counter: null,
+                rpName: null,
+                userDisplayName: null,
+                discoverable: null
+              },
+              key
+            )
+            cipher.login.fido2Credentials.push(cred)
+          }
+        }
+
+        return
+      case CipherType.SecureNote:
+        cipher.secureNote = new SecureNote()
+        cipher.secureNote.type = model.secureNote.type
+        return
+      case CipherType.Card:
+        cipher.card = new Card()
+        await this.encryptObjProperty(
+          model.card,
+          cipher.card,
+          {
+            cardholderName: null,
+            brand: null,
+            number: null,
+            expMonth: null,
+            expYear: null,
+            code: null
+          },
+          key
+        )
+        return
+      case CipherType.Identity:
+        cipher.identity = new Identity()
+        await this.encryptObjProperty(
+          model.identity,
+          cipher.identity,
+          {
+            title: null,
+            firstName: null,
+            middleName: null,
+            lastName: null,
+            address1: null,
+            address2: null,
+            address3: null,
+            city: null,
+            state: null,
+            postalCode: null,
+            country: null,
+            company: null,
+            email: null,
+            phone: null,
+            ssn: null,
+            username: null,
+            passportNumber: null,
+            licenseNumber: null
+          },
+          key
+        )
+        return
+      case CipherType.Secret:
+        cipher.secret = new Secret()
+        await this.encryptObjProperty(model.secret, cipher.secret, {
+          description: null,
+          key: null,
+          value: null,
+        }, key)
+        return
+      case CipherType.Environment:
+        cipher.environment = new Environment()
+        await this.encryptObjProperty(model.environment, cipher.environment, {
+          description: null,
+          name: null,
+          externalUrl: null,
+        }, key)
+        return
+      default:
+        throw new Error('Unknown cipher type.')
     }
   }
 
@@ -1266,8 +1302,8 @@ export class CipherService implements CipherServiceAbstraction {
     }
   }
 
-  updateDecryptedCache (ciphers: CipherView[]) {
-    const decCiphers = [...(this.decryptedCipherCache || [])]
+  updateDecryptedCache(ciphers: CipherView[]) {
+    const decCiphers = this.decryptedCipherCache ? [...this.decryptedCipherCache] : []
     for (const cipher of ciphers) {
       const cachedIndex = decCiphers.findIndex(c => c.id === cipher.id)
       if (cachedIndex >= 0) {
