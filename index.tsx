@@ -30,6 +30,7 @@ import { StorageService } from './src/abstractions/storage.service'
 import { CipherService } from './src/services/cipher.service'
 import { CryptoService } from './src/services/crypto.service'
 import { TotpService } from './src/services/totp.service'
+import { Fido2AuthenticatorService } from './src/services/fido2Authenticator.service'
 import { Utils } from './src/misc/utils'
 
 const CsCore = async (global = self, platform = 'web') => {
@@ -166,6 +167,11 @@ const CsCore = async (global = self, platform = 'web') => {
     cryptoFunctionService,
   )
 
+  const fido2AuthenticatorService = new Fido2AuthenticatorService(
+    consoleLogService,
+    cipherService
+  )
+
   storageService.init()
   containerService.attachToWindow(global)
   Utils.global = global
@@ -192,7 +198,8 @@ const CsCore = async (global = self, platform = 'web') => {
     sendService,
     totpService,
     auditService,
-    policyService
+    policyService,
+    fido2AuthenticatorService
   }
 }
 
