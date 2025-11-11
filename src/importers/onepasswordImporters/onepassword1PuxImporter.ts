@@ -175,6 +175,8 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
           // }))
         }
 
+        this.processFolder(this.result, vault.attrs.name)
+
         this.result.ciphers.push(cipher)
       })
     })
@@ -206,8 +208,7 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
     }
 
     if (overview.tags != null && overview.tags.length > 0) {
-      const folderName = this.capitalize(overview.tags[0])
-      this.processFolder(this.result, folderName)
+      this.processKvp(cipher, 'Tags', overview.tags.join(', '), FieldType.Text)
     }
   }
 
