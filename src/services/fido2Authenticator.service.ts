@@ -77,7 +77,7 @@ export class Fido2AuthenticatorService implements Fido2AuthenticatorServiceAbstr
       this.logService?.info(
         '[Fido2Authenticator] Aborting due to excluded credential found in vault.'
       )
-      throw new Fido2AuthenticatorError(Fido2AuthenticatorErrorCode.NotAllowed)
+      throw new Fido2AuthenticatorError(Fido2AuthenticatorErrorCode.CredentialExcluded)
     }
 
     let fido2Credential: Fido2CredentialView
@@ -167,7 +167,7 @@ export class Fido2AuthenticatorService implements Fido2AuthenticatorServiceAbstr
       this.logService.info(
         '[Fido2Authenticator] Aborting because no matching credentials were found in the vault.'
       )
-      throw new Fido2AuthenticatorError(Fido2AuthenticatorErrorCode.NotAllowed)
+      throw new Fido2AuthenticatorError(Fido2AuthenticatorErrorCode.NoCredentials)
     }
 
     const credentials: Fido2CredentialView[] = []
@@ -196,7 +196,7 @@ export class Fido2AuthenticatorService implements Fido2AuthenticatorServiceAbstr
         `[Fido2Authenticator] No credentials found for RP ID: ${params.rpId}. Aborting assertion.`
       )
 
-      throw new Fido2AuthenticatorError(Fido2AuthenticatorErrorCode.NotAllowed)
+      throw new Fido2AuthenticatorError(Fido2AuthenticatorErrorCode.NoCredentials)
     }
 
     // TODO: Implement user verification logic if needed
