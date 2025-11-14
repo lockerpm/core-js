@@ -175,7 +175,12 @@ export class OnePassword1PuxImporter extends BaseImporter implements Importer {
           // }))
         }
 
-        this.processFolder(this.result, vault.attrs.name)
+        // If item is archived -> move to archived folder, else to vault name folder
+        if (item.state === 'archived') {
+          this.processFolder(this.result, 'Archived Items')
+        } else {
+          this.processFolder(this.result, vault.attrs.name)
+        }
 
         this.result.ciphers.push(cipher)
       })
