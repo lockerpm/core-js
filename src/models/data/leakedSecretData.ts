@@ -4,6 +4,10 @@ export class LeakedSecretData {
   description: string
   key: string
   value: string
+  location: string
+  lineInCode: string
+  imageUrl: string
+  commit: string
 
   constructor(data?: LeakedSecretApi) {
     if (data == null) {
@@ -13,5 +17,9 @@ export class LeakedSecretData {
     this.description = data.description
     this.key = data.key
     this.value = data.value
+    this.location = data.location
+    this.lineInCode = data.lineInCode
+    this.imageUrl = data.imageUrl
+    this.commit = data.commit
   }
 }

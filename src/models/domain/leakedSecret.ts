@@ -10,6 +10,10 @@ export class LeakedSecret extends Domain {
   description: EncString
   key: EncString
   value: EncString
+  location: EncString
+  lineInCode: EncString
+  imageUrl: EncString
+  commit: EncString
 
   constructor(obj?: LeakedSecretData, alreadyEncrypted: boolean = false) {
     super()
@@ -21,6 +25,10 @@ export class LeakedSecret extends Domain {
       description: null,
       key: null,
       value: null,
+      location: null,
+      lineInCode: null,
+      imageUrl: null,
+      commit: null,
     }, alreadyEncrypted, [])
   }
 
@@ -29,6 +37,10 @@ export class LeakedSecret extends Domain {
       description: null,
       key: null,
       value: null,
+      location: null,
+      lineInCode: null,
+      imageUrl: null,
+      commit: null,
     }, orgId, encKey)
   }
 
@@ -38,6 +50,10 @@ export class LeakedSecret extends Domain {
       description: null,
       key: null,
       value: null,
+      location: null,
+      lineInCode: null,
+      imageUrl: null,
+      commit: null,
     })
     return s
   }

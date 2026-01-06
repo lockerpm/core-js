@@ -9,6 +9,7 @@ import {
   Attachment,
   Secret,
   Environment,
+  LeakedSecret,
   Card,
   Cipher,
   EncArrayBuffer,
@@ -1150,6 +1151,18 @@ export class CipherService implements CipherServiceAbstraction {
         description: null,
         name: null,
         externalUrl: null,
+      }, key)
+      return
+    case CipherType.LeakedSecret:
+      cipher.leakedSecret = new LeakedSecret()
+      await this.encryptObjProperty(model.leakedSecret, cipher.leakedSecret, {
+        description: null,
+        key: null,
+        value: null,
+        location: null,
+        lineInCode: null,
+        imageUrl: null,
+        commit: null,
       }, key)
       return
     default:
