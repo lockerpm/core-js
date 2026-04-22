@@ -1,6 +1,6 @@
-import * as constants from 'constants'
 import * as crypto from 'crypto'
 import * as forge from 'node-forge'
+import { argon2idAsync } from '@noble/hashes/argon2.js'
 
 import { CryptoFunctionService } from '../abstractions/cryptoFunction.service'
 
@@ -28,6 +28,25 @@ export class NodeCryptoFunctionService implements CryptoFunctionService {
         }
       })
     })
+  }
+
+  async argon2id(
+    password: string | ArrayBuffer,
+    salt: string | ArrayBuffer,
+    iterations: number,
+    memory: number,
+    parallelism: number,
+    outputByteSize: number
+  ): Promise<ArrayBuffer> {
+    const nodePassword = this.toNodeValue(password)
+    const nodeSalt = this.toNodeValue(salt)
+    const res = await argon2idAsync(nodePassword, nodeSalt, {
+      t: iterations,
+      m: memory,
+      p: parallelism,
+      dkLen: outputByteSize
+    })
+    return res.buffer
   }
 
   // ref: https://tools.ietf.org/html/rfc5869
@@ -121,15 +140,15 @@ export class NodeCryptoFunctionService implements CryptoFunctionService {
   }
 
   hmacFast(
-    value: ArrayBuffer,
-    key: ArrayBuffer,
+    value: ArrayBuffer | string,
+    key: ArrayBuffer | string,
     algorithm: 'sha1' | 'sha256' | 'sha512'
   ): Promise<ArrayBuffer> {
-    return this.hmac(value, key, algorithm)
+    return this.hmac(value as ArrayBuffer, key as ArrayBuffer, algorithm)
   }
 
-  compareFast(a: ArrayBuffer, b: ArrayBuffer): Promise<boolean> {
-    return this.compare(a, b)
+  compareFast(a: ArrayBuffer | string, b: ArrayBuffer | string): Promise<boolean> {
+    return this.compare(a as ArrayBuffer, b as ArrayBuffer)
   }
 
   aesEncrypt(data: ArrayBuffer, iv: ArrayBuffer, key: ArrayBuffer): Promise<ArrayBuffer> {
@@ -148,9 +167,9 @@ export class NodeCryptoFunctionService implements CryptoFunctionService {
     key: SymmetricCryptoKey
   ): DecryptParameters<ArrayBuffer> {
     const p = new DecryptParameters<ArrayBuffer>()
-    p.encKey = key.encKey
-    p.data = Utils.fromB64ToArray(data).buffer
-    p.iv = Utils.fromB64ToArray(iv).buffer
+    p.encKey = key.encKey!
+    p.data = Utils.fromB64ToArray(data).buffer as ArrayBuffer
+    p.iv = Utils.fromB64ToArray(iv).buffer as ArrayBuffer
 
     const macData = new Uint8Array(p.iv.byteLength + p.data.byteLength)
     macData.set(new Uint8Array(p.iv), 0)
@@ -161,14 +180,18 @@ export class NodeCryptoFunctionService implements CryptoFunctionService {
       p.macKey = key.macKey
     }
     if (mac != null) {
-      p.mac = Utils.fromB64ToArray(mac).buffer
+      p.mac = Utils.fromB64ToArray(mac).buffer as ArrayBuffer
     }
 
     return p
   }
 
-  async aesDecryptFast(parameters: DecryptParameters<ArrayBuffer>): Promise<string> {
-    const decBuf = await this.aesDecrypt(parameters.data, parameters.iv, parameters.encKey)
+  async aesDecryptFast(parameters: DecryptParameters<ArrayBuffer | string>): Promise<string> {
+    const decBuf = await this.aesDecrypt(
+      parameters.data as ArrayBuffer,
+      parameters.iv as ArrayBuffer,
+      parameters.encKey as ArrayBuffer
+    )
     return Utils.fromBufferToUtf8(decBuf)
   }
 
@@ -217,7 +240,7 @@ export class NodeCryptoFunctionService implements CryptoFunctionService {
     const publicKeyAsn1 = (forge.pki as any).publicKeyToAsn1(forgePublicKey)
     const publicKeyByteString = forge.asn1.toDer(publicKeyAsn1).data
     const publicKeyArray = Utils.fromByteStringToArray(publicKeyByteString)
-    return Promise.resolve(publicKeyArray.buffer)
+    return Promise.resolve(publicKeyArray.buffer as ArrayBuffer)
   }
 
   async rsaGenerateKeyPair(length: 1024 | 2048 | 4096): Promise<[ArrayBuffer, ArrayBuffer]> {
@@ -226,7 +249,7 @@ export class NodeCryptoFunctionService implements CryptoFunctionService {
         {
           bits: length,
           workers: -1,
-          e: 0x10001, // 65537
+          e: 0x10001 // 65537
         },
         (error, keyPair) => {
           if (error != null) {
@@ -243,7 +266,7 @@ export class NodeCryptoFunctionService implements CryptoFunctionService {
           const privateKeyByteString = forge.asn1.toDer(privateKeyPkcs8).getBytes()
           const privateKey = Utils.fromByteStringToArray(privateKeyByteString)
 
-          resolve([publicKey.buffer, privateKey.buffer])
+          resolve([publicKey.buffer as ArrayBuffer, privateKey.buffer as ArrayBuffer])
         }
       )
     })
@@ -278,9 +301,9 @@ export class NodeCryptoFunctionService implements CryptoFunctionService {
   private toArrayBuffer(value: Buffer | string | ArrayBuffer): ArrayBuffer {
     let buf: ArrayBuffer
     if (typeof value === 'string') {
-      buf = Utils.fromUtf8ToArray(value).buffer
+      buf = Utils.fromUtf8ToArray(value).buffer as ArrayBuffer
     } else {
-      buf = new Uint8Array(value).buffer
+      buf = new Uint8Array(value).buffer as ArrayBuffer
     }
     return buf
   }

@@ -7,64 +7,82 @@ import { ProfileOrganizationResponse } from '../models/response/profileOrganizat
 import { KdfType } from '../enums/kdfType'
 
 export abstract class CryptoService {
-  setKey: (key: SymmetricCryptoKey) => Promise<any>
-  setKeyHash: (keyHash: string) => Promise<{}>
-  setEncKey: (encKey: string) => Promise<{}>
-  setEncPrivateKey: (encPrivateKey: string) => Promise<{}>
-  setOrgKeys: (orgs: ProfileOrganizationResponse[]) => Promise<{}>
-  getKey: () => Promise<SymmetricCryptoKey>
-  getKeyHash: () => Promise<string>
-  getEncKey: (key?: SymmetricCryptoKey) => Promise<SymmetricCryptoKey>
-  getPublicKey: () => Promise<ArrayBuffer>
-  getPrivateKey: () => Promise<ArrayBuffer>
-  getFingerprint: (userId: string, publicKey?: ArrayBuffer) => Promise<string[]>
-  getOrgKeys: () => Promise<Map<string, SymmetricCryptoKey>>
-  getOrgKey: (orgId: string) => Promise<SymmetricCryptoKey>
-  hasKey: () => Promise<boolean>
-  hasEncKey: () => Promise<boolean>
-  clearKey: () => Promise<any>
-  clearKeyHash: () => Promise<any>
-  clearEncKey: (memoryOnly?: boolean) => Promise<any>
-  clearKeyPair: (memoryOnly?: boolean) => Promise<any>
-  clearOrgKeys: (memoryOnly?: boolean) => Promise<any>
-  clearPinProtectedKey: () => Promise<any>
-  clearKeys: () => Promise<any>
-  toggleKey: () => Promise<any>
-  makeKey: (
+  abstract setKey: (key: SymmetricCryptoKey) => Promise<void>
+  abstract setKeyHash: (keyHash: string) => Promise<void>
+  abstract setEncKey: (encKey: string) => Promise<void>
+  abstract setEncPrivateKey: (encPrivateKey: string) => Promise<void>
+  abstract setOrgKeys: (orgs: ProfileOrganizationResponse[]) => Promise<void>
+  abstract getKey: () => Promise<SymmetricCryptoKey | null>
+  abstract getKeyHash: () => Promise<string | null>
+  abstract getEncKey: (key?: SymmetricCryptoKey) => Promise<SymmetricCryptoKey | null>
+  abstract getPublicKey: () => Promise<ArrayBuffer | null>
+  abstract getPrivateKey: () => Promise<ArrayBuffer | null>
+  abstract getFingerprint: (userId: string, publicKey?: ArrayBuffer) => Promise<string[]>
+  abstract getOrgKeys: () => Promise<Map<string, SymmetricCryptoKey> | null>
+  abstract getOrgKey: (orgId: string) => Promise<SymmetricCryptoKey | null>
+  abstract hasKey: () => Promise<boolean>
+  abstract hasEncKey: () => Promise<boolean>
+  abstract clearKey: () => Promise<void>
+  abstract clearKeyHash: () => Promise<void>
+  abstract clearEncKey: (memoryOnly?: boolean) => Promise<void>
+  abstract clearKeyPair: (memoryOnly?: boolean) => Promise<void>
+  abstract clearOrgKeys: (memoryOnly?: boolean) => Promise<void>
+  abstract clearPinProtectedKey: () => Promise<void>
+  abstract clearKeys: () => Promise<void>
+  abstract toggleKey: () => Promise<void>
+  abstract makeKey: (
     password: string,
     salt: string,
     kdf: KdfType,
-    kdfIterations: number
+    kdfIterations: number,
+    kdfMemory?: number,
+    kdfParallelism?: number
   ) => Promise<SymmetricCryptoKey>
-  makeKeyFromPin: (
+  abstract makeKeyFromPin: (
     pin: string,
     salt: string,
     kdf: KdfType,
     kdfIterations: number,
+    kdfMemory?: number,
+    kdfParallelism?: number,
     protectedKeyCs?: EncString
   ) => Promise<SymmetricCryptoKey>
-  makeShareKey: () => Promise<[EncString, SymmetricCryptoKey]>
-  makeKeyPair: (key?: SymmetricCryptoKey) => Promise<[string, EncString]>
-  makePinKey: (
+  abstract makeShareKey: () => Promise<[EncString, SymmetricCryptoKey]>
+  abstract makeKeyPair: (key?: SymmetricCryptoKey) => Promise<[string, EncString]>
+  abstract makePinKey: (
     pin: string,
     salt: string,
     kdf: KdfType,
-    kdfIterations: number
+    kdfIterations: number,
+    kdfMemory?: number,
+    kdfParallelism?: number
   ) => Promise<SymmetricCryptoKey>
-  makeSendKey: (keyMaterial: ArrayBuffer) => Promise<SymmetricCryptoKey>
-  hashPassword: (password: string, key: SymmetricCryptoKey) => Promise<string>
-  makeEncKey: (key: SymmetricCryptoKey) => Promise<[SymmetricCryptoKey, EncString]>
-  remakeEncKey: (
+  abstract makeSendKey: (keyMaterial: ArrayBuffer) => Promise<SymmetricCryptoKey>
+  abstract hashPassword: (password: string, key: SymmetricCryptoKey) => Promise<string>
+  abstract makeEncKey: (key: SymmetricCryptoKey) => Promise<[SymmetricCryptoKey, EncString]>
+  abstract remakeEncKey: (
     key: SymmetricCryptoKey,
     encKey?: SymmetricCryptoKey
   ) => Promise<[SymmetricCryptoKey, EncString]>
-  encrypt: (plainValue: string | ArrayBuffer, key?: SymmetricCryptoKey) => Promise<EncString>
-  encryptToBytes: (plainValue: ArrayBuffer, key?: SymmetricCryptoKey) => Promise<EncArrayBuffer>
-  rsaEncrypt: (data: ArrayBuffer, publicKey?: ArrayBuffer) => Promise<EncString>
-  rsaDecrypt: (encValue: string) => Promise<ArrayBuffer>
-  decryptToBytes: (encString: EncString, key?: SymmetricCryptoKey) => Promise<ArrayBuffer>
-  decryptToUtf8: (encString: EncString, key?: SymmetricCryptoKey) => Promise<string>
-  decryptFromBytes: (encBuf: ArrayBuffer, key: SymmetricCryptoKey) => Promise<ArrayBuffer>
-  randomNumber: (min: number, max: number) => Promise<number>
-  validateKey: (key: SymmetricCryptoKey) => Promise<boolean>
+  abstract encrypt: (
+    plainValue: string | ArrayBuffer,
+    key?: SymmetricCryptoKey
+  ) => Promise<EncString>
+  abstract encryptToBytes: (
+    plainValue: ArrayBuffer,
+    key?: SymmetricCryptoKey
+  ) => Promise<EncArrayBuffer>
+  abstract rsaEncrypt: (data: ArrayBuffer, publicKey?: ArrayBuffer) => Promise<EncString>
+  abstract rsaDecrypt: (encValue: string) => Promise<ArrayBuffer>
+  abstract decryptToBytes: (
+    encString: EncString,
+    key?: SymmetricCryptoKey
+  ) => Promise<ArrayBuffer | null>
+  abstract decryptToUtf8: (encString: EncString, key?: SymmetricCryptoKey) => Promise<string | null>
+  abstract decryptFromBytes: (
+    encBuf: ArrayBuffer,
+    key: SymmetricCryptoKey
+  ) => Promise<ArrayBuffer | null>
+  abstract randomNumber: (min: number, max: number) => Promise<number>
+  abstract validateKey: (key: SymmetricCryptoKey) => Promise<boolean>
 }

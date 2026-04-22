@@ -5,17 +5,17 @@ import { SendView } from '../models/view/sendView'
 import { SendData } from '../models/data/sendData'
 
 export abstract class SendService {
-  decryptedSendCache: SendView[]
+  decryptedSendCache: SendView[] | null = null
 
-  clearCache: () => void
-  encrypt: (model: SendView, password: string, key?: SymmetricCryptoKey) => Promise<Send>
+  abstract clearCache: () => void
+  abstract encrypt: (model: SendView, password: string, key?: SymmetricCryptoKey) => Promise<Send>
 
-  get: (id: string) => Promise<Send>;
-  getAll: () => Promise<Send[]>
-  getAllDecrypted: () => Promise<SendView[]>
-  upsert: (send: SendData | SendData[]) => Promise<any>
+  abstract get: (id: string) => Promise<Send | null>
+  abstract getAll: () => Promise<Send[]>
+  abstract getAllDecrypted: () => Promise<SendView[]>
+  abstract upsert: (send: SendData | SendData[]) => Promise<any>
 
-  replace: (sends: { [id: string]: SendData }) => Promise<any>
-  clear: (userId: string) => Promise<any>
-  delete: (id: string | string[]) => Promise<any>
+  abstract replace: (sends: { [id: string]: SendData }) => Promise<any>
+  abstract clear: (userId: string) => Promise<any>
+  abstract delete: (id: string | string[]) => Promise<any>
 }
