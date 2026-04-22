@@ -8,6 +8,7 @@ export abstract class UserService {
     userId: string,
     email: string,
     kdf: KdfType,
+    kdfVersion: number,
     kdfIterations: number,
     kdfMemory: number,
     kdfParallelism: number

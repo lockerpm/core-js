@@ -12,6 +12,7 @@ const Keys = {
   userEmail: 'userEmail',
   stamp: 'securityStamp',
   kdf: 'kdf',
+  kdfVersion: 'kdfVersion',
   kdfIterations: 'kdfIterations',
   kdfMemory: 'kdfMemory',
   kdfParallelism: 'kdfParallelism',
@@ -24,6 +25,7 @@ export class UserService implements UserServiceAbstraction {
   private email: string | null = null
   private stamp: string | null = null
   private kdf: KdfType | null = null
+  private kdfVersion: number | null = null
   private kdfIterations: number | null = null
   private kdfMemory: number | null = null
   private kdfParallelism: number | null = null
@@ -35,6 +37,7 @@ export class UserService implements UserServiceAbstraction {
     userId: string,
     email: string,
     kdf: KdfType,
+    kdfVersion: number,
     kdfIterations: number,
     kdfMemory: number,
     kdfParallelism: number
@@ -42,6 +45,7 @@ export class UserService implements UserServiceAbstraction {
     this.email = email
     this.userId = userId
     this.kdf = kdf
+    this.kdfVersion = kdfVersion
     this.kdfIterations = kdfIterations
     this.kdfMemory = kdfMemory
     this.kdfParallelism = kdfParallelism
@@ -50,6 +54,7 @@ export class UserService implements UserServiceAbstraction {
       this.storageService.save(Keys.userEmail, email),
       this.storageService.save(Keys.userId, userId),
       this.storageService.save(Keys.kdf, kdf),
+      this.storageService.save(Keys.kdfVersion, kdfVersion),
       this.storageService.save(Keys.kdfIterations, kdfIterations),
       this.storageService.save(Keys.kdfMemory, kdfMemory),
       this.storageService.save(Keys.kdfParallelism, kdfParallelism)
@@ -94,6 +99,13 @@ export class UserService implements UserServiceAbstraction {
     return this.kdf
   }
 
+  async getKdfVersion(): Promise<number> {
+    if (this.kdfVersion == null) {
+      this.kdfVersion = await this.storageService.get<number>(Keys.kdfVersion)
+    }
+    return this.kdfVersion
+  }
+
   async getKdfIterations(): Promise<number> {
     if (this.kdfIterations == null) {
       this.kdfIterations = await this.storageService.get<number>(Keys.kdfIterations)
@@ -130,6 +142,7 @@ export class UserService implements UserServiceAbstraction {
       this.storageService.remove(Keys.userEmail),
       this.storageService.remove(Keys.stamp),
       this.storageService.remove(Keys.kdf),
+      this.storageService.remove(Keys.kdfVersion),
       this.storageService.remove(Keys.kdfIterations),
       this.storageService.remove(Keys.kdfMemory),
       this.storageService.remove(Keys.kdfParallelism),
@@ -138,6 +151,7 @@ export class UserService implements UserServiceAbstraction {
 
     this.userId = this.email = this.stamp = null
     this.kdf = null
+    this.kdfVersion = null
     this.kdfIterations = null
     this.kdfMemory = null
     this.kdfParallelism = null
