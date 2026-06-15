@@ -16,23 +16,17 @@ export const IgnoredProperties = [
   'tags',
   'title',
   'uuid',
-  'notes',
+  'notes'
 ]
 
 export abstract class OnePasswordCsvImporter extends BaseImporter implements Importer {
-  protected loginPropertyParsers = [
-    this.setLoginUsername,
-    this.setLoginPassword,
-    this.setLoginUris,
-  ]
-
+  protected loginPropertyParsers = [this.setLoginUsername, this.setLoginPassword, this.setLoginUris]
   protected creditCardPropertyParsers = [
     this.setCreditCardNumber,
     this.setCreditCardVerification,
     this.setCreditCardCardholderName,
-    this.setCreditCardExpiry,
+    this.setCreditCardExpiry
   ]
-
   protected identityPropertyParsers = [
     this.setIdentityFirstName,
     this.setIdentityInitial,
@@ -40,16 +34,16 @@ export abstract class OnePasswordCsvImporter extends BaseImporter implements Imp
     this.setIdentityUserName,
     this.setIdentityEmail,
     this.setIdentityPhone,
-    this.setIdentityCompany,
+    this.setIdentityCompany
   ]
 
-  abstract setCipherType(value: any, cipher: CipherView): void;
+  abstract setCipherType(value: any, cipher: CipherView): void
 
   parse(data: string): Promise<ImportResult> {
     const result = new ImportResult()
     const results = this.parseCsv(data, true, {
       quoteChar: '"',
-      escapeChar: '\\',
+      escapeChar: '\\'
     })
     if (results == null) {
       result.success = false
@@ -90,7 +84,7 @@ export abstract class OnePasswordCsvImporter extends BaseImporter implements Imp
         cipher.type === CipherType.Login &&
         !this.isNullOrWhitespace(altUsername) &&
         this.isNullOrWhitespace(cipher.login.username) &&
-        !altUsername.includes('://')
+        altUsername.indexOf('://') === -1
       ) {
         cipher.login.username = altUsername
       }
@@ -178,7 +172,7 @@ export abstract class OnePasswordCsvImporter extends BaseImporter implements Imp
 
   protected setUnknownValue(context: CipherImportContext, altUsername: string): string {
     if (
-      !IgnoredProperties.includes(context.lowerProperty) &&
+      IgnoredProperties.indexOf(context.lowerProperty) === -1 &&
       !context.lowerProperty.startsWith('section:') &&
       !context.lowerProperty.startsWith('section ')
     ) {
@@ -329,10 +323,7 @@ export abstract class OnePasswordCsvImporter extends BaseImporter implements Imp
       context.lowerProperty.includes('expiry date') &&
       context.importRecord[context.property].length === 7
     ) {
-      context.cipher.card.expMonth = (context.importRecord[context.property] as string).substr(
-        0,
-        2
-      )
+      context.cipher.card.expMonth = (context.importRecord[context.property] as string).substr(0, 2)
       if (context.cipher.card.expMonth[0] === '0') {
         context.cipher.card.expMonth = context.cipher.card.expMonth.substr(1, 1)
       }
@@ -369,7 +360,7 @@ export abstract class OnePasswordCsvImporter extends BaseImporter implements Imp
       (context.cipher.login.uris == null || context.cipher.login.uris.length === 0) &&
       context.lowerProperty === 'urls'
     ) {
-      const urls = context.importRecord[context.property].split(this.newLineRegex)
+      const urls = context.importRecord[context.property]?.split(this.newLineRegex)
       context.cipher.login.uris = this.makeUriArray(urls)
       return true
     } else if (context.lowerProperty === 'url') {

@@ -17,11 +17,11 @@ import { UserService } from '../../src/abstractions/user.service'
 import { Utils } from '../../src/misc/utils'
 
 const Keys = {
-  sendsPrefix: 'sends_',
+  sendsPrefix: 'sends_'
 }
 
 export class SendService implements SendServiceAbstraction {
-  decryptedSendCache: SendView[]
+  decryptedSendCache: SendView[] | null = null
 
   // eslint-disable-next-line no-useless-constructor
   constructor(
@@ -34,7 +34,6 @@ export class SendService implements SendServiceAbstraction {
   ) {}
 
   clearCache(): void {
-    // @ts-ignore
     this.decryptedSendCache = null
   }
 
@@ -57,7 +56,7 @@ export class SendService implements SendServiceAbstraction {
         password,
         model.key,
         'sha256',
-        100000
+        600000
       )
       send.password = Utils.fromBufferToB64(passwordHash)
     }
@@ -67,13 +66,12 @@ export class SendService implements SendServiceAbstraction {
     return send
   }
 
-  async get(id: string): Promise<Send> {
+  async get(id: string): Promise<Send | null> {
     const userId = await this.userService.getUserId()
     const sends = await this.storageService.get<{ [id: string]: SendData }>(
       Keys.sendsPrefix + userId
     )
     if (sends == null || !sends.hasOwnProperty(id)) {
-      // @ts-ignore
       return null
     }
 
@@ -122,9 +120,7 @@ export class SendService implements SendServiceAbstraction {
 
   async upsert(send: SendData | SendData[]): Promise<any> {
     const userId = await this.userService.getUserId()
-    let sends = await this.storageService.get<{ [id: string]: SendData }>(
-      Keys.sendsPrefix + userId
-    )
+    let sends = await this.storageService.get<{ [id: string]: SendData }>(Keys.sendsPrefix + userId)
     if (sends == null) {
       sends = {}
     }
@@ -133,7 +129,7 @@ export class SendService implements SendServiceAbstraction {
       const s = send as SendData
       sends[s.id] = s
     } else {
-      (send as SendData[]).forEach(s => {
+      ;(send as SendData[]).forEach(s => {
         sends[s.id] = s
       })
     }
@@ -168,7 +164,7 @@ export class SendService implements SendServiceAbstraction {
       }
       delete sends[id]
     } else {
-      (id as string[]).forEach(i => {
+      ;(id as string[]).forEach(i => {
         delete sends[i]
       })
     }

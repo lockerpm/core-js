@@ -1,4 +1,5 @@
 import { LoginUri } from './loginUri'
+import { Fido2Credential } from './fido2Credential'
 
 import { LoginData } from '../data/loginData'
 
@@ -10,6 +11,7 @@ import { SymmetricCryptoKey } from './symmetricCryptoKey'
 
 export class Login extends Domain {
   uris: LoginUri[]
+  fido2Credentials: Fido2Credential[]
   username: EncString
   password: EncString
   passwordRevisionDate?: Date
@@ -29,7 +31,7 @@ export class Login extends Domain {
       {
         username: null,
         password: null,
-        totp: null,
+        totp: null
       },
       alreadyEncrypted,
       []
@@ -41,6 +43,13 @@ export class Login extends Domain {
         this.uris.push(new LoginUri(u, alreadyEncrypted))
       })
     }
+
+    if (obj.fido2Credentials) {
+      this.fido2Credentials = []
+      obj.fido2Credentials.forEach(c => {
+        this.fido2Credentials.push(new Fido2Credential(c, alreadyEncrypted))
+      })
+    }
   }
 
   async decrypt(orgId: string, encKey?: SymmetricCryptoKey): Promise<LoginView> {
@@ -49,7 +58,7 @@ export class Login extends Domain {
       {
         username: null,
         password: null,
-        totp: null,
+        totp: null
       },
       orgId,
       encKey
@@ -63,6 +72,14 @@ export class Login extends Domain {
       }
     }
 
+    if (this.fido2Credentials != null) {
+      view.fido2Credentials = []
+      for (let i = 0; i < this.fido2Credentials.length; i++) {
+        const cred = await this.fido2Credentials[i].decrypt(orgId, encKey)
+        view.fido2Credentials.push(cred)
+      }
+    }
+
     return view
   }
 
@@ -73,13 +90,20 @@ export class Login extends Domain {
     this.buildDataModel(this, l, {
       username: null,
       password: null,
-      totp: null,
+      totp: null
     })
 
     if (this.uris != null && this.uris.length > 0) {
       l.uris = []
       this.uris.forEach(u => {
         l.uris.push(u.toLoginUriData())
+      })
+    }
+
+    if (this.fido2Credentials != null && this.fido2Credentials.length > 0) {
+      l.fido2Credentials = []
+      this.fido2Credentials.forEach(c => {
+        l.fido2Credentials.push(c.toFido2CredentialData())
       })
     }
 

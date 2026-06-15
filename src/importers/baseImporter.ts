@@ -60,7 +60,7 @@ export abstract class BaseImporter {
     'reg #',
 
     // Non-English names
-    'passwort',
+    'passwort'
   ]
 
   protected usernameFieldNames = [
@@ -91,7 +91,7 @@ export abstract class BaseImporter {
 
     // Non-English names
     'nom',
-    'benutzername',
+    'benutzername'
   ]
 
   protected notesFieldNames = [
@@ -108,7 +108,7 @@ export abstract class BaseImporter {
     'free',
 
     // Non-English names
-    'kommentar',
+    'kommentar'
   ]
 
   protected uriFieldNames: string[] = [
@@ -132,12 +132,12 @@ export abstract class BaseImporter {
 
     // Non-English names
     'ort',
-    'adresse',
+    'adresse'
   ]
 
   protected parseCsvOptions = {
     encoding: 'UTF-8',
-    skipEmptyLines: false,
+    skipEmptyLines: false
   }
 
   protected get organization() {
@@ -274,9 +274,7 @@ export abstract class BaseImporter {
     }
 
     // Discover
-    re = new RegExp(
-      '^(6011|622(12[6-9]|1[3-9][0-9]|[2-8][0-9]{2}|9[0-1][0-9]|92[0-5]|64[4-9])|65)'
-    )
+    re = new RegExp('^(6011|622(12[6-9]|1[3-9][0-9]|[2-8][0-9]{2}|9[0-1][0-9]|92[0-5]|64[4-9])|65)')
     if (cardNum.match(re) != null) {
       return 'Discover'
     }
@@ -313,8 +311,8 @@ export abstract class BaseImporter {
       expiration = expiration.replace(/\s/g, '')
       const parts = expiration.split('/')
       if (parts.length === 2) {
-        let month: string = null
-        let year: string = null
+        let month: string | null = null
+        let year: string | null = null
         if (parts[0].length === 1 || parts[0].length === 2) {
           month = parts[0]
           if (month.length === 2 && month[0] === '0') {
@@ -322,7 +320,7 @@ export abstract class BaseImporter {
           }
         }
         if (parts[1].length === 2 || parts[1].length === 4) {
-          year = month.length === 2 ? '20' + parts[1] : parts[1]
+          year = month!.length === 2 ? '20' + parts[1] : parts[1]
         }
         if (month != null && year != null) {
           cipher.card.expMonth = month
@@ -414,11 +412,13 @@ export abstract class BaseImporter {
       field.value = value
 
       // CS
-      if (type === 7 || type === 8) {
+      if (type === FieldType.Date || type === FieldType.MonthYear) {
         try {
           const val = parseInt(value)
-          field.value = moment(val).format(type === 8 ? 'MM/YYYY' : 'DD/MM/YYYY')
-        } catch (error) {}
+          field.value = moment(val).format(type === FieldType.MonthYear ? 'MM/YYYY' : 'DD/MM/YYYY')
+        } catch (error) {
+          //
+        }
       }
 
       cipher.fields.push(field)
@@ -460,6 +460,23 @@ export abstract class BaseImporter {
       cipher.type = CipherType.SecureNote
       cipher.secureNote = new SecureNoteView()
       cipher.secureNote.type = SecureNoteType.Generic
+    }
+  }
+
+  protected processFullName(cipher: CipherView, fullName: string) {
+    if (this.isNullOrWhitespace(fullName)) {
+      return
+    }
+
+    const nameParts = fullName.split(' ')
+    if (nameParts.length > 0) {
+      cipher.identity.firstName = this.getValueOrDefault(nameParts[0])
+    }
+    if (nameParts.length === 2) {
+      cipher.identity.lastName = this.getValueOrDefault(nameParts[1])
+    } else if (nameParts.length >= 3) {
+      cipher.identity.middleName = this.getValueOrDefault(nameParts[1])
+      cipher.identity.lastName = nameParts.slice(2, nameParts.length).join(' ')
     }
   }
 }

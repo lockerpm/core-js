@@ -3,27 +3,23 @@ import { UriMatchType } from '../enums/uriMatchType'
 
 import { CipherData } from '../models/data/cipherData'
 
-import Domain from '../models/domain/domainBase'
-
-import {
-  Attachment,
-  Secret,
-  Environment,
-  LeakedSecret,
-  Card,
-  Cipher,
-  EncArrayBuffer,
-  EncString,
-  Field,
-  Identity,
-  Login,
-  LoginUri,
-  Password,
-  SecureNote,
-  SymmetricCryptoKey,
-  SortedCiphersCache
-} from '../models/domain'
-
+import { Attachment } from '../../src/models/domain/attachment'
+import { Card } from '../../src/models/domain/card'
+import { Cipher } from '../models/domain/cipher'
+import Domain from '../../src/models/domain/domainBase'
+import { EncArrayBuffer } from '../../src/models/domain/encArrayBuffer'
+import { EncString } from '../../src/models/domain/encString'
+import { Field } from '../../src/models/domain/field'
+import { Identity } from '../../src/models/domain/identity'
+import { Login } from '../../src/models/domain/login'
+import { LoginUri } from '../../src/models/domain/loginUri'
+import { Fido2Credential } from '../models/domain/fido2Credential'
+import { Password } from '../../src/models/domain/password'
+import { SecureNote } from '../../src/models/domain/secureNote'
+import { SymmetricCryptoKey } from '../../src/models/domain/symmetricCryptoKey'
+import { Secret } from '../../src/models/domain/secret'
+import { Environment } from '../../src/models/domain/environment'
+import { LeakedSecret } from '../../src/models/domain/leakedSecret'
 
 import { AttachmentRequest } from '../models/request/attachmentRequest'
 import { CipherBulkDeleteRequest } from '../models/request/cipherBulkDeleteRequest'
@@ -38,15 +34,13 @@ import { CipherShareRequest } from '../models/request/cipherShareRequest'
 import { CipherResponse } from '../models/response/cipherResponse'
 import { ErrorResponse } from '../models/response/errorResponse'
 
-import {
-  AttachmentView,
-  CipherView,
-  FieldView,
-  PasswordHistoryView,
-  View
-} from '../models/view'
+import { AttachmentView } from '../../src/models/view/attachmentView'
+import { CipherView } from '../models/view/cipherView'
+import { FieldView } from '../../src/models/view/fieldView'
+import { PasswordHistoryView } from '../../src/models/view/passwordHistoryView'
+import { View } from '../../src/models/view/view'
 
-
+import { SortedCiphersCache } from '../models/domain/sortedCiphersCache'
 
 import { ApiService } from '../abstractions/api.service'
 import { CipherService as CipherServiceAbstraction } from '../abstractions/cipher.service'
@@ -169,10 +163,15 @@ export class CipherService implements CipherServiceAbstraction {
       }
     }
     await Promise.all([
-      this.encryptObjProperty(model, cipher, {
-        name: null,
-        notes: null
-      }, key),
+      this.encryptObjProperty(
+        model,
+        cipher,
+        {
+          name: null,
+          notes: null
+        },
+        key
+      ),
       this.encryptCipherData(cipher, model, key),
       this.encryptFields(model.fields, key).then(fields => {
         cipher.fields = fields
@@ -201,9 +200,14 @@ export class CipherService implements CipherServiceAbstraction {
       attachment.size = model.size
       attachment.sizeName = model.sizeName
       attachment.url = model.url
-      const promise = this.encryptObjProperty(model, attachment, {
-        fileName: null
-      }, key).then(async () => {
+      const promise = this.encryptObjProperty(
+        model,
+        attachment,
+        {
+          fileName: null
+        },
+        key
+      ).then(async () => {
         if (model.key != null) {
           attachment.key = await this.cryptoService.encrypt(model.key.key, key)
         }
@@ -242,10 +246,15 @@ export class CipherService implements CipherServiceAbstraction {
       fieldModel.value = 'false'
     }
 
-    await this.encryptObjProperty(fieldModel, field, {
-      name: null,
-      value: null
-    }, key)
+    await this.encryptObjProperty(
+      fieldModel,
+      field,
+      {
+        name: null,
+        value: null
+      },
+      key
+    )
 
     return field
   }
@@ -272,9 +281,14 @@ export class CipherService implements CipherServiceAbstraction {
     const ph = new Password()
     ph.lastUsedDate = phModel.lastUsedDate
 
-    await this.encryptObjProperty(phModel, ph, {
-      password: null
-    }, key)
+    await this.encryptObjProperty(
+      phModel,
+      ph,
+      {
+        password: null
+      },
+      key
+    )
 
     return ph
   }
@@ -314,7 +328,7 @@ export class CipherService implements CipherServiceAbstraction {
       if ((this.searchService().indexedEntityId ?? userId) !== userId) {
         await this.searchService().indexCiphers(userId, this.decryptedCipherCache)
       }
-      
+
       // Filter invalid cipher to decrypt again
       decCiphers = this.decryptedCipherCache.filter(c => !!c.name)
     }
@@ -326,11 +340,11 @@ export class CipherService implements CipherServiceAbstraction {
 
     const promises: any[] = []
     let ciphers = await this.getAll()
-    
+
     // only decrypt what is not decrypted
     const decryptedCipherIds = decCiphers.map(c => c.id)
     ciphers = ciphers.filter(c => !decryptedCipherIds.includes(c.id))
-    
+
     ciphers.forEach(cipher => {
       promises.push(cipher.decrypt().then(c => decCiphers.push(c)))
     })
@@ -438,45 +452,45 @@ export class CipherService implements CipherServiceAbstraction {
 
           const match = u.match == null ? defaultMatch : u.match
           switch (match) {
-          case UriMatchType.Domain:
-            if (domain != null && u.domain != null && matchingDomains.includes(u.domain)) {
-              if (DomainMatchBlacklist.has(u.domain)) {
-                const domainUrlHost = Utils.getHost(url)
-                if (!DomainMatchBlacklist.get(u.domain).has(domainUrlHost)) {
+            case UriMatchType.Domain:
+              if (domain != null && u.domain != null && matchingDomains.includes(u.domain)) {
+                if (DomainMatchBlacklist.has(u.domain)) {
+                  const domainUrlHost = Utils.getHost(url)
+                  if (!DomainMatchBlacklist.get(u.domain).has(domainUrlHost)) {
+                    return true
+                  }
+                } else {
                   return true
                 }
-              } else {
+              }
+              break
+            case UriMatchType.Host:
+              const urlHost = Utils.getHost(url)
+              if (urlHost != null && urlHost === Utils.getHost(u.uri)) {
                 return true
               }
-            }
-            break
-          case UriMatchType.Host:
-            const urlHost = Utils.getHost(url)
-            if (urlHost != null && urlHost === Utils.getHost(u.uri)) {
-              return true
-            }
-            break
-          case UriMatchType.Exact:
-            if (url === u.uri) {
-              return true
-            }
-            break
-          case UriMatchType.StartsWith:
-            if (url.startsWith(u.uri)) {
-              return true
-            }
-            break
-          case UriMatchType.RegularExpression:
-            try {
-              const regex = new RegExp(u.uri, 'i')
-              if (regex.test(url)) {
+              break
+            case UriMatchType.Exact:
+              if (url === u.uri) {
                 return true
               }
-            } catch { }
-            break
-          case UriMatchType.Never:
-          default:
-            break
+              break
+            case UriMatchType.StartsWith:
+              if (url.startsWith(u.uri)) {
+                return true
+              }
+              break
+            case UriMatchType.RegularExpression:
+              try {
+                const regex = new RegExp(u.uri, 'i')
+                if (regex.test(url)) {
+                  return true
+                }
+              } catch {}
+              break
+            case UriMatchType.Never:
+            default:
+              break
           }
         }
       }
@@ -714,16 +728,22 @@ export class CipherService implements CipherServiceAbstraction {
     encData: EncArrayBuffer, key: EncString) {
     const fd = new FormData()
     try {
-      const blob = new Blob([encData.buffer], { type: 'application/octet-stream' })
+      const blob = new Blob([encData.buffer], {
+        type: 'application/octet-stream'
+      })
       fd.append('key', key.encryptedString)
       fd.append('data', blob, encFileName.encryptedString)
     } catch (e) {
       if (Utils.isNode && !Utils.isBrowser) {
         fd.append('key', key.encryptedString)
-        fd.append('data', Buffer.from(encData.buffer) as any, {
-          filepath: encFileName.encryptedString,
-          contentType: 'application/octet-stream'
-        } as any)
+        fd.append(
+          'data',
+          Buffer.from(encData.buffer) as any,
+          {
+            filepath: encFileName.encryptedString,
+            contentType: 'application/octet-stream'
+          } as any
+        )
       } else {
         throw e
       }
@@ -763,7 +783,10 @@ export class CipherService implements CipherServiceAbstraction {
       const c = cipher as CipherData
       ciphers[c.id] = c
     } else {
-      (cipher as CipherData[]).forEach(c => {
+      ;(cipher as CipherData[]).forEach(c => {
+        if (ciphers[c.id]) {
+          c.creationDate = ciphers[c.id].creationDate || c.revisionDate
+        }
         ciphers[c.id] = c
       })
     }
@@ -817,7 +840,7 @@ export class CipherService implements CipherServiceAbstraction {
       }
       delete ciphers[id]
     } else {
-      (id as string[]).forEach(i => {
+      ;(id as string[]).forEach(i => {
         delete ciphers[i]
       })
     }
@@ -949,7 +972,7 @@ export class CipherService implements CipherServiceAbstraction {
     if (typeof id === 'string') {
       setDeletedDate(id)
     } else {
-      (id as string[]).forEach(setDeletedDate)
+      ;(id as string[]).forEach(setDeletedDate)
     }
 
     await this.storageService.save(Keys.ciphersPrefix + userId, ciphers)
@@ -983,7 +1006,7 @@ export class CipherService implements CipherServiceAbstraction {
     }
 
     if (cipher.constructor.name === 'Array') {
-      (cipher as { id: string, revisionDate: string; }[]).forEach(clearDeletedDate)
+      ;(cipher as { id: string; revisionDate: string }[]).forEach(clearDeletedDate)
     } else {
       clearDeletedDate(cipher as { id: string, revisionDate: string; })
     }
@@ -1026,16 +1049,22 @@ export class CipherService implements CipherServiceAbstraction {
 
     const fd = new FormData()
     try {
-      const blob = new Blob([encData.buffer], { type: 'application/octet-stream' })
+      const blob = new Blob([encData.buffer], {
+        type: 'application/octet-stream'
+      })
       fd.append('key', dataEncKey[1].encryptedString)
       fd.append('data', blob, encFileName.encryptedString)
     } catch (e) {
       if (Utils.isNode && !Utils.isBrowser) {
         fd.append('key', dataEncKey[1].encryptedString)
-        fd.append('data', Buffer.from(encData.buffer) as any, {
-          filepath: encFileName.encryptedString,
-          contentType: 'application/octet-stream'
-        } as any)
+        fd.append(
+          'data',
+          Buffer.from(encData.buffer) as any,
+          {
+            filepath: encFileName.encryptedString,
+            contentType: 'application/octet-stream'
+          } as any
+        )
       } else {
         throw e
       }
@@ -1059,16 +1088,21 @@ export class CipherService implements CipherServiceAbstraction {
       }
 
       // tslint:disable-next-line
-      (function (theProp, theObj) {
-        const p = Promise.resolve().then(() => {
-          const modelProp = (model as any)[(map[theProp] || theProp)]
-          if (modelProp && modelProp !== '') {
-            return self.cryptoService.encrypt(modelProp, key)
-          }
-          return null
-        }).then((val: EncString) => {
-          (theObj as any)[theProp] = val
-        })
+      ;(function (theProp, theObj) {
+        const p = Promise.resolve()
+          .then(() => {
+            const modelProp = (model as any)[map[theProp] || theProp]
+            if (typeof modelProp === 'boolean' || typeof modelProp === 'number') {
+              return self.cryptoService.encrypt(modelProp.toString(), key)
+            }
+            if (modelProp && modelProp !== '') {
+              return self.cryptoService.encrypt(modelProp, key)
+            }
+            return null
+          })
+          .then((val: EncString) => {
+            ;(theObj as any)[theProp] = val
+          })
         promises.push(p)
       })(prop, obj)
     }
@@ -1078,95 +1112,144 @@ export class CipherService implements CipherServiceAbstraction {
 
   private async encryptCipherData (cipher: Cipher, model: CipherView, key: SymmetricCryptoKey) {
     switch (cipher.type) {
-    case CipherType.Login:
-      cipher.login = new Login()
-      cipher.login.passwordRevisionDate = model.login.passwordRevisionDate
-      await this.encryptObjProperty(model.login, cipher.login, {
-        username: null,
-        password: null,
-        totp: null
-      }, key)
+      case CipherType.Login:
+        cipher.login = new Login()
+        cipher.login.passwordRevisionDate = model.login.passwordRevisionDate
+        await this.encryptObjProperty(
+          model.login,
+          cipher.login,
+          {
+            username: null,
+            password: null,
+            totp: null
+          },
+          key
+        )
 
-      if (model.login.uris != null) {
-        cipher.login.uris = []
-        for (let i = 0; i < model.login.uris.length; i++) {
-          const loginUri = new LoginUri()
-          loginUri.match = model.login.uris[i].match
-          await this.encryptObjProperty(model.login.uris[i], loginUri, {
-            uri: null
-          }, key)
-          cipher.login.uris.push(loginUri)
+        if (model.login.uris != null) {
+          cipher.login.uris = []
+          for (let i = 0; i < model.login.uris.length; i++) {
+            const loginUri = new LoginUri()
+            loginUri.match = model.login.uris[i].match
+            await this.encryptObjProperty(
+              model.login.uris[i],
+              loginUri,
+              {
+                uri: null
+              },
+              key
+            )
+            cipher.login.uris.push(loginUri)
+          }
         }
-      }
-      return
-    case CipherType.SecureNote:
-      cipher.secureNote = new SecureNote()
-      cipher.secureNote.type = model.secureNote.type
-      return
-    case CipherType.Card:
-      cipher.card = new Card()
-      await this.encryptObjProperty(model.card, cipher.card, {
-        cardholderName: null,
-        brand: null,
-        number: null,
-        expMonth: null,
-        expYear: null,
-        code: null
-      }, key)
-      return
-    case CipherType.Identity:
-      cipher.identity = new Identity()
-      await this.encryptObjProperty(model.identity, cipher.identity, {
-        title: null,
-        firstName: null,
-        middleName: null,
-        lastName: null,
-        address1: null,
-        address2: null,
-        address3: null,
-        city: null,
-        state: null,
-        postalCode: null,
-        country: null,
-        company: null,
-        email: null,
-        phone: null,
-        ssn: null,
-        username: null,
-        passportNumber: null,
-        licenseNumber: null
-      }, key)
-      return
-    case CipherType.Secret:
-      cipher.secret = new Secret()
-      await this.encryptObjProperty(model.secret, cipher.secret, {
-        description: null,
-        key: null,
-        value: null,
-      }, key)
-      return
-    case CipherType.Environment:
-      cipher.environment = new Environment()
-      await this.encryptObjProperty(model.environment, cipher.environment, {
-        description: null,
-        name: null,
-        externalUrl: null,
-      }, key)
-      return
-    case CipherType.LeakedSecret:
-      cipher.leakedSecret = new LeakedSecret()
-      await this.encryptObjProperty(model.leakedSecret, cipher.leakedSecret, {
-        description: null,
-        key: null,
-        value: null,
-        location: null,
-        lineInCode: null,
-        imageUrl: null,
-        commit: null,
-      }, key)
-      return
-    default:
-      throw new Error('Unknown cipher type.')
+
+        if (model.login.fido2Credentials != null) {
+          cipher.login.fido2Credentials = []
+          for (let i = 0; i < model.login.fido2Credentials.length; i++) {
+            const cred = new Fido2Credential()
+            cred.creationDate = model.login.fido2Credentials[i].creationDate
+            await this.encryptObjProperty(
+              model.login.fido2Credentials[i],
+              cred,
+              {
+                credentialId: null,
+                keyType: null,
+                keyAlgorithm: null,
+                keyCurve: null,
+                keyValue: null,
+                rpId: null,
+                userHandle: null,
+                userName: null,
+                counter: null,
+                rpName: null,
+                userDisplayName: null,
+                discoverable: null
+              },
+              key
+            )
+            cipher.login.fido2Credentials.push(cred)
+          }
+        }
+
+        return
+      case CipherType.SecureNote:
+        cipher.secureNote = new SecureNote()
+        cipher.secureNote.type = model.secureNote.type
+        return
+      case CipherType.Card:
+        cipher.card = new Card()
+        await this.encryptObjProperty(
+          model.card,
+          cipher.card,
+          {
+            cardholderName: null,
+            brand: null,
+            number: null,
+            expMonth: null,
+            expYear: null,
+            code: null
+          },
+          key
+        )
+        return
+      case CipherType.Identity:
+        cipher.identity = new Identity()
+        await this.encryptObjProperty(
+          model.identity,
+          cipher.identity,
+          {
+            title: null,
+            firstName: null,
+            middleName: null,
+            lastName: null,
+            address1: null,
+            address2: null,
+            address3: null,
+            city: null,
+            state: null,
+            postalCode: null,
+            country: null,
+            company: null,
+            email: null,
+            phone: null,
+            ssn: null,
+            username: null,
+            passportNumber: null,
+            licenseNumber: null
+          },
+          key
+        )
+        return
+      case CipherType.Secret:
+        cipher.secret = new Secret()
+        await this.encryptObjProperty(model.secret, cipher.secret, {
+          description: null,
+          key: null,
+          value: null,
+        }, key)
+        return
+      case CipherType.Environment:
+        cipher.environment = new Environment()
+        await this.encryptObjProperty(model.environment, cipher.environment, {
+          description: null,
+          name: null,
+          externalUrl: null,
+        }, key)
+        return
+      case CipherType.LeakedSecret:
+        cipher.leakedSecret = new LeakedSecret()
+        await this.encryptObjProperty(model.leakedSecret, cipher.leakedSecret, {
+          description: null,
+          key: null,
+          value: null,
+          location: null,
+          lineInCode: null,
+          imageUrl: null,
+          commit: null,
+        }, key)
+        return
+      default:
+        throw new Error('Unknown cipher type.')
     }
   }
 
@@ -1211,8 +1294,8 @@ export class CipherService implements CipherServiceAbstraction {
     }
   }
 
-  updateDecryptedCache (ciphers: CipherView[]) {
-    const decCiphers = [...(this.decryptedCipherCache || [])]
+  updateDecryptedCache(ciphers: CipherView[]) {
+    const decCiphers = this.decryptedCipherCache ? [...this.decryptedCipherCache] : []
     for (const cipher of ciphers) {
       const cachedIndex = decCiphers.findIndex(c => c.id === cipher.id)
       if (cachedIndex >= 0) {
