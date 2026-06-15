@@ -564,10 +564,13 @@ export class CryptoService implements CryptoServiceAbstraction {
     }
 
     const data = Utils.fromB64ToArray(encPieces[0]).buffer
-    const privateKey = await this.getPrivateKey()
+    if (!privateKey) {
+      privateKey = await this.getPrivateKey()
+    }
     if (privateKey == null) {
       throw new Error('No private key.')
     }
+
 
     let alg: 'sha1' | 'sha256' = 'sha1'
     switch (encType) {
