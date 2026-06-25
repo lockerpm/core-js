@@ -267,7 +267,7 @@ export class CryptoService implements CryptoServiceAbstraction {
       return null
     }
 
-    return orgKeys.get(orgId) || null
+    return orgKeys.get(`${orgId}`) || null
   }
 
   async hasKey(): Promise<boolean> {
