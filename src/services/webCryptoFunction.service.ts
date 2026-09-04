@@ -1,4 +1,6 @@
-import * as forge from 'node-forge'
+import * as _forge from 'node-forge'
+
+const forge: any = (_forge as any)?.default ?? _forge
 import { argon2idAsync } from '@noble/hashes/argon2.js'
 
 import { CryptoFunctionService } from '../abstractions/cryptoFunction.service'
@@ -35,8 +37,7 @@ export class WebCryptoFunctionService implements CryptoFunctionService {
       const forgeLen = algorithm === 'sha256' ? 32 : 64
       const passwordBytes = this.toByteString(password)
       const saltBytes = this.toByteString(salt)
-      const forgeLib: any = forge
-      const derivedKeyBytes = forgeLib.pkcs5.pbkdf2(
+      const derivedKeyBytes = forge.pkcs5.pbkdf2(
         passwordBytes,
         saltBytes,
         iterations,
