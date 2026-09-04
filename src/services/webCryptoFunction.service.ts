@@ -35,7 +35,8 @@ export class WebCryptoFunctionService implements CryptoFunctionService {
       const forgeLen = algorithm === 'sha256' ? 32 : 64
       const passwordBytes = this.toByteString(password)
       const saltBytes = this.toByteString(salt)
-      const derivedKeyBytes = forge.pkcs5.pbkdf2(
+      const forgeLib: any = forge
+      const derivedKeyBytes = forgeLib.pkcs5.pbkdf2(
         passwordBytes,
         saltBytes,
         iterations,
