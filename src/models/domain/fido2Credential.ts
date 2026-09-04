@@ -10,6 +10,7 @@ export class Fido2Credential extends Domain {
   keyAlgorithm: EncString
   keyCurve: EncString
   keyValue: EncString
+  prfKey: EncString | null = null
   rpId: EncString
   userHandle: EncString
   userName: EncString
@@ -35,6 +36,7 @@ export class Fido2Credential extends Domain {
         keyAlgorithm: null,
         keyCurve: null,
         keyValue: null,
+        prfKey: null,
         rpId: null,
         userHandle: null,
         userName: null,
@@ -59,6 +61,7 @@ export class Fido2Credential extends Domain {
         keyAlgorithm: null,
         keyCurve: null,
         keyValue: null,
+        prfKey: null,
         rpId: null,
         userHandle: null,
         userName: null,
@@ -84,6 +87,7 @@ export class Fido2Credential extends Domain {
         keyAlgorithm: null,
         keyCurve: null,
         keyValue: null,
+        prfKey: null,
         rpId: null,
         userHandle: null,
         userName: null,
