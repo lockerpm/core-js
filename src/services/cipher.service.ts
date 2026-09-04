@@ -1261,6 +1261,7 @@ export class CipherService implements CipherServiceAbstraction {
                 keyAlgorithm: null,
                 keyCurve: null,
                 keyValue: null,
+                prfKey: null,
                 rpId: null,
                 userHandle: null,
                 userName: null,
