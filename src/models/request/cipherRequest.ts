@@ -76,6 +76,7 @@ export class CipherRequest {
             cred.keyAlgorithm = c.keyAlgorithm != null ? c.keyAlgorithm.encryptedString : null
             cred.keyCurve = c.keyCurve != null ? c.keyCurve.encryptedString : null
             cred.keyValue = c.keyValue != null ? c.keyValue.encryptedString : null
+            cred.prfKey = c.prfKey != null ? c.prfKey.encryptedString : null
             cred.rpId = c.rpId != null ? c.rpId.encryptedString : null
             cred.userHandle = c.userHandle != null ? c.userHandle.encryptedString : null
             cred.userName = c.userName != null ? c.userName.encryptedString : null
