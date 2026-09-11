@@ -54,7 +54,7 @@ export class SearchService implements SearchServiceAbstraction {
     builder.ref('id')
     builder.field('shortid', {
       boost: 100,
-      extractor: (c: CipherView) => c.id.substr(0, 8),
+      extractor: (c: CipherView) => c && c.id ? c.id.substr(0, 8) : null,
     })
     builder.field('name', { boost: 10 })
     builder.field('subtitle', {
@@ -90,8 +90,8 @@ export class SearchService implements SearchServiceAbstraction {
     builder.field('organizationid', {
       extractor: (c: CipherView) => c.organizationId,
     })
-    ciphers = ciphers || (await this.cipherService.getAllDecrypted())
-    ciphers.forEach(c => builder.add(c))
+    ciphers = ciphers || (await this.cipherService.getAllDecrypted());
+    (ciphers || []).forEach(c => builder.add(c))
     this.index = builder.build()
 
     this.indexing = false

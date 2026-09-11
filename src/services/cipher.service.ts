@@ -139,9 +139,6 @@ export class CipherService implements CipherServiceAbstraction {
       }
       if (model.passwordHistory != null && model.passwordHistory.length === 0) {
         model.passwordHistory = null
-      } else if (model.passwordHistory != null && model.passwordHistory.length > 5) {
-        // only save last 5 history
-        model.passwordHistory = model.passwordHistory.slice(0, 5)
       }
     }
 
@@ -187,7 +184,10 @@ export class CipherService implements CipherServiceAbstraction {
     return cipher
   }
 
-  async encryptAttachments (attachmentsModel: AttachmentView[], key: SymmetricCryptoKey): Promise<Attachment[]> {
+  async encryptAttachments(
+    attachmentsModel: AttachmentView[],
+    key: SymmetricCryptoKey,
+  ): Promise<Attachment[]> {
     if (attachmentsModel == null || attachmentsModel.length === 0) {
       return null
     }
@@ -204,9 +204,11 @@ export class CipherService implements CipherServiceAbstraction {
         model,
         attachment,
         {
-          fileName: null
+          url: null,
+          fileName: null,
+          key: null,
         },
-        key
+        key,
       ).then(async () => {
         if (model.key != null) {
           attachment.key = await this.cryptoService.encrypt(model.key.key, key)
@@ -783,7 +785,7 @@ export class CipherService implements CipherServiceAbstraction {
       const c = cipher as CipherData
       ciphers[c.id] = c
     } else {
-      ;(cipher as CipherData[]).forEach(c => {
+      (cipher as CipherData[]).forEach(c => {
         if (ciphers[c.id]) {
           c.creationDate = ciphers[c.id].creationDate || c.revisionDate
         }
@@ -917,6 +919,30 @@ export class CipherService implements CipherServiceAbstraction {
     return this.getLocaleSortingFunction()(a, b)
   }
 
+  sortCiphers(ciphers: CipherView[]): CipherView[] {
+    const sort = (array: CipherView[]) => {
+      const newArray = array.sort((a: CipherView, b: CipherView) => {
+        if (b.numUse > a.numUse) {
+          return 1
+        } else if (b.numUse === a.numUse) {
+          if (b.lastUseDate > a.lastUseDate) {
+            return 1
+          } else if (b.lastUseDate === a.lastUseDate) {
+            return this.getLocaleSortingFunction()(a, b)
+          } else {
+            return -1
+          }
+        } else {
+          return -1
+        }
+      })
+      return newArray
+    }
+    const favoriteCiphers = sort(ciphers.filter((c: CipherView) => c.favorite))
+    const notFavoriteCiphers = sort(ciphers.filter((c: CipherView) => !c.favorite))
+    return [...favoriteCiphers, ...notFavoriteCiphers]
+  }
+
   getLocaleSortingFunction (): (a: CipherView, b: CipherView) => number {
     return (a, b) => {
       let aName = a.name
@@ -1006,7 +1032,7 @@ export class CipherService implements CipherServiceAbstraction {
     }
 
     if (cipher.constructor.name === 'Array') {
-      ;(cipher as { id: string; revisionDate: string }[]).forEach(clearDeletedDate)
+      ;(cipher as { id: string, revisionDate: string; }[]).forEach(clearDeletedDate)
     } else {
       clearDeletedDate(cipher as { id: string, revisionDate: string; })
     }
@@ -1157,6 +1183,7 @@ export class CipherService implements CipherServiceAbstraction {
                 keyAlgorithm: null,
                 keyCurve: null,
                 keyValue: null,
+                prfKey: null,
                 rpId: null,
                 userHandle: null,
                 userName: null,

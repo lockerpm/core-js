@@ -32,11 +32,11 @@ export class HtmlStorageService implements StorageService {
   get<T>(key: string): Promise<T> {
     let json: any = null
     if (this.isLocalStorage(key)) {
-      json = window.localStorage.getItem(key)
+      json = self.localStorage.getItem(key)
     } else if (this.isMemoryStorage(key)) {
       json = this.memoryStorage.get(key)
     } else {
-      json = window.sessionStorage.getItem(key)
+      json = self.sessionStorage.getItem(key)
     }
     if (json != null) {
       const obj = JSON.parse(json)
@@ -52,22 +52,22 @@ export class HtmlStorageService implements StorageService {
 
     const json = JSON.stringify(obj)
     if (this.isLocalStorage(key)) {
-      window.localStorage.setItem(key, json)
+      self.localStorage.setItem(key, json)
     } else if (this.isMemoryStorage(key)) {
       this.memoryStorage.set(key, json)
     } else {
-      window.sessionStorage.setItem(key, json)
+      self.sessionStorage.setItem(key, json)
     }
     return Promise.resolve()
   }
 
   remove(key: string): Promise<any> {
     if (this.isLocalStorage(key)) {
-      window.localStorage.removeItem(key)
+      self.localStorage.removeItem(key)
     } else if (this.isMemoryStorage(key)) {
       this.memoryStorage.delete(key)
     } else {
-      window.sessionStorage.removeItem(key)
+      self.sessionStorage.removeItem(key)
     }
     return Promise.resolve()
   }

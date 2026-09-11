@@ -113,7 +113,7 @@ export class PolicyService implements PolicyServiceAbstraction {
   evaluateMasterPassword(
     passwordStrength: number,
     newPassword: string,
-    enforcedPolicyOptions: MasterPasswordPolicyOptions
+    enforcedPolicyOptions?: MasterPasswordPolicyOptions
   ): boolean {
     if (enforcedPolicyOptions == null) {
       return true

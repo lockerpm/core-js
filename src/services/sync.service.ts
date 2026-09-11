@@ -337,7 +337,7 @@ export class SyncService implements SyncServiceAbstraction {
 
   private async syncProfile (response: ProfileResponse) {
     const stamp = await this.userService.getSecurityStamp()
-    if (stamp != null && stamp !== response.securityStamp) {
+    if (!!stamp && !!response.securityStamp && stamp !== response.securityStamp) {
       if (this.logoutCallback != null) {
         await this.logoutCallback(true)
       }

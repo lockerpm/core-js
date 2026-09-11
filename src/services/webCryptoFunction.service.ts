@@ -1,4 +1,6 @@
-import * as forge from 'node-forge'
+import * as _forge from 'node-forge'
+
+const forge: any = (_forge as any)?.default ?? _forge
 import { argon2idAsync } from '@noble/hashes/argon2.js'
 
 import { CryptoFunctionService } from '../abstractions/cryptoFunction.service'

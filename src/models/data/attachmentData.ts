@@ -6,7 +6,6 @@ export class AttachmentData {
   fileName: string
   key: string
   size: string
-  sizeName: string
 
   constructor(response?: AttachmentResponse) {
     if (response == null) {
@@ -17,6 +16,5 @@ export class AttachmentData {
     this.fileName = response.fileName
     this.key = response.key
     this.size = response.size
-    this.sizeName = response.sizeName
   }
 }

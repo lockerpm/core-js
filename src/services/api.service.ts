@@ -11,6 +11,7 @@ import { AttachmentRequest } from '../../src/models/request/attachmentRequest'
 import { BitPayInvoiceRequest } from '../../src/models/request/bitPayInvoiceRequest'
 import { CipherBulkDeleteRequest } from '../../src/models/request/cipherBulkDeleteRequest'
 import { CipherBulkMoveRequest } from '../../src/models/request/cipherBulkMoveRequest'
+import { CipherBulkRestoreRequest } from '../../src/models/request/cipherBulkRestoreRequest'
 import { CipherBulkShareRequest } from '../../src/models/request/cipherBulkShareRequest'
 import { CipherCollectionsRequest } from '../../src/models/request/cipherCollectionsRequest'
 import { CipherCreateRequest } from '../../src/models/request/cipherCreateRequest'
@@ -655,7 +656,7 @@ export class ApiService implements ApiServiceAbstraction {
   }
 
   async putRestoreManyCiphers(
-    request: CipherBulkDeleteRequest
+    request: CipherBulkRestoreRequest
   ): Promise<ListResponse<CipherResponse>> {
     const r = await this.send('PUT', '/ciphers/restore', request, true, true)
     return new ListResponse<CipherResponse>(r, CipherResponse)

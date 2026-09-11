@@ -3,7 +3,7 @@ import * as tldjs from 'tldjs'
 import { I18nService } from '../abstractions/i18n.service'
 
 // tslint:disable-next-line
-const nodeURL = typeof window === 'undefined' ? require('url') : null
+const nodeURL = typeof self === 'undefined' ? require('url') : null
 
 export class Utils {
   static inited = false
@@ -26,22 +26,22 @@ export class Utils {
       typeof process !== 'undefined' &&
       (process as any).release != null &&
       (process as any).release.name === 'node'
-    Utils.isBrowser = typeof window !== 'undefined'
+    Utils.isBrowser = typeof self !== 'undefined'
     Utils.isNativeScript = !Utils.isNode && !Utils.isBrowser
-    Utils.isMobileBrowser = Utils.isBrowser && this.isMobile(window)
-    Utils.isAppleMobileBrowser = Utils.isBrowser && this.isAppleMobile(window)
+    Utils.isMobileBrowser = Utils.isBrowser && this.isMobile(self)
+    Utils.isAppleMobileBrowser = Utils.isBrowser && this.isAppleMobile(self)
     Utils.global = Utils.isNativeScript
       ? global
       : Utils.isNode && !Utils.isBrowser
         ? global
-        : window
+        : self
   }
 
   static fromB64ToArray(str: string): Uint8Array {
     if (Utils.isNode || Utils.isNativeScript) {
       return new Uint8Array(Buffer.from(str, 'base64'))
     } else {
-      const binaryString = window.atob(str)
+      const binaryString = self.atob(str)
       const bytes = new Uint8Array(binaryString.length)
       for (let i = 0; i < binaryString.length; i++) {
         bytes[i] = binaryString.charCodeAt(i)
@@ -96,7 +96,7 @@ export class Utils {
       for (let i = 0; i < bytes.byteLength; i++) {
         binary += String.fromCharCode(bytes[i])
       }
-      return window.btoa(binary)
+      return self.btoa(binary)
     }
   }
 
@@ -160,7 +160,7 @@ export class Utils {
     if (Utils.isNode || Utils.isNativeScript) {
       return Buffer.from(utfStr, 'utf8').toString('base64')
     } else {
-      return decodeURIComponent(escape(window.btoa(utfStr)))
+      return decodeURIComponent(escape(self.btoa(utfStr)))
     }
   }
 
@@ -168,7 +168,7 @@ export class Utils {
     if (Utils.isNode || Utils.isNativeScript) {
       return Buffer.from(b64Str, 'base64').toString('utf8')
     } else {
-      return decodeURIComponent(escape(window.atob(b64Str)))
+      return decodeURIComponent(escape(self.atob(b64Str)))
     }
   }
 
@@ -363,14 +363,14 @@ export class Utils {
         return nodeURL.URL ? new nodeURL.URL(uriString) : nodeURL.parse(uriString)
       } else if (typeof URL === 'function') {
         return new URL(uriString)
-      } else if (window != null) {
+      } else if (self && self?.document) {
         const hasProtocol = uriString.indexOf('://') > -1
         if (!hasProtocol && uriString.indexOf('.') > -1) {
           uriString = 'http://' + uriString
         } else if (!hasProtocol) {
           return null
         }
-        const anchor = window.document.createElement('a')
+        const anchor = self.document.createElement('a')
         anchor.href = uriString
         return anchor as any
       }

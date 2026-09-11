@@ -3,6 +3,9 @@ import { StorageService } from '../abstractions/storage.service'
 export class MemoryStorageService implements StorageService {
   private store = new Map<string, any>()
 
+  async init() {
+  }
+
   get<T>(key: string): Promise<T> {
     if (this.store.has(key)) {
       const obj = this.store.get(key)

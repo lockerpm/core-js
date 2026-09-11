@@ -1,15 +1,14 @@
-import { View } from './view'
+import { View } from "./view"
 
-import { Attachment } from '../domain/attachment'
-import { SymmetricCryptoKey } from '../domain/symmetricCryptoKey'
+import { Attachment } from "../domain/attachment"
 
 export class AttachmentView implements View {
   id: string = null
-  url: string = null
   size: string = null
-  sizeName: string = null
+
+  url: string = null
   fileName: string = null
-  key: SymmetricCryptoKey = null
+  key: string = null
 
   constructor(a?: Attachment) {
     if (!a) {
@@ -17,9 +16,7 @@ export class AttachmentView implements View {
     }
 
     this.id = a.id
-    this.url = a.url
     this.size = a.size
-    this.sizeName = a.sizeName
   }
 
   get fileSize(): number {
@@ -31,3 +28,4 @@ export class AttachmentView implements View {
     return 0
   }
 }
+
